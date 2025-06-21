@@ -1,15 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  AudioLinesIcon,
-  Book,
-  Command,
-  ImageIcon,
-  PieChart,
-  User,
-  Video,
-} from "lucide-react";
+import { Command } from "lucide-react";
 
 import { NavUser } from "@/components/commons/nav-user";
 import { Label } from "@/components/ui/label";
@@ -28,6 +20,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
 import { tr } from "@/translation";
+import { menus } from "@/lib/menu";
+import { useNavigate } from "@tanstack/react-router";
 
 // This is sample data
 const data = {
@@ -36,44 +30,7 @@ const data = {
     email: "matthieu25v6.org",
     avatar: "/images/logo-pkacou3.jpeg",
   },
-  navMain: [
-    {
-      title: tr("home.biography"),
-      url: "/biographies",
-      icon: User,
-      isActive: false,
-    },
-    {
-      title: tr("home.sermon"),
-      url: "/sermons",
-      icon: Book,
-      isActive: true,
-    },
-    {
-      title: tr("home.church"),
-      url: "/assemblees",
-      icon: PieChart,
-      isActive: false,
-    },
-    {
-      title: tr("home.hymns"),
-      url: "/hymns",
-      icon: AudioLinesIcon,
-      isActive: false,
-    },
-    {
-      title: tr("home.photos"),
-      url: "/photos",
-      icon: ImageIcon,
-      isActive: false,
-    },
-    {
-      title: tr("home.videos"),
-      url: "/videos",
-      icon: Video,
-      isActive: false,
-    },
-  ],
+  navMain: menus,
   mails: [
     {
       name: "William Smith",
@@ -161,9 +118,10 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Note: I'm using state to show active item.
   // IRL you should use the url/router.
-  const [activeItem, setActiveItem] = React.useState(data.navMain[0]);
-  const [mails, setMails] = React.useState(data.mails);
+  const activeItem = data.navMain[0];
+  const mails = data.mails;
   const { setOpen } = useSidebar();
+  const navigate = useNavigate();
 
   return (
     <Sidebar
@@ -207,18 +165,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         hidden: false,
                       }}
                       onClick={() => {
-                        setActiveItem(item);
-                        const mail = data.mails.sort(() => Math.random() - 0.5);
-                        setMails(
-                          mail.slice(
-                            0,
-                            Math.max(5, Math.floor(Math.random() * 10) + 1)
-                          )
-                        );
+                        navigate({ to: item.url });
                         setOpen(true);
                       }}
                       isActive={activeItem?.title === item.title}
-                      className="px-2.5 md:px-2"
+                      className="px-2.5 md:px-2 cursor-pointer"
                     >
                       <item.icon />
                       <span>{item.title}</span>

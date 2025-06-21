@@ -3,14 +3,11 @@ import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AppSidebar } from "@/components/commons/app-sidebar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { menus } from "@/lib/menu";
 import { ThemeToggleButton } from "@/components/commons/hheme-toggle-button";
@@ -24,16 +21,10 @@ function RootComponent() {
     <React.Fragment>
       <AppSidebar />
       <SidebarInset>
-        <header className="bg-background sticky top-0 flex shrink-0 items-center gap-2 border-b p-4">
-          <SidebarTrigger className="-ml-1" />
-          <ThemeToggleButton />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
+        <header className="bg-background sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4">
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block flex ">
+              <BreadcrumbItem className="hidden md:block">
                 {menus.map((menu) => (
                   <Link
                     key={menu.url}
@@ -46,12 +37,12 @@ function RootComponent() {
                   </Link>
                 ))}
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Inbox</BreadcrumbPage>
-              </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
+          <div className="flex items-center">
+            <SidebarTrigger className="cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
+            <ThemeToggleButton />
+          </div>
         </header>
 
         <div className="flex flex-1 flex-col gap-4 p-4">
