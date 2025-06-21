@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "matthieu25v6-desktop-v2",
-  "version": "0.1.0",
+  "productName": "Matthieu25v6",
+  "version": "2.0.0",
   "identifier": "com.matthieu25v6.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -12,24 +12,74 @@
   "app": {
     "windows": [
       {
-        "title": "matthieu25v6-desktop-v2",
-        "width": 800,
-        "height": 600
+        "title": "Matthieu25:6 v2.0.0",
+        "width": 1024,
+        "height": 576,
+        "resizable": true,
+        "fullscreen": false
       }
     ],
     "security": {
       "csp": null
-    }
+    },
+    "withGlobalTauri": true
   },
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "icon": ["icons/icon.ico"],
+    "resources": {},
+    "externalBin": [],
+    "copyright": "",
+    "category": "News",
+    "shortDescription": "This app contains all the message of Prophet Kacou Philippe",
+    "longDescription": "",
+    "windows": {
+      "allowDowngrades": true,
+      "certificateThumbprint": null,
+      "digestAlgorithm": null,
+      "nsis": null,
+      "signCommand": null,
+      "timestampUrl": null,
+      "tsp": false,
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "downloadBootstrapper"
+      },
+      "wix": null
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": false,
+        "files": {}
+      },
+      "deb": {
+        "files": {}
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1"
+      }
+    },
+    "macOS": {
+      "dmg": {
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        },
+        "windowSize": {
+          "height": 576,
+          "width": 1024
+        }
+      },
+      "files": {},
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "10.13"
+    }
   }
 }
