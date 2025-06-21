@@ -7,6 +7,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const styles = {
+  activeBtn: {
+    hover: "hover:bg-primary hover:text-white hover:opacity-70",
+    default: "bg-primary rounded-lg text-white",
+  },
+};
+
 // utils/translation-keys.ts
 export type DotNestedKeys<T, Prefix extends string = ""> = {
   [K in keyof T]: T[K] extends object
