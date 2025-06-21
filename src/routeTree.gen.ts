@@ -9,8 +9,44 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VideosRouteImport } from './routes/videos'
+import { Route as SermonsRouteImport } from './routes/sermons'
+import { Route as PhotosRouteImport } from './routes/photos'
+import { Route as HymnsRouteImport } from './routes/hymns'
+import { Route as BiographiesRouteImport } from './routes/biographies'
+import { Route as AssembleesRouteImport } from './routes/assemblees'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VideosRoute = VideosRouteImport.update({
+  id: '/videos',
+  path: '/videos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SermonsRoute = SermonsRouteImport.update({
+  id: '/sermons',
+  path: '/sermons',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PhotosRoute = PhotosRouteImport.update({
+  id: '/photos',
+  path: '/photos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HymnsRoute = HymnsRouteImport.update({
+  id: '/hymns',
+  path: '/hymns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BiographiesRoute = BiographiesRouteImport.update({
+  id: '/biographies',
+  path: '/biographies',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AssembleesRoute = AssembleesRouteImport.update({
+  id: '/assemblees',
+  path: '/assemblees',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +55,116 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/assemblees': typeof AssembleesRoute
+  '/biographies': typeof BiographiesRoute
+  '/hymns': typeof HymnsRoute
+  '/photos': typeof PhotosRoute
+  '/sermons': typeof SermonsRoute
+  '/videos': typeof VideosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/assemblees': typeof AssembleesRoute
+  '/biographies': typeof BiographiesRoute
+  '/hymns': typeof HymnsRoute
+  '/photos': typeof PhotosRoute
+  '/sermons': typeof SermonsRoute
+  '/videos': typeof VideosRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/assemblees': typeof AssembleesRoute
+  '/biographies': typeof BiographiesRoute
+  '/hymns': typeof HymnsRoute
+  '/photos': typeof PhotosRoute
+  '/sermons': typeof SermonsRoute
+  '/videos': typeof VideosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/assemblees'
+    | '/biographies'
+    | '/hymns'
+    | '/photos'
+    | '/sermons'
+    | '/videos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/assemblees'
+    | '/biographies'
+    | '/hymns'
+    | '/photos'
+    | '/sermons'
+    | '/videos'
+  id:
+    | '__root__'
+    | '/'
+    | '/assemblees'
+    | '/biographies'
+    | '/hymns'
+    | '/photos'
+    | '/sermons'
+    | '/videos'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AssembleesRoute: typeof AssembleesRoute
+  BiographiesRoute: typeof BiographiesRoute
+  HymnsRoute: typeof HymnsRoute
+  PhotosRoute: typeof PhotosRoute
+  SermonsRoute: typeof SermonsRoute
+  VideosRoute: typeof VideosRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/videos': {
+      id: '/videos'
+      path: '/videos'
+      fullPath: '/videos'
+      preLoaderRoute: typeof VideosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sermons': {
+      id: '/sermons'
+      path: '/sermons'
+      fullPath: '/sermons'
+      preLoaderRoute: typeof SermonsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/photos': {
+      id: '/photos'
+      path: '/photos'
+      fullPath: '/photos'
+      preLoaderRoute: typeof PhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hymns': {
+      id: '/hymns'
+      path: '/hymns'
+      fullPath: '/hymns'
+      preLoaderRoute: typeof HymnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/biographies': {
+      id: '/biographies'
+      path: '/biographies'
+      fullPath: '/biographies'
+      preLoaderRoute: typeof BiographiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assemblees': {
+      id: '/assemblees'
+      path: '/assemblees'
+      fullPath: '/assemblees'
+      preLoaderRoute: typeof AssembleesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +177,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AssembleesRoute: AssembleesRoute,
+  BiographiesRoute: BiographiesRoute,
+  HymnsRoute: HymnsRoute,
+  PhotosRoute: PhotosRoute,
+  SermonsRoute: SermonsRoute,
+  VideosRoute: VideosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

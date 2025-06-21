@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { ArchiveX, Command, File, Inbox, Send, Trash2 } from "lucide-react";
+import {
+  AudioLinesIcon,
+  Book,
+  Command,
+  ImageIcon,
+  PieChart,
+  User,
+  Video,
+} from "lucide-react";
 
 import { NavUser } from "@/components/commons/nav-user";
 import { Label } from "@/components/ui/label";
@@ -30,33 +38,39 @@ const data = {
   },
   navMain: [
     {
-      title: "Inbox",
-      url: "#",
-      icon: Inbox,
+      title: tr("home.biography"),
+      url: "/biographies",
+      icon: User,
+      isActive: false,
+    },
+    {
+      title: tr("home.sermon"),
+      url: "/sermons",
+      icon: Book,
       isActive: true,
     },
     {
-      title: "Drafts",
-      url: "#",
-      icon: File,
+      title: tr("home.church"),
+      url: "/assemblees",
+      icon: PieChart,
       isActive: false,
     },
     {
-      title: "Sent",
-      url: "#",
-      icon: Send,
+      title: tr("home.hymns"),
+      url: "/hymns",
+      icon: AudioLinesIcon,
       isActive: false,
     },
     {
-      title: "Junk",
-      url: "#",
-      icon: ArchiveX,
+      title: tr("home.photos"),
+      url: "/photos",
+      icon: ImageIcon,
       isActive: false,
     },
     {
-      title: "Trash",
-      url: "#",
-      icon: Trash2,
+      title: tr("home.videos"),
+      url: "/videos",
+      icon: Video,
       isActive: false,
     },
   ],
@@ -160,7 +174,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* This is the first sidebar */}
       {/* We disable collapsible and adjust width to icon. */}
       {/* This will make the sidebar appear as icons. w-[calc(var(--sidebar-width-icon)+1px)]!*/}
-      <Sidebar collapsible="none" className=" border-r">
+      <Sidebar
+        collapsible="none"
+        className=" border-r w-[calc(var(--sidebar-width-icon)+1px)]!"
+      >
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
