@@ -10,7 +10,7 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { menus } from "@/lib/menu";
-import { ThemeToggleButton } from "@/components/commons/hheme-toggle-button";
+import { ThemeToggleButton } from "@/components/commons/heme-toggle-button";
 
 export const Route = createRootRoute({
   component: RootComponent,
