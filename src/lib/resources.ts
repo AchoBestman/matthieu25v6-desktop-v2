@@ -1,0 +1,26 @@
+export const resources = Object.freeze({
+  travels: "travels",
+  assemblies: "assemblies",
+  biographies: "biographies",
+  books: "books",
+  brothers: "brothers",
+  cities: "cities",
+  countries: "countries",
+  dbs: "dbs",
+  download: "download",
+  informations: "informations",
+  langues: "langues",
+  photos: "photos",
+  sermons: "sermons",
+  verses: "verses",
+  testimonies: "testimonies",
+  videos: "videos",
+  sings: "sings",
+  albums: "albums",
+  singers: "singers",
+  statistics: "statistics",
+  heads: "heads",
+  downloadAudio: "download-audio",
+});
+
+export type ResourcesType = (typeof resources)[keyof typeof resources];
