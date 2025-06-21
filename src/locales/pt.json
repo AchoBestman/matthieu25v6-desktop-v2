@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Mateus 25:6",
+    "sermon": "Pregações",
+    "menu": "Cardápio",
+    "lng": "Idiomas",
+    "all_lng": "Todos os idiomas",
+    "sermon_num": "N° Pregaç.",
+    "verset_num": "N° Versíc.",
+    "waiting": "Carregando, por favor aguarde...",
+    "sermon_unvailable": "Atualmente não há nenhuma pregação disponível em:",
+    "search_not_found_title": "Pesquisa não encontrada!",
+    "search_not_found_pred_message": "não está disponível no momento",
+    "search_not_found_vers_message": "não contém versículo",
+    "hymns": "Hinos",
+    "church": "Congregações",
+    "biography": "Biografia do Profeta",
+    "photos": "Fotos",
+    "videos": "Vidéos"
+  },
+  "button": {
+    "search": "Procurar",
+    "pdf": "Baixar pdf",
+    "audio": "Baixar mp3",
+    "close": "Fechar",
+    "see_more": "Ver mais"
+  },
+  "table": {
+    "select_all": "Selecionar tudo",
+    "name": "Nome",
+    "select": "Selec.",
+    "address": "Endereço",
+    "username": "Dirigente",
+    "username_info": "Informações do dirigente",
+    "phone": "Telefone",
+    "actions": "Ações",
+    "filter_by_name": "Filtrar por nome...",
+    "columns": "Colunas",
+    "selected": "Selecionado(s)",
+    "no_result": "Nenhum resultado.",
+    "row": "linha(s)",
+    "previous": "anterior",
+    "next": "próximo",
+    "countries": "Países",
+    "cities": "Cidades",
+    "titre": "Título",
+    "filter_by_title": "Filtrar por título...",
+    "singers": "Cantores",
+    "lien_audio": "Baixar",
+    "listen": "Ouvir o áudio associado",
+    "line_per_page": "Linhas por página",
+    "page": "Página"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "O idioma está sendo baixado, por favor, aguarde.",
+    "waiting_for_downloaded_audio": "O áudio está sendo baixado, por favor, aguarde.",
+    "langue_is_downloaded": "Download concluído! Por favor, feche a janela!",
+    "langue_not_found": "Você precisa baixar o idioma primeiro!"
+  },
+  "text": {
+    "font_size": "Tamanho do texto"
+  },
+  "alert": {
+    "cannot_download": "Você está offline. Conecte-se à internet para fazer o download.",
+    "stop_playing": "Você realmente deseja parar o áudio e fechar o reprodutor?"
+  }
+}

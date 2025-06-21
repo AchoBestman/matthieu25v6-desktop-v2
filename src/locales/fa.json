@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "متی 25:6",
+    "sermon": "موعظه‌ها",
+    "menu": "منو",
+    "lng": "زبان‌ها",
+    "all_lng": "همه زبان‌ها",
+    "sermon_num": "شماره موعظه",
+    "verset_num": "شماره آیه",
+    "waiting": "در حال بارگذاری، لطفاً صبر کنید...",
+    "sermon_unvailable": "در حال حاضر هیچ موعظه‌ای به این زبان موجود نیست:",
+    "search_not_found_title": "جستجو یافت نشد!",
+    "search_not_found_pred_message": "در حال حاضر موجود نیست",
+    "search_not_found_vers_message": "حاوی آیه نیست",
+    "hymns": "سرودها",
+    "church": "کلیساها",
+    "biography": "زندگینامه پیامبر",
+    "photos": "عکس‌ها",
+    "videos": "ویدئوها"
+  },
+  "button": {
+    "search": "جستجو",
+    "pdf": "دانلود PDF",
+    "audio": "دانلود MP3",
+    "close": "بستن",
+    "see_more": "مشاهده بیشتر"
+  },
+  "table": {
+    "select_all": "انتخاب همه",
+    "name": "نام",
+    "select": "انتخاب",
+    "address": "آدرس",
+    "username": "رهبر",
+    "username_info": "اطلاعات رهبر",
+    "phone": "تلفن",
+    "actions": "اقدامات",
+    "filter_by_name": "فیلتر بر اساس نام...",
+    "columns": "ستون‌ها",
+    "selected": "انتخاب شده",
+    "no_result": "نتیجه‌ای یافت نشد.",
+    "row": "سطرها",
+    "previous": "قبلی",
+    "next": "بعدی",
+    "countries": "کشورها",
+    "cities": "شهرها",
+    "titre": "عنوان",
+    "filter_by_title": "فیلتر بر اساس عنوان...",
+    "singers": "خوانندگان",
+    "lien_audio": "دانلود",
+    "listen": "گوش دادن به صدا",
+    "line_per_page": "سطر در صفحه",
+    "page": "صفحه"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "در حال دانلود زبان، لطفاً صبر کنید.",
+    "waiting_for_downloaded_audio": "در حال دانلود صدا، لطفاً صبر کنید.",
+    "langue_is_downloaded": "دانلود کامل شد! لطفاً پنجره را ببندید!",
+    "langue_not_found": "ابتدا باید زبان را دانلود کنید!"
+  },
+  "text": {
+    "font_size": "اندازه متن"
+  },
+  "alert": {
+    "cannot_download": "شما آفلاین هستید. لطفاً برای دانلود به اینترنت متصل شوید.",
+    "stop_playing": "آیا واقعاً می‌خواهید صدا را متوقف کرده و پخش‌کننده را ببندید؟"
+  }
+}

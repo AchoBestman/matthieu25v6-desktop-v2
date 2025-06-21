@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Matteo 25:6",
+    "sermon": "Prediche",
+    "menu": "Menu",
+    "lng": "Lingue",
+    "all_lng": "Tutte le lingue",
+    "sermon_num": "N° Pred.",
+    "verset_num": "N° Versetto",
+    "waiting": "Caricamento in corso, attendere prego...",
+    "sermon_unvailable": "Al momento non ci sono prediche disponibili in:",
+    "search_not_found_title": "Ricerca non trovata!",
+    "search_not_found_pred_message": "non è al momento disponibile",
+    "search_not_found_vers_message": "non contiene versetti",
+    "hymns": "Inni",
+    "church": "Chiese",
+    "biography": "Biografia del Profeta",
+    "photos": "Foto",
+    "videos": "Video"
+  },
+  "button": {
+    "search": "Cerca",
+    "pdf": "Scarica PDF",
+    "audio": "Scarica MP3",
+    "close": "Chiudi",
+    "see_more": "Vedi più"
+  },
+  "table": {
+    "select_all": "Seleziona tutto",
+    "name": "Nome",
+    "select": "Selez.",
+    "address": "Indirizzo",
+    "username": "Responsabile",
+    "username_info": "Informazioni responsabile",
+    "phone": "Telefono",
+    "actions": "Azioni",
+    "filter_by_name": "Filtra per nome...",
+    "columns": "Colonne",
+    "selected": "Selezionato",
+    "no_result": "Nessun risultato.",
+    "row": "righe",
+    "previous": "precedente",
+    "next": "successivo",
+    "countries": "Paesi",
+    "cities": "Città",
+    "titre": "Titolo",
+    "filter_by_title": "Filtra per titolo...",
+    "singers": "Cantanti",
+    "lien_audio": "Scarica",
+    "listen": "Ascolta l'audio",
+    "line_per_page": "Righe per pagina",
+    "page": "Pagina"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Download della lingua in corso, attendere prego.",
+    "waiting_for_downloaded_audio": "Download dell'audio in corso, attendere prego.",
+    "langue_is_downloaded": "Download completato! Si prega di chiudere la finestra!",
+    "langue_not_found": "Prima devi scaricare la lingua!"
+  },
+  "text": {
+    "font_size": "Dimensione del testo"
+  },
+  "alert": {
+    "cannot_download": "Sei offline. Connettiti a Internet per scaricare.",
+    "stop_playing": "Vuoi davvero interrompere l'audio e chiudere il lettore?"
+  }
+}

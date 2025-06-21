@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "मत्ती 25:6",
+    "sermon": "प्रवचन",
+    "menu": "मेनू",
+    "lng": "भाषाएँ",
+    "all_lng": "सभी भाषाएँ",
+    "sermon_num": "प्रवचन संख्या",
+    "verset_num": "पद संख्या",
+    "waiting": "लोड हो रहा है, कृपया प्रतीक्षा करें...",
+    "sermon_unvailable": "वर्तमान में इस भाषा में कोई प्रवचन उपलब्ध नहीं है:",
+    "search_not_found_title": "खोज नहीं मिली!",
+    "search_not_found_pred_message": "वर्तमान में उपलब्ध नहीं है",
+    "search_not_found_vers_message": "में कोई पद नहीं है",
+    "hymns": "भजन",
+    "church": "चर्च",
+    "biography": "पैगंबर की जीवनी",
+    "photos": "तस्वीरें",
+    "videos": "वीडियो"
+  },
+  "button": {
+    "search": "खोजें",
+    "pdf": "PDF डाउनलोड करें",
+    "audio": "MP3 डाउनलोड करें",
+    "close": "बंद करें",
+    "see_more": "और देखें"
+  },
+  "table": {
+    "select_all": "सभी चुनें",
+    "name": "नाम",
+    "select": "चुनें",
+    "address": "पता",
+    "username": "नेता",
+    "username_info": "नेता जानकारी",
+    "phone": "फोन",
+    "actions": "कार्रवाई",
+    "filter_by_name": "नाम से फ़िल्टर करें...",
+    "columns": "कॉलम",
+    "selected": "चयनित",
+    "no_result": "कोई परिणाम नहीं.",
+    "row": "पंक्तियाँ",
+    "previous": "पिछला",
+    "next": "अगला",
+    "countries": "देश",
+    "cities": "शहर",
+    "titre": "शीर्षक",
+    "filter_by_title": "शीर्षक से फ़िल्टर करें...",
+    "singers": "गायक",
+    "lien_audio": "डाउनलोड",
+    "listen": "ऑडियो सुनें",
+    "line_per_page": "प्रति पृष्ठ पंक्तियाँ",
+    "page": "पृष्ठ"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "भाषा डाउनलोड हो रही है, कृपया प्रतीक्षा करें.",
+    "waiting_for_downloaded_audio": "ऑडियो डाउनलोड हो रहा है, कृपया प्रतीक्षा करें.",
+    "langue_is_downloaded": "डाउनलोड पूर्ण! कृपया विंडो बंद करें!",
+    "langue_not_found": "आपको पहले भाषा डाउनलोड करनी होगी!"
+  },
+  "text": {
+    "font_size": "टेक्स्ट आकार"
+  },
+  "alert": {
+    "cannot_download": "आप ऑफ़लाइन हैं। कृपया डाउनलोड करने के लिए इंटरनेट से कनेक्ट करें।",
+    "stop_playing": "क्या आप वास्तव में ऑडियो बंद करना और प्लेयर को बंद करना चाहते हैं?"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Matthäus 25:6",
+    "sermon": "Predigten",
+    "menu": "Menü",
+    "lng": "Sprachen",
+    "all_lng": "Alle Sprachen",
+    "sermon_num": "Nr. Pred.",
+    "verset_num": "Nr. Vers",
+    "waiting": "Wird geladen, bitte warten...",
+    "sermon_unvailable": "Derzeit sind keine Predigten verfügbar in:",
+    "search_not_found_title": "Suche nicht gefunden!",
+    "search_not_found_pred_message": "ist derzeit nicht verfügbar",
+    "search_not_found_vers_message": "enthält keinen Vers",
+    "hymns": "Hymnen",
+    "church": "Gemeinden",
+    "biography": "Biographie des Propheten",
+    "photos": "Fotos",
+    "videos": "Videos"
+  },
+  "button": {
+    "search": "Suchen",
+    "pdf": "PDF herunterladen",
+    "audio": "MP3 herunterladen",
+    "close": "Schließen",
+    "see_more": "Mehr sehen"
+  },
+  "table": {
+    "select_all": "Alle auswählen",
+    "name": "Name",
+    "select": "Ausw.",
+    "address": "Adresse",
+    "username": "Leiter",
+    "username_info": "Leiterinformationen",
+    "phone": "Telefon",
+    "actions": "Aktionen",
+    "filter_by_name": "Nach Namen filtern...",
+    "columns": "Spalten",
+    "selected": "Ausgewählt",
+    "no_result": "Keine Ergebnisse.",
+    "row": "Zeilen",
+    "previous": "vorherige",
+    "next": "nächste",
+    "countries": "Länder",
+    "cities": "Städte",
+    "titre": "Titel",
+    "filter_by_title": "Nach Titel filtern...",
+    "singers": "Sänger",
+    "lien_audio": "Herunterladen",
+    "listen": "Audio anhören",
+    "line_per_page": "Zeilen pro Seite",
+    "page": "Seite"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Sprache wird heruntergeladen, bitte warten.",
+    "waiting_for_downloaded_audio": "Audio wird heruntergeladen, bitte warten.",
+    "langue_is_downloaded": "Download abgeschlossen! Bitte Fenster schließen!",
+    "langue_not_found": "Sie müssen zuerst die Sprache herunterladen!"
+  },
+  "text": {
+    "font_size": "Schriftgröße"
+  },
+  "alert": {
+    "cannot_download": "Sie sind offline. Bitte stellen Sie eine Internetverbindung her, um den Download zu starten.",
+    "stop_playing": "Möchten Sie die Wiedergabe wirklich beenden und den Player schließen?"
+  }
+}

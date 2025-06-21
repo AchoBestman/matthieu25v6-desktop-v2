@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Matei 25:6",
+    "sermon": "Predici",
+    "menu": "Meniu",
+    "lng": "Limbi",
+    "all_lng": "Toate limbile",
+    "sermon_num": "Nr. Pred.",
+    "verset_num": "Nr. Verset",
+    "waiting": "Se încarcă, vă rugăm să așteptați...",
+    "sermon_unvailable": "Momentan nu sunt predici disponibile în:",
+    "search_not_found_title": "Căutare negăsită!",
+    "search_not_found_pred_message": "nu este disponibil momentan",
+    "search_not_found_vers_message": "nu conține verset",
+    "hymns": "Imnuri",
+    "church": "Biserici",
+    "biography": "Biografia Profetului",
+    "photos": "Fotografii",
+    "videos": "Videoclipuri"
+  },
+  "button": {
+    "search": "Căutare",
+    "pdf": "Descarcă PDF",
+    "audio": "Descarcă MP3",
+    "close": "Închide",
+    "see_more": "Vezi mai mult"
+  },
+  "table": {
+    "select_all": "Selectează tot",
+    "name": "Nume",
+    "select": "Select.",
+    "address": "Adresă",
+    "username": "Lider",
+    "username_info": "Informații lider",
+    "phone": "Telefon",
+    "actions": "Acțiuni",
+    "filter_by_name": "Filtrează după nume...",
+    "columns": "Coloane",
+    "selected": "Selectat(e)",
+    "no_result": "Niciun rezultat.",
+    "row": "linii",
+    "previous": "anterior",
+    "next": "următor",
+    "countries": "Țări",
+    "cities": "Orașe",
+    "titre": "Titlu",
+    "filter_by_title": "Filtrează după titlu...",
+    "singers": "Cântăreți",
+    "lien_audio": "Descarcă",
+    "listen": "Ascultă audio",
+    "line_per_page": "Linii pe pagină",
+    "page": "Pagina"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Se descarcă limba, vă rugăm să așteptați.",
+    "waiting_for_downloaded_audio": "Se descarcă audio, vă rugăm să așteptați.",
+    "langue_is_downloaded": "Descărcare completă! Vă rugăm să închideți fereastra!",
+    "langue_not_found": "Trebuie mai întâi să descărcați limba!"
+  },
+  "text": {
+    "font_size": "Dimensiune text"
+  },
+  "alert": {
+    "cannot_download": "Ești offline. Te rugăm să te conectezi la internet pentru a descărca.",
+    "stop_playing": "Chiar vrei să oprești audio și să închizi playerul?"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Mateo 25:6",
+    "sermon": "Sermones",
+    "menu": "Menú",
+    "lng": "Idiomas",
+    "all_lng": "Todos los idiomas",
+    "sermon_num": "N° Sermone",
+    "verset_num": "N° Verso",
+    "waiting": "Cargando, por favor espere...",
+    "sermon_unvailable": "Actualmente no hay ninguna predicación disponible en:",
+    "search_not_found_title": "¡Búsqueda no encontrada!",
+    "search_not_found_pred_message": "no está disponible en este momento",
+    "search_not_found_vers_message": "no contiene versículo",
+    "hymns": "Himnos",
+    "church": "Asamblea",
+    "biography": "Biografía del Profeta",
+    "photos": "Fotos",
+    "videos": "Videos"
+  },
+  "button": {
+    "search": "Busca",
+    "pdf": "Descargar pdf",
+    "audio": "Descargar mp3",
+    "close": "Cerrar",
+    "see_more": "Ver más"
+  },
+  "table": {
+    "select_all": "Seleccionar todo",
+    "name": "Nombre",
+    "select": "Selec.",
+    "address": "Dirección",
+    "username": "Dirigente",
+    "username_info": "Información del dirigente",
+    "phone": "Teléfono",
+    "actions": "Acciones",
+    "filter_by_name": "Filtrar por nombre...",
+    "columns": "Columnas",
+    "selected": "Seleccionado(s)",
+    "no_result": "No se encontraron resultados.",
+    "row": "fila(s)",
+    "previous": "anterior",
+    "next": "siguiente",
+    "countries": "Países",
+    "cities": "Ciudades",
+    "titre": "Título",
+    "filter_by_title": "Filtrar por título...",
+    "singers": "Cantantes",
+    "lien_audio": "Descargar",
+    "listen": "Escuchar el audio asociado",
+    "line_per_page": "Líneas por página",
+    "page": "Página"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Se está descargando el idioma, por favor espera.",
+    "waiting_for_downloaded_audio": "Descargando el audio, por favor espera.",
+    "langue_is_downloaded": "¡Descarga completada! ¡Por favor, cierra la ventana!",
+    "langue_not_found": "¡Debes descargar el idioma primero!"
+  },
+  "text": {
+    "font_size": "Tamaño del texto"
+  },
+  "alert": {
+    "cannot_download": "Estás desconectado. Por favor, conéctate a Internet para descargar.",
+    "stop_playing": "¿Realmente quieres detener el audio y cerrar el reproductor?"
+  }
+}

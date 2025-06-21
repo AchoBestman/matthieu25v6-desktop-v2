@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "马太福音 25:6",
+    "sermon": "讲道",
+    "menu": "菜单",
+    "lng": "语言",
+    "all_lng": "所有语言",
+    "sermon_num": "讲道编号",
+    "verset_num": "经文编号",
+    "waiting": "正在加载，请稍候...",
+    "sermon_unvailable": "当前没有可用的讲道语言:",
+    "search_not_found_title": "搜索未找到!",
+    "search_not_found_pred_message": "当前不可用",
+    "search_not_found_vers_message": "不包含经文",
+    "hymns": "赞美诗",
+    "church": "教会",
+    "biography": "先知传记",
+    "photos": "照片",
+    "videos": "视频"
+  },
+  "button": {
+    "search": "搜索",
+    "pdf": "下载PDF",
+    "audio": "下载MP3",
+    "close": "关闭",
+    "see_more": "查看更多"
+  },
+  "table": {
+    "select_all": "全选",
+    "name": "名称",
+    "select": "选择",
+    "address": "地址",
+    "username": "负责人",
+    "username_info": "负责人信息",
+    "phone": "电话",
+    "actions": "操作",
+    "filter_by_name": "按名称筛选...",
+    "columns": "列",
+    "selected": "已选",
+    "no_result": "无结果.",
+    "row": "行",
+    "previous": "上一页",
+    "next": "下一页",
+    "countries": "国家",
+    "cities": "城市",
+    "titre": "标题",
+    "filter_by_title": "按标题筛选...",
+    "singers": "歌手",
+    "lien_audio": "下载",
+    "listen": "收听音频",
+    "line_per_page": "每页行数",
+    "page": "页"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "正在下载语言，请稍候.",
+    "waiting_for_downloaded_audio": "正在下载音频，请稍候.",
+    "langue_is_downloaded": "下载完成!请关闭窗口!",
+    "langue_not_found": "您需要先下载语言!"
+  },
+  "text": {
+    "font_size": "文字大小"
+  },
+  "alert": {
+    "cannot_download": "您当前处于离线状态。请连接互联网以下载。",
+    "stop_playing": "您确定要停止音频并关闭播放器吗？"
+  }
+}

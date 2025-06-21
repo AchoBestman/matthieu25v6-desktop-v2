@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Матфея 25:6",
+    "sermon": "Проповеди",
+    "menu": "Меню",
+    "lng": "Языки",
+    "all_lng": "Все языки",
+    "sermon_num": "№ Проп.",
+    "verset_num": "№ Стиха",
+    "waiting": "Идёт загрузка, пожалуйста, подождите...",
+    "sermon_unvailable": "В настоящее время нет доступных проповедей на:",
+    "search_not_found_title": "Поиск не найден!",
+    "search_not_found_pred_message": "в настоящее время недоступен",
+    "search_not_found_vers_message": "не содержит стиха",
+    "hymns": "Гимны",
+    "church": "Церкви",
+    "biography": "Биография Пророка",
+    "photos": "Фото",
+    "videos": "Видео"
+  },
+  "button": {
+    "search": "Поиск",
+    "pdf": "Скачать PDF",
+    "audio": "Скачать MP3",
+    "close": "Закрыть",
+    "see_more": "Подробнее"
+  },
+  "table": {
+    "select_all": "Выбрать все",
+    "name": "Имя",
+    "select": "Выбр.",
+    "address": "Адрес",
+    "username": "Руководитель",
+    "username_info": "Информация о руководителе",
+    "phone": "Телефон",
+    "actions": "Действия",
+    "filter_by_name": "Фильтр по имени...",
+    "columns": "Колонки",
+    "selected": "Выбрано",
+    "no_result": "Нет результатов.",
+    "row": "строки",
+    "previous": "предыдущий",
+    "next": "следующий",
+    "countries": "Страны",
+    "cities": "Города",
+    "titre": "Название",
+    "filter_by_title": "Фильтр по названию...",
+    "singers": "Певцы",
+    "lien_audio": "Скачать",
+    "listen": "Слушать аудио",
+    "line_per_page": "Строк на странице",
+    "page": "Страница"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Идёт загрузка языка, пожалуйста, подождите.",
+    "waiting_for_downloaded_audio": "Идёт загрузка аудио, пожалуйста, подождите.",
+    "langue_is_downloaded": "Загрузка завершена! Пожалуйста, закройте окно!",
+    "langue_not_found": "Сначала нужно загрузить язык!"
+  },
+  "text": {
+    "font_size": "Размер шрифта"
+  },
+  "alert": {
+    "cannot_download": "Вы офлайн. Пожалуйста, подключитесь к интернету, чтобы скачать.",
+    "stop_playing": "Вы действительно хотите остановить аудио и закрыть плеер?"
+  }
+}

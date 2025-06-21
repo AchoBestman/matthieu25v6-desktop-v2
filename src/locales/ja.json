@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "マタイ 25:6",
+    "sermon": "説教",
+    "menu": "メニュー",
+    "lng": "言語",
+    "all_lng": "すべての言語",
+    "sermon_num": "説教番号",
+    "verset_num": "聖句番号",
+    "waiting": "読み込み中、お待ちください...",
+    "sermon_unvailable": "現在、次の言語で利用可能な説教はありません:",
+    "search_not_found_title": "検索結果が見つかりません!",
+    "search_not_found_pred_message": "現在利用できません",
+    "search_not_found_vers_message": "聖句が含まれていません",
+    "hymns": "賛美歌",
+    "church": "教会",
+    "biography": "預言者の伝記",
+    "photos": "写真",
+    "videos": "ビデオ"
+  },
+  "button": {
+    "search": "検索",
+    "pdf": "PDFダウンロード",
+    "audio": "MP3ダウンロード",
+    "close": "閉じる",
+    "see_more": "もっと見る"
+  },
+  "table": {
+    "select_all": "すべて選択",
+    "name": "名前",
+    "select": "選択",
+    "address": "住所",
+    "username": "リーダー",
+    "username_info": "リーダー情報",
+    "phone": "電話",
+    "actions": "操作",
+    "filter_by_name": "名前でフィルタ...",
+    "columns": "列",
+    "selected": "選択済み",
+    "no_result": "結果がありません.",
+    "row": "行",
+    "previous": "前へ",
+    "next": "次へ",
+    "countries": "国",
+    "cities": "都市",
+    "titre": "タイトル",
+    "filter_by_title": "タイトルでフィルタ...",
+    "singers": "歌手",
+    "lien_audio": "ダウンロード",
+    "listen": "オーディオを聴く",
+    "line_per_page": "1ページあたりの行数",
+    "page": "ページ"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "言語をダウンロード中、お待ちください.",
+    "waiting_for_downloaded_audio": "オーディオをダウンロード中、お待ちください.",
+    "langue_is_downloaded": "ダウンロード完了! ウィンドウを閉じてください!",
+    "langue_not_found": "まず言語をダウンロードする必要があります!"
+  },
+  "text": {
+    "font_size": "文字サイズ"
+  },
+  "alert": {
+    "cannot_download": "オフラインです。ダウンロードするにはインターネットに接続してください。",
+    "stop_playing": "本当にオーディオを停止してプレーヤーを閉じますか？"
+  }
+}
