@@ -4,7 +4,6 @@ import * as React from "react";
 import { Command } from "lucide-react";
 
 import { NavUser } from "@/components/commons/nav-user";
-import { Label } from "@/components/ui/label";
 import {
   Sidebar,
   SidebarContent,
@@ -12,16 +11,15 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarHeader,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Switch } from "@/components/ui/switch";
 import { tr } from "@/translation";
 import { menus } from "@/lib/menu";
-import { useLocation, useNavigate, useRouter } from "@tanstack/react-router";
+import { useLocation, useNavigate } from "@tanstack/react-router";
+import SermonSidebar from "@/components/sermons/sermon-sidebar";
 
 // This is sample data
 const data = {
@@ -188,44 +186,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* This is the second sidebar */}
       {/* We disable collapsible and let it fill remaining space */}
-      {location.pathname === "/sermons" && (
-        <Sidebar collapsible="none" className="hidden flex-1 md:flex bg-muted">
-          <SidebarHeader className="gap-3.5 border-b p-4">
-            <div className="flex w-full items-center justify-between">
-              <div className="text-foreground text-base font-medium">
-                {activeItem?.title}
-              </div>
-              <Label className="flex items-center gap-2 text-sm">
-                <span>Unreads</span>
-                <Switch className="shadow-none " />
-              </Label>
-            </div>
-            <SidebarInput placeholder="Type to search..." />
-          </SidebarHeader>
-          <SidebarContent>
-            <SidebarGroup className="px-0">
-              <SidebarGroupContent>
-                {mails.map((mail) => (
-                  <a
-                    href="#"
-                    key={mail.email}
-                    className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
-                  >
-                    <div className="flex w-full items-center gap-2">
-                      <span>{mail.name}</span>{" "}
-                      <span className="ml-auto text-xs">{mail.date}</span>
-                    </div>
-                    <span className="font-medium">{mail.subject}</span>
-                    <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                      {mail.teaser}
-                    </span>
-                  </a>
-                ))}
-              </SidebarGroupContent>
-            </SidebarGroup>
-          </SidebarContent>
-        </Sidebar>
-      )}
+      {location.pathname === "/sermons" && <SermonSidebar></SermonSidebar>}
     </Sidebar>
   );
 }

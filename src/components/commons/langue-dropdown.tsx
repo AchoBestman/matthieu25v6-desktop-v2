@@ -195,7 +195,7 @@ const LangueDropdown = () => {
                 </Avatar>
               )}
             </span>
-            <span className="dark:text-white cursor-pointer">
+            <span className="text-white cursor-pointer">
               <svg
                 className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
