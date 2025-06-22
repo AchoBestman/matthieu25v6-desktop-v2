@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Sidebar,
@@ -15,23 +15,70 @@ import { Input } from "@/components/ui/input";
 import DisplayAlert from "@/components/dialog/display-alert";
 import { useQuery } from "@tanstack/react-query";
 import { resources } from "@/lib/resources";
+import { findAll } from "@/lib/resources/sermon";
+import { SermonSearchParams } from "@/schemas/sermon";
+import { useDebounce } from "use-debounce";
+import { useRouter } from "@tanstack/react-router";
 
 const SermonSidebar = () => {
   const [fontSize, setFontSize] = useState<number>(16);
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const router = useRouter();
+
+  const [searchParams, setSearchParams] = useState<SermonSearchParams>({
+    per_page: 500,
+    order: "ASC",
+  });
+
+  const [selectedSermon, setSelectedSermon] = useState<{
+    number: number;
+    verse_number?: number;
+    fontSize: number;
+  }>({ number: 1, fontSize });
+
+  const [searchParamsDebouce] = useDebounce(searchParams, 1000);
+  const [selectedVerseDebounce] = useDebounce(selectedSermon, 1000);
+
+  const {
+    data: sermons,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["sermons", searchParamsDebouce, "lng"],
+    queryFn: () =>
+      findAll(resources.sermons, "en-en", searchParamsDebouce, {
+        column: "number",
+        direction: searchParamsDebouce.order,
+      }),
+  });
+
   const onOpenChange = () => {
     setOpen(!open);
   };
 
-  const {
-    data: totalSermon,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["total-sermon", "lng"], // reactively refetches when lng changes
-    queryFn: () => totalModel(resources.sermons, lng),
-  });
+  const handleToggle = () => {
+    setSearchParams((prev) => {
+      return { ...prev, order: prev.order === "ASC" ? "DESC" : "ASC" };
+    });
+  };
+
+  useEffect(() => {
+    setSelectedSermon((prev) => {
+      return {
+        ...prev,
+        fontSize,
+      };
+    });
+    return () => {};
+  }, [fontSize]);
+
+  useEffect(() => {
+    router.navigate({
+      to: "/sermons",
+      search: selectedVerseDebounce,
+    });
+  }, [selectedVerseDebounce]);
 
   return (
     <Sidebar collapsible="none" className="hidden flex-1 md:flex bg-muted">
@@ -53,74 +100,111 @@ const SermonSidebar = () => {
           </div>
           <Label className="flex items-center gap-2 text-sm cursor-pointer">
             <span>Reorder</span>
-            <Switch className="shadow-none border-1 border-amber-800" />
+            <Switch
+              checked={searchParamsDebouce.order === "DESC"}
+              onCheckedChange={handleToggle}
+              className="shadow-none border-1 dark:border-white cursor-pointer"
+            />
           </Label>
         </div>
-        <SidebarInput placeholder={tr("button.search")} />
+
         <div className="flex">
-          <div className="mx-2 flex justify-center items-center">
-            <div className="text-white px-2 whitespace-nowrap">
+          <div className="flex justify-center items-center">
+            <div className="whitespace-nowrap px-1">
               {tr("home.sermon_num")}:
             </div>
             <Input
-              className="bg-white dark:bg-muted/100 h-8"
-              size={5}
+              className="bg-white h-7 mt-1 border-1 dark:border-white"
+              size={3}
               type="text"
               placeholder={tr("home.sermon_num")}
               onChange={(e) => {
-                if (e.target.value && parseInt(e.target.value) > totalSermon) {
+                if (
+                  sermons &&
+                  e.target.value &&
+                  parseInt(e.target.value) > sermons?.pagination?.meta?.total
+                ) {
                   setMessage(
-                    `Kacou ${e.target.value} ${t.home.search_not_found_pred_message}`
+                    `Kacou ${e.target.value} ${tr("home.search_not_found_pred_message")}`
                   );
                   setOpen(true);
-                  setPredication(e.target.value);
-                  setSearchSermon({ number: e.target.value });
-                  return;
                 }
 
-                setTimeout(() => {
-                  if (e.target.value && parseInt(e.target.value)) {
-                    setSearchSermon({ number: e.target.value });
-                    setToggleSearch(!toggleSearch);
-                    setPredication(e.target.value);
-                  }
-                }, 1000);
+                setSelectedSermon((prev) => {
+                  return {
+                    ...prev,
+                    number: Number.parseInt(e.target.value),
+                  };
+                });
               }}
             ></Input>
           </div>
           <div className="flex justify-center items-center">
-            <span className="px-2 whitespace-nowrap text-white">
-              {t.home.verset_num}:
+            <span className="whitespace-nowrap px-1">
+              {tr("home.verset_num")}:
             </span>
             <Input
-              className="bg-white dark:bg-black dark:bg-muted/100 h-8"
+              className="bg-white h-7 mt-1 dark:border-white"
               size={5}
               type="text"
-              onChange={(e) => setSearchSermon({ versetId: e.target.value })}
-              placeholder={t.home.verset_num}
+              onChange={(e) => {
+                setSelectedSermon((prev) => {
+                  return {
+                    ...prev,
+                    verse_number: Number.parseInt(e.target.value),
+                  };
+                });
+              }}
+              placeholder={tr("home.verset_num")}
             ></Input>
           </div>
         </div>
+        <SidebarInput
+          className="border-1 dark:border-white"
+          placeholder={tr("button.search")}
+          onChange={(e) =>
+            setSearchParams((prev) => {
+              return {
+                ...prev,
+                search: e.target.value,
+              };
+            })
+          }
+        />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="px-0">
           <SidebarGroupContent>
-            {/* {mails.map((mail) => (
-                <a
-                  href="#"
-                  key={mail.email}
-                  className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0"
-                >
-                  <div className="flex w-full items-center gap-2">
-                    <span>{mail.name}</span>{" "}
-                    <span className="ml-auto text-xs">{mail.date}</span>
-                  </div>
-                  <span className="font-medium">{mail.subject}</span>
-                  <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                    {mail.teaser}
+            {sermons?.data.map((sermon) => (
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedSermon((prev) => {
+                    return {
+                      ...prev,
+                      number: sermon.number,
+                    };
+                  })
+                }
+                key={sermon.number}
+                className="cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              >
+                <div className="flex w-full items-center gap-2">
+                  <span className="font-medium">{sermon.chapter}</span>{" "}
+                  <span className="ml-auto text-xs text-blue-600 dark:text-blue-400">
+                    {sermon.publication_date}
                   </span>
-                </a>
-              ))} */}
+                </div>
+                <span className="line-clamp-2 font-medium w-[260px] whitespace-break-spaces">
+                  {sermon.title}
+                </span>
+                <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
+                  {sermon.sub_title}
+                </span>
+              </button>
+            ))}
+            {isError && <span>{tr("home.sermon_unvailable")}</span>}
+            {isLoading && <span>{tr("home.waiting")}</span>}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

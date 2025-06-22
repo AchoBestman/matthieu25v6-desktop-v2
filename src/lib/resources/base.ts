@@ -1,7 +1,7 @@
 import database from "@/lib/database";
-import { DataType } from "@/types/sermon";
 import { resources, ResourcesType } from "@/lib/resources";
 import { downloadDrogressType, toSingle } from "@/lib/utils";
+import { DataType } from "@/schemas/sermon";
 
 export const allModels = async <T>(
   lang: string,
@@ -19,6 +19,7 @@ export const allModels = async <T>(
     countQuery,
     searchParams
   );
+
   const [{ total }] = countResult;
 
   const perPage = params?.per_page ? parseInt(params.per_page.toString()) : 10;
@@ -46,9 +47,9 @@ export const allModels = async <T>(
     }
   }
 
-  console.log("baseQuery", baseQuery);
-  const result = await db.select(baseQuery, [...searchParams, perPage, offset]);
 
+  const result = await db.select(baseQuery, [...searchParams, perPage, offset]);
+ 
   return {
     data: result as T[],
     pagination: {

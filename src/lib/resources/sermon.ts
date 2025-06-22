@@ -1,22 +1,34 @@
 import { ResourcesType } from "@/lib/resources";
-import { DataType, parseConcordance, Sermon } from "@/types/sermon";
 import { allModels, oneModel } from "@/lib/resources/base";
 import { downloadDrogressType } from "../utils";
+import {
+  createDataTypeSchema,
+  DataType,
+  parseConcordance,
+  Sermon,
+  SermonSchema,
+} from "@/schemas/sermon";
 
-export const findAll = async <T>(
+export const findAll = async (
   resource: ResourcesType,
   lang: string,
   params?: { [key: string]: string | number | boolean },
   order?: { column: string; direction: "ASC" | "DESC" }
-): Promise<DataType<T>> => {
+): Promise<DataType<Sermon>> => {
   const baseQuery = `SELECT * FROM ${resource}`;
   let countQuery = `SELECT COUNT(*) as total FROM ${resource}`;
   const conditions = [];
   const searchParams: any[] = [];
 
   if (params?.search) {
-    conditions.push(`(title LIKE ? OR chapter LIKE ?)`);
-    searchParams.push(`%${params.search}%`, `%${params.search}%`);
+    conditions.push(
+      `(title LIKE ? OR chapter LIKE ? OR publication_date LIKE?)`
+    );
+    searchParams.push(
+      `%${params.search}%`,
+      `%${params.search}%`,
+      `%${params.search}%`
+    );
   }
 
   if (params?.number) {
@@ -29,7 +41,7 @@ export const findAll = async <T>(
     countQuery += whereClause;
   }
 
-  const response = await allModels<T>(
+  const response = await allModels<Sermon>(
     lang,
     baseQuery,
     countQuery,
@@ -39,7 +51,13 @@ export const findAll = async <T>(
     order
   );
 
-  return response;
+  const result = createDataTypeSchema(SermonSchema).safeParse(response);
+
+  if (!result.success) {
+    throw new Error("Zod validation failed: " + result.error);
+  }
+
+  return result.data;
 };
 
 export const findBy = async (
@@ -58,7 +76,7 @@ export const findBy = async (
   );
 
   const model = response as Sermon;
-  return {
+  const sermon = {
     ...model,
     verses: model.verses?.map((value: any) => {
       return {
@@ -82,4 +100,12 @@ export const findBy = async (
       };
     }),
   };
+
+  const result = SermonSchema.safeParse(sermon);
+
+  if (!result.success) {
+    throw new Error("Zod validation failed: " + result.error);
+  }
+
+  return result.data;
 };
