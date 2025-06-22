@@ -16,7 +16,8 @@ import { setTr, tr } from "@/translation";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import DisplayAlert from "@/components/dialog/display-alert";
 import { Langue } from "@/schemas/langue";
-import { Image } from "@radix-ui/react-avatar";
+import { useLangue } from "@/context/langue-context";
+import { Avatar, AvatarImage } from "../ui/avatar";
 
 type LangueDataType = {
   id: number;
@@ -29,7 +30,7 @@ type LangueDataType = {
 };
 
 const LangueDropdown = () => {
-  const { setLng, setLangName, lng } = useI18next();
+  const { setLng, setLangName, lng } = useLangue();
   const [isOpen, setIsOpen] = useState(false);
   const [langues, setLangues] = useState<Array<LangueDataType>>([]);
   const [searchLangues, setSearchLangues] = useState<Array<LangueDataType>>([]);
@@ -98,6 +99,7 @@ const LangueDropdown = () => {
       { column: "order", direction: "ASC" }
     );
 
+    console.log(response, "response");
     const data = response.data;
 
     const customLangues = await Promise.all(
@@ -182,17 +184,18 @@ const LangueDropdown = () => {
             onClick={toggleDropdown}
             className="flex items-center text-gray-700 dark:text-gray-400"
           >
-            <span className="pt-2 mr-1 overflow-hidden rounded-lg h-[44px] w-[44px]">
+            <span className="h-8 w-8  ml-1.5 cursor-pointer">
               {activeLang() && (
-                <img
-                  width={42}
-                  height={44}
-                  src={activeLang().icon}
-                  alt={activeLang().name}
-                />
+                <Avatar>
+                  <AvatarImage
+                    src={activeLang().icon}
+                    alt={activeLang().name}
+                    className="object-cover p-0.5 rounded-full"
+                  />
+                </Avatar>
               )}
             </span>
-            <span className="text-white">
+            <span className="dark:text-white cursor-pointer">
               <svg
                 className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
@@ -230,9 +233,9 @@ const LangueDropdown = () => {
               langues.map((item: LangueDataType) => {
                 return (
                   <li key={item.id}>
-                    <DropdownMenuItem className="flex cursor-pointer items-center justify-between gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
+                    <DropdownMenuItem className="flex -mt-1 items-center justify-between font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300">
                       <button
-                        className="flex w-full"
+                        className="flex cursor-pointer"
                         onClick={() => {
                           if (item.exist) {
                             changeUrl(item);
@@ -242,19 +245,21 @@ const LangueDropdown = () => {
                           }
                         }}
                       >
-                        <div className="flex size-6 items-center justify-center mr-2">
-                          <Image
-                            alt={item.lang}
-                            src={item.icon}
-                            width={20}
-                            height={20}
-                            className="rounded-full size-6 text-gray-600"
-                          />
+                        <div className="flex items-center justify-center">
+                          <Avatar>
+                            <AvatarImage
+                              alt={item.lang}
+                              src={item.icon}
+                              width={20}
+                              height={20}
+                              className="rounded-full p-0.5"
+                            />
+                          </Avatar>
+                          {item.name}
                         </div>
-                        {item.name}
                       </button>
 
-                      <button className="flex">
+                      <button className="flex cursor-pointer">
                         {item.exist ? (
                           <>
                             <RefreshCcw

@@ -6,6 +6,7 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 import { ThemeProvider } from "@/context/theme-context";
 import { SidebarProvider } from "./components/ui/sidebar";
+import { LangueProvider } from "./context/langue-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -23,17 +24,19 @@ if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <ThemeProvider>
-        <SidebarProvider
-          style={
-            {
-              "--sidebar-width": "350px",
-            } as React.CSSProperties
-          }
-        >
-          <RouterProvider router={router} />
-        </SidebarProvider>
-      </ThemeProvider>
+      <LangueProvider>
+        <ThemeProvider>
+          <SidebarProvider
+            style={
+              {
+                "--sidebar-width": "350px",
+              } as React.CSSProperties
+            }
+          >
+            <RouterProvider router={router} />
+          </SidebarProvider>
+        </ThemeProvider>
+      </LangueProvider>
     </StrictMode>
   );
 }

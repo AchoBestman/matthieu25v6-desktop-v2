@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { menus } from "@/lib/menu";
 import { ThemeToggleButton } from "@/components/commons/heme-toggle-button";
+import LangueDropdown from "@/components/commons/langue-dropdown";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -20,8 +21,8 @@ function RootComponent() {
   return (
     <React.Fragment>
       <AppSidebar />
-      <SidebarInset>
-        <header className="bg-background sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4">
+      <SidebarInset className="bg-muted">
+        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -29,7 +30,7 @@ function RootComponent() {
                   <Link
                     key={menu.url}
                     to={menu.url}
-                    className="[&.active]:font-bold gap-2 p-2 "
+                    className="[&.active]:font-bold gap-2 p-2 text-white"
                   >
                     <BreadcrumbLink href={menu.url}>
                       {menu.title}
@@ -42,6 +43,7 @@ function RootComponent() {
           <div className="flex items-center">
             <SidebarTrigger className="cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
             <ThemeToggleButton />
+            <LangueDropdown />
           </div>
         </header>
 
