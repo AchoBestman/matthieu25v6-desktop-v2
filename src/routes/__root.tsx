@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { AppSidebar } from "@/components/commons/app-sidebar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -12,6 +11,7 @@ import {
 import { menus } from "@/lib/menu";
 import { ThemeToggleButton } from "@/components/buttons/heme-toggle-button";
 import LangueDropdown from "@/components/commons/langue-dropdown";
+import { tr } from "@/translation";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -33,7 +33,7 @@ function RootComponent() {
                     className="[&.active]:font-bold gap-2 p-2 text-white"
                   >
                     <BreadcrumbLink href={menu.url}>
-                      {menu.title}
+                      {tr(menu.title)}
                     </BreadcrumbLink>
                   </Link>
                 ))}

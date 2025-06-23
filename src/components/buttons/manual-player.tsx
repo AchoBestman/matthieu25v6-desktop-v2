@@ -6,6 +6,7 @@ import { SingList } from "@/schemas/song";
 import { useAudioPlayer } from "@/context/audio-player-context";
 import { tr } from "@/translation";
 import { DownloadButton } from "./download-button";
+import { useLangue } from "@/context/langue-context";
 
 export type SongPlayerManualButtonType = {
   data: Sermon | SingList;
@@ -22,7 +23,7 @@ const SongPlayerManualButton = ({
   const { setAudio, togglePlayPause, audioUrl, playedAudioUrl, play } =
     useAudioPlayer();
 
-  const lng = "en-en";
+  const { lng } = useLangue();
 
   const title =
     type === "Sermon"

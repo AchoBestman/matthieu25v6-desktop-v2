@@ -1,5 +1,6 @@
 "use client";
 import { useAudioPlayer } from "@/context/audio-player-context";
+import { useLangue } from "@/context/langue-context";
 import { tr } from "@/translation";
 import { XCircle } from "lucide-react";
 import AudioPlayer from "react-h5-audio-player";
@@ -17,7 +18,7 @@ const SongPlayer = ({
     dark: lightColor ?? "white",
     system: darkColor ?? "#e9d8a6",
   };
-  const lng = "en-en";
+  const {lng} = useLangue()
   const {
     audioUrl,
     autoPlay,

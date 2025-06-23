@@ -19,8 +19,10 @@ import { findAll } from "@/lib/resources/sermon";
 import { SermonSearchParams } from "@/schemas/sermon";
 import { useDebounce } from "use-debounce";
 import { useRouter } from "@tanstack/react-router";
+import { useLangue } from "@/context/langue-context";
 
 const SermonSidebar = () => {
+  const { lng } = useLangue();
   const [fontSize, setFontSize] = useState<number>(16);
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
@@ -47,7 +49,7 @@ const SermonSidebar = () => {
   } = useQuery({
     queryKey: ["sermons", searchParamsDebouce, "lng"],
     queryFn: () =>
-      findAll(resources.sermons, "en-en", searchParamsDebouce, {
+      findAll(resources.sermons, lng, searchParamsDebouce, {
         column: "number",
         direction: searchParamsDebouce.order,
       }),

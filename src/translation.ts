@@ -17,7 +17,7 @@ import zh from "@/locales/zh.json";
 import { DotNestedKeys } from "./lib/utils";
 
 export type TranslationSchema = typeof en;
-type TranslationKeySchema = DotNestedKeys<TranslationSchema>;
+export type TranslationKeySchema = DotNestedKeys<TranslationSchema>;
 type ResourcesSchema = Record<string, { translation: TranslationSchema }>;
 
 const resources: ResourcesSchema = {

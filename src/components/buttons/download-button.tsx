@@ -7,6 +7,7 @@ import { resources } from "@/lib/resources";
 import { API_URL } from "@/lib/env";
 import { tr } from "@/translation";
 import DownloadProgressModal from "../dialog/download-progress-modal";
+import { useLangue } from "@/context/langue-context";
 
 export async function downloadAudioWithProgress(
   initial: string,
@@ -126,6 +127,7 @@ export const DownloadButton = ({
   setFinishedDownload: (state: boolean) => void;
   children?: React.ReactNode;
 }) => {
+  const {lng} = useLangue()
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<downloadDrogressType>({
     percent: 0,
@@ -161,7 +163,7 @@ export const DownloadButton = ({
       setIsDownloading(true);
       setFinishedDownload(false);
       await downloadAudioWithProgress(
-        "en-en",
+        lng,
         audioUrl,
         subFolder,
         fileName,

@@ -98,8 +98,6 @@ const LangueDropdown = () => {
       },
       { column: "order", direction: "ASC" }
     );
-
-    console.log(response, "response");
     const data = response.data;
 
     const customLangues = await Promise.all(

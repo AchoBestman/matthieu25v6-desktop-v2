@@ -11,6 +11,7 @@ import {
 import { findNextSong, findPreviousSong } from "@/lib/resources/song";
 import { getLocalFilePath } from "@/lib/utils";
 import { tr } from "@/translation";
+import { useLangue } from "./langue-context";
 
 type AudioContextType = {
   audioUrl: string | null;
@@ -49,6 +50,7 @@ export function AudioPlayerProvider({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { lng } = useLangue();
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
   const [audioTitle, setAudioTitle] = useState<string>("");
@@ -61,7 +63,7 @@ export function AudioPlayerProvider({
 
   useEffect(() => {
     if (audioId && audioTitle && audioUrl) {
-      fileUrl(audioUrl, audioTitle, "en-en");
+      fileUrl(audioUrl, audioTitle, lng);
     }
     return () => {};
   }, [audioUrl, audioTitle, audioId, albumId, autoPlay]);
@@ -135,7 +137,7 @@ export function AudioPlayerProvider({
   const getCanPlay = async (audioFileName: string) => {
     if (!navigator.onLine) {
       await getLocalFilePath(
-        "en-en",
+        lng,
         audioFileName.includes(" : ") ? "Sermons" : "Hymns",
         audioFileName.replace(" : ", "_")
       );

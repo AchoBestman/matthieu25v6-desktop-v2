@@ -2,6 +2,7 @@ import { DownloadButton } from "@/components/buttons/download-button";
 import DisplayAlert from "@/components/dialog/display-alert";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import SermonHeader from "@/components/sermons/sermon-header";
+import { useLangue } from "@/context/langue-context";
 import { resources } from "@/lib/resources";
 import { findBy } from "@/lib/resources/sermon";
 import { downloadDrogressType, fileUrlFormat } from "@/lib/utils";
@@ -27,6 +28,7 @@ type SearchType = {
   search?: string;
 };
 function RouteComponent() {
+  const { lng } = useLangue();
   const location = useLocation();
   const router = useRouter();
   const refs = useRef<(HTMLParagraphElement | null)[]>([]);
@@ -48,11 +50,11 @@ function RouteComponent() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["sermons", searchParams, "lng"],
+    queryKey: ["sermons", searchParams, lng],
     queryFn: () =>
       findBy(
         resources.sermons,
-        "en-en",
+        lng,
         {
           column: "number",
           value: searchParams.number,
@@ -60,8 +62,6 @@ function RouteComponent() {
         [{ table: resources.verses, type: "HasMany" }]
       ),
   });
-
-  console.log(sermon, "sermon");
 
   const navigateToSermon = (sermon_number: number, verse_number: number) => {
     if (sermon_number) {

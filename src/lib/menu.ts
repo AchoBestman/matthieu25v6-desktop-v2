@@ -1,46 +1,55 @@
+import { TranslationKeySchema } from "@/translation";
 import {
   AudioLinesIcon,
   Book,
   ImageIcon,
+  LucideProps,
   PieChart,
   User,
   Video,
 } from "lucide-react";
-import { tr } from "@/translation";
+import { ForwardRefExoticComponent, RefAttributes } from "react";
 
-export const menus = [
+export const menus: {
+  title: TranslationKeySchema;
+  url: string;
+  icon: ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>
+  >;
+  isActive: boolean;
+}[] = [
   {
-    title: tr("home.biography"),
+    title: "home.biography",
     url: "/biographies",
     icon: User,
     isActive: false,
   },
   {
-    title: tr("home.sermon"),
+    title: "home.sermon",
     url: "/sermons",
     icon: Book,
     isActive: true,
   },
   {
-    title: tr("home.church"),
+    title: "home.church",
     url: "/assemblees",
     icon: PieChart,
     isActive: false,
   },
   {
-    title: tr("home.hymns"),
+    title: "home.hymns",
     url: "/hymns",
     icon: AudioLinesIcon,
     isActive: false,
   },
   {
-    title: tr("home.photos"),
+    title: "home.photos",
     url: "/photos",
     icon: ImageIcon,
     isActive: false,
   },
   {
-    title: tr("home.videos"),
+    title: "home.videos",
     url: "/videos",
     icon: Video,
     isActive: false,

@@ -5,7 +5,12 @@ import {
   Bell,
   ChevronsUpDown,
   CreditCard,
+  Home,
   LogOut,
+  Mail,
+  Navigation,
+  Phone,
+  PhoneCall,
   Sparkles,
 } from "lucide-react";
 
@@ -28,13 +33,13 @@ import {
 
 export function NavUser({
   user,
-}: {
+}: Readonly<{
   user: {
     name: string;
     email: string;
     avatar: string;
   };
-}) {
+}>) {
   const { isMobile } = useSidebar();
 
   return (
@@ -44,7 +49,7 @@ export function NavUser({
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0"
+              className="cursor-pointer data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={user.avatar} alt={user.name} />
@@ -71,36 +76,52 @@ export function NavUser({
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate text-xs">
+                    <a
+                      className="text-primary"
+                      href={`https://${user.email}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {user.email}
+                    </a>
+                  </span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
+                <Mail />
+                <a href="mailto:mat25v6.msg@gmail.com">mat25v6.msg@gmail.com</a>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+                <Home />
+                <span>{"BP 374 Sikensi (Côte d'Ivoire)"}</span>
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <CreditCard />
-                Billing
+                <Phone />
+                {"(+225) 0757585000"}
               </DropdownMenuItem>
               <DropdownMenuItem>
-                <Bell />
-                Notifications
+                <PhoneCall />
+                {"(+225) 0757585000"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <LogOut />
-              Log out
+              <Navigation />
+              <a
+                href={`https://${user.email}`}
+                className="text-primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {user.email}
+              </a>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
