@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/context/theme-context";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { LangueProvider } from "./context/langue-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AudioPlayerProvider } from "./context/audio-player-context";
+import SongPlayer from "@/components/buttons/player-button";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -28,17 +30,20 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <LangueProvider>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <SidebarProvider
-              style={
-                {
-                  "--sidebar-width": "350px",
-                } as React.CSSProperties
-              }
-            >
-              <RouterProvider router={router} />
-            </SidebarProvider>
-          </ThemeProvider>
+          <AudioPlayerProvider>
+            <SongPlayer darkColor="white" lightColor="white" />
+            <ThemeProvider>
+              <SidebarProvider
+                style={
+                  {
+                    "--sidebar-width": "350px",
+                  } as React.CSSProperties
+                }
+              >
+                <RouterProvider router={router} />
+              </SidebarProvider>
+            </ThemeProvider>
+          </AudioPlayerProvider>
         </QueryClientProvider>
       </LangueProvider>
     </StrictMode>

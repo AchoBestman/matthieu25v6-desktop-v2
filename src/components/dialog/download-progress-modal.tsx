@@ -30,7 +30,7 @@ const DownloadProgressModal = ({
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent className="border-primary dark:border-white border-2">
+        <AlertDialogContent className="border-amber-800 dark:border-white border-2">
           <AlertDialogHeader>
             <AlertDialogTitle className="italic text-sm">
               {progress.percent === 100
@@ -72,7 +72,7 @@ const DownloadProgressModal = ({
             progress.percent === 100) && (
             <AlertDialogFooter>
               {cancel && (
-                <AlertDialogCancel className="border-primary italic dark:border-white border-2">
+                <AlertDialogCancel className="border-amber-800 italic dark:border-white border-2 cursor-pointer">
                   {tr("button.close")}
                 </AlertDialogCancel>
               )}

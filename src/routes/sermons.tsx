@@ -1,9 +1,10 @@
+import { DownloadButton } from "@/components/buttons/download-button";
 import DisplayAlert from "@/components/dialog/display-alert";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import SermonHeader from "@/components/sermons/sermon-header";
 import { resources } from "@/lib/resources";
 import { findBy } from "@/lib/resources/sermon";
-import { downloadDrogressType } from "@/lib/utils";
+import { downloadDrogressType, fileUrlFormat } from "@/lib/utils";
 import { Verses } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
@@ -12,6 +13,7 @@ import {
   useLocation,
   useRouter,
 } from "@tanstack/react-router";
+import { Download } from "lucide-react";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/sermons")({
@@ -143,12 +145,16 @@ function RouteComponent() {
         </div>
       ) : (
         <div className="relatives -mt-8">
-          <div className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted`}>
+          <div
+            className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-20`}
+          >
             {sermon && (
               <SermonHeader
                 sermon={sermon}
                 search={searchParams.search ?? ""}
                 handleLocalSearch={handleLocalSearch}
+                fileIsDownload={finishedDownload}
+                setFinishedDownload={setFinishedDownload}
               ></SermonHeader>
             )}
           </div>
@@ -211,14 +217,14 @@ function RouteComponent() {
                           ),
                         }}
                       ></button>
-                      {/* <DownloadButton
+                      <DownloadButton
                         audioUrl={verset.url_content}
                         fileName={fileUrlFormat(verset.link_at_content)}
                         subFolder="Sermons"
                         setFinishedDownload={setFinishedDownload}
                       >
                         <Download className="text-red-500 cursor-pointer"></Download>
-                      </DownloadButton> */}
+                      </DownloadButton>
                     </div>
                   ) : (
                     verset.content

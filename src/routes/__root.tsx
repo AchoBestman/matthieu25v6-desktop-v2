@@ -10,7 +10,7 @@ import {
   BreadcrumbList,
 } from "@/components/ui/breadcrumb";
 import { menus } from "@/lib/menu";
-import { ThemeToggleButton } from "@/components/commons/heme-toggle-button";
+import { ThemeToggleButton } from "@/components/buttons/heme-toggle-button";
 import LangueDropdown from "@/components/commons/langue-dropdown";
 
 export const Route = createRootRoute({
@@ -22,7 +22,7 @@ function RootComponent() {
     <React.Fragment>
       <AppSidebar />
       <SidebarInset className="bg-muted">
-        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4">
+        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4 z-30">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -52,7 +52,7 @@ function RootComponent() {
         </div>
       </SidebarInset>
 
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
     </React.Fragment>
   );
 }
