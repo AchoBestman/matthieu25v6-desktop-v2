@@ -49,12 +49,12 @@ export const VersesSchema = z.object({
   id: ModelRefSchema,
   number: z.number(),
   content: z.string(),
-  info: z.string().optional(),
-  link_at_content: z.string().optional(),
-  url_content: z.string().optional(),
+  info: z.string().optional().nullable(),
+  link_at_content: z.string().optional().nullable(),
+  url_content: z.string().optional().nullable(),
   sermon_id: ModelRefSchema,
-  concordances: ConcordanceSchema.optional(),
-  concordance: z.string().optional(),
+  concordances: ConcordanceSchema.optional().nullable(),
+  concordance: z.string().optional().nullable(),
 });
 
 export const SermonSchema = z.object({

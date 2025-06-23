@@ -101,8 +101,9 @@ export const findBy = async (
     }),
   };
 
+  console.log(sermon, "sermon");
   const result = SermonSchema.safeParse(sermon);
-
+  console.log(result, "result");
   if (!result.success) {
     throw new Error("Zod validation failed: " + result.error);
   }

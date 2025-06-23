@@ -47,9 +47,8 @@ export const allModels = async <T>(
     }
   }
 
-
   const result = await db.select(baseQuery, [...searchParams, perPage, offset]);
- 
+
   return {
     data: result as T[],
     pagination: {
@@ -123,7 +122,7 @@ export const oneModel = async <T>(
       if (resource === resources.sermons) {
         relatedModels = await db.select(
           `
-            SELECT verses.*, concordances.*
+            SELECT verses.*, concordances.num_verset, concordances.num_pred, concordances.concordance
             FROM verses
             LEFT JOIN concordances
               ON verses.number = concordances.num_verset
