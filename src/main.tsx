@@ -10,6 +10,7 @@ import { LangueProvider } from "./context/langue-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AudioPlayerProvider } from "./context/audio-player-context";
 import SongPlayer from "@/components/buttons/player-button";
+import { SermonProvider } from "@/context/sermon-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -33,15 +34,17 @@ if (!rootElement.innerHTML) {
           <AudioPlayerProvider>
             <SongPlayer darkColor="white" lightColor="white" />
             <ThemeProvider>
-              <SidebarProvider
-                style={
-                  {
-                    "--sidebar-width": "350px",
-                  } as React.CSSProperties
-                }
-              >
-                <RouterProvider router={router} />
-              </SidebarProvider>
+              <SermonProvider>
+                <SidebarProvider
+                  style={
+                    {
+                      "--sidebar-width": "350px",
+                    } as React.CSSProperties
+                  }
+                >
+                  <RouterProvider router={router} />
+                </SidebarProvider>
+              </SermonProvider>
             </ThemeProvider>
           </AudioPlayerProvider>
         </QueryClientProvider>

@@ -1,8 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Command } from "lucide-react";
-
 import { NavUser } from "@/components/commons/nav-user";
 import {
   Sidebar,
@@ -18,10 +16,10 @@ import {
 } from "@/components/ui/sidebar";
 import { tr } from "@/translation";
 import { menus } from "@/lib/menu";
-import { useLocation, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import SermonSidebar from "@/components/sermons/sermon-sidebar";
 import { useLangue } from "@/context/langue-context";
-import { Avatar, AvatarImage } from "../ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // Note: I'm using state to show active item.
@@ -34,7 +32,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   const { setOpen } = useSidebar();
   const navigate = useNavigate();
-  const location = useLocation();
   const { lng, langName } = useLangue();
   return (
     <Sidebar
@@ -47,32 +44,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* This will make the sidebar appear as icons.*/}
       <Sidebar
         collapsible="none"
-        className={`border-r ${location.pathname === "/sermons" ? "w-[calc(var(--sidebar-width-icon)+1px)]!" : "w-64s"} bg-muted`}
+        className={`border-r w-[calc(var(--sidebar-width-icon)+1px)]! bg-muted`}
       >
-        <SidebarHeader
-          className={`${location.pathname === "/sermons" ? "" : "bg-amber-800"}`}
-        >
+        <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                size="lg"
-                asChild
-                className={`md:h-8 ${location.pathname === "/sermons" ? "-ml-1" : "px-2 py-5 border-white border-2 hover:bg-amber-800"}`}
-              >
+              <SidebarMenuButton size="lg" asChild className={`md:h-8 -ml-1`}>
                 <button
                   className="cursor-pointer"
-                  onClick={() =>
-                    navigate({ to: "/sermons", search: { number: 1 } })
-                  }
+                  onClick={() => navigate({ to: "/sermons" })}
                 >
                   <div
-                    className={`${location.pathname === "/sermons" ? "" : "bg-white"}  text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg`}
+                    className={`text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg`}
                   >
                     <Avatar>
                       <AvatarImage
                         alt="logo"
                         src={`/images/drapeau/${lng?.split("-")[0]}.jpg`}
-                        className={`size-8 p-1.5 ${location.pathname === "/sermons" ? "rounded-2xl -ml-1 " : ""}`}
+                        className={`size-8 p-1.5 rounded-2xl -ml-1`}
                       ></AvatarImage>
                     </Avatar>
                   </div>
@@ -122,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       {/* This is the second sidebar */}
       {/* We disable collapsible and let it fill remaining space */}
-      {location.pathname === "/sermons" && <SermonSidebar></SermonSidebar>}
+      <SermonSidebar></SermonSidebar>
     </Sidebar>
   );
 }

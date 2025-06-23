@@ -2,18 +2,20 @@ import { DownloadButton } from "@/components/buttons/download-button";
 import DisplayAlert from "@/components/dialog/display-alert";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import SermonHeader from "@/components/sermons/sermon-header";
+import { useAudioPlayer } from "@/context/audio-player-context";
 import { useLangue } from "@/context/langue-context";
+import { useSermon } from "@/context/sermon-context";
 import { resources } from "@/lib/resources";
 import { findBy } from "@/lib/resources/sermon";
-import { downloadDrogressType, fileUrlFormat } from "@/lib/utils";
+import {
+  downloadDrogressType,
+  fileUrlFormat,
+  getLocalFilePath,
+} from "@/lib/utils";
 import { Verses } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
-import {
-  createFileRoute,
-  useLocation,
-  useRouter,
-} from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 
@@ -21,16 +23,9 @@ export const Route = createFileRoute("/sermons")({
   component: RouteComponent,
 });
 
-type SearchType = {
-  number: number;
-  fontSize: number;
-  verse_number?: number;
-  search?: string;
-};
 function RouteComponent() {
-  const { lng } = useLangue();
-  const location = useLocation();
-  const router = useRouter();
+  const { lng, langName } = useLangue();
+  const { setAudio } = useAudioPlayer();
   const refs = useRef<(HTMLParagraphElement | null)[]>([]);
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
@@ -40,41 +35,46 @@ function RouteComponent() {
     downloadSize: 0,
     totalSize: 0,
   });
-  const [search, setSearch] = useState<string>("");
   const [finishedDownload, setFinishedDownload] = useState<boolean>(false);
 
-  const searchParams = location.search as SearchType;
+  const {
+    fontSize,
+    verseNumber,
+    number,
+    search,
+    setSearch,
+    setNumber,
+    setVerseNumber,
+  } = useSermon();
 
   const {
     data: sermon,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["sermons", searchParams, lng],
+    queryKey: ["sermons", number, lng, finishedDownload],
     queryFn: () =>
       findBy(
         resources.sermons,
         lng,
         {
           column: "number",
-          value: searchParams.number,
+          value: number,
         },
-        [{ table: resources.verses, type: "HasMany" }]
+        [{ table: resources.verses, type: "HasMany" }],
+        (percent) => {
+          onOpenChangeProgress();
+          setProgress(percent);
+        }
       ),
   });
 
   const navigateToSermon = (sermon_number: number, verse_number: number) => {
     if (sermon_number) {
-      router.navigate({
-        to: "/sermons",
-        search: { ...searchParams, number: sermon_number },
-      });
+      setNumber(sermon_number);
     }
     if (verse_number) {
-      router.navigate({
-        to: "/sermons",
-        search: { ...searchParams, verse_number: verse_number },
-      });
+      setVerseNumber(verse_number);
     }
   };
 
@@ -84,29 +84,29 @@ function RouteComponent() {
       const index = sermon?.verses?.find((item) =>
         item.content.toLowerCase().includes(term.toLowerCase())
       );
-      router.navigate({
-        to: "/sermons",
-        search: { ...searchParams, verse_number: index?.number, search: term },
-      });
+      if (index?.number) {
+        setVerseNumber(index?.number);
+      }
+      setSearch(term);
     }
   };
 
   const handleSearch = useCallback(() => {
-    if (!searchParams.verse_number) return;
-    if (sermon?.verses && searchParams.verse_number > sermon.verses.length) {
+    if (!verseNumber) return;
+    if (sermon?.verses && verseNumber > sermon.verses.length) {
       setMessage(
-        `${sermon.chapter} ${tr("home.search_not_found_vers_message")} ${searchParams.verse_number}`
+        `${sermon.chapter} ${tr("home.search_not_found_vers_message")} ${verseNumber}`
       );
       setOpen(true);
     }
-    const index = searchParams.verse_number - 1; // Convert search to 0-based index
+    const index = verseNumber - 1; // Convert search to 0-based index
     if (sermon?.verses && index >= 0 && index < sermon.verses.length) {
       refs.current[index]?.scrollIntoView({
         behavior: "smooth", // Smooth scrolling
         block: "center", // Align to the top of the viewport
       });
     }
-  }, [searchParams.verse_number, sermon]);
+  }, [verseNumber, sermon]);
 
   useEffect(() => {
     handleSearch();
@@ -118,6 +118,20 @@ function RouteComponent() {
 
   const onOpenChangeProgress = () => {
     setOpenProgress(!openProgress);
+  };
+
+  const playAudio = async (url: string, title: string) => {
+    let canPlay = true;
+
+    if (!navigator.onLine) {
+      await getLocalFilePath(lng, "Sermons", title).catch(() => {
+        alert(tr("alert.cannot_download"));
+        canPlay = false;
+      });
+    }
+    if (canPlay && sermon) {
+      setAudio(url, `${title} : `, sermon.id, undefined, true);
+    }
   };
 
   return (
@@ -139,8 +153,8 @@ function RouteComponent() {
       />
       {isLoading ? (
         <div className="mt-16">
-          {"sermonUnvailable" === "sermonUnvailable"
-            ? `${tr("home.sermon_unvailable")} ${"langName"}`
+          {isError
+            ? `${tr("home.sermon_unvailable")} ${langName}`
             : tr("home.waiting")}
         </div>
       ) : (
@@ -151,7 +165,7 @@ function RouteComponent() {
             {sermon && (
               <SermonHeader
                 sermon={sermon}
-                search={searchParams.search ?? ""}
+                search={search ?? ""}
                 handleLocalSearch={handleLocalSearch}
                 fileIsDownload={finishedDownload}
                 setFinishedDownload={setFinishedDownload}
@@ -163,34 +177,25 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min`}
           >
-            <div
-              className="text-center"
-              style={{ fontSize: searchParams.fontSize }}
-            >
+            <div className="text-center pb-4" style={{ fontSize }}>
               {" "}
               {sermon?.chapter} :{" "}
               {sermon &&
                 `${sermon.title} ${sermon.sub_title}`.replace("null", "")}
             </div>
             {sermon?.verses?.map((verset: Verses, key: number) => (
-              <div
-                key={verset.number}
-                className="px-2"
-                style={{ fontSize: searchParams.fontSize }}
-              >
+              <div key={verset.number} className="px-2" style={{ fontSize }}>
                 <div
                   ref={(el) => {
                     refs.current[key] = el;
                   }}
                   style={{
                     backgroundColor:
-                      searchParams?.verse_number?.toString() ===
-                      verset.number.toString()
+                      verseNumber?.toString() === verset.number.toString()
                         ? "yellow"
                         : "transparent",
                     color:
-                      searchParams?.verse_number?.toString() ===
-                      verset.number.toString()
+                      verseNumber?.toString() === verset.number.toString()
                         ? "black"
                         : "",
                   }}
@@ -204,11 +209,10 @@ function RouteComponent() {
                       <button
                         className="text-left cursor-cursor"
                         onClick={() =>
-                          // playAudio(
-                          //   verset.url_content as string,
-                          //   verset.link_at_content as string
-                          // )
-                          console.log("djdj")
+                          playAudio(
+                            verset.url_content as string,
+                            verset.link_at_content as string
+                          )
                         }
                         dangerouslySetInnerHTML={{
                           __html: verset.content.replace(

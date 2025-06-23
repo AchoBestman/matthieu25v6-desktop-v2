@@ -18,15 +18,23 @@ import { resources } from "@/lib/resources";
 import { findAll } from "@/lib/resources/sermon";
 import { SermonSearchParams } from "@/schemas/sermon";
 import { useDebounce } from "use-debounce";
-import { useRouter } from "@tanstack/react-router";
 import { useLangue } from "@/context/langue-context";
+import { useSermon } from "@/context/sermon-context";
+import { useNavigate } from "@tanstack/react-router";
 
 const SermonSidebar = () => {
   const { lng } = useLangue();
-  const [fontSize, setFontSize] = useState<number>(16);
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const router = useRouter();
+  const {
+    fontSize,
+    setFontSize,
+    setNumber,
+    setVerseNumber,
+    number,
+    verseNumber,
+  } = useSermon();
+  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useState<SermonSearchParams>({
     per_page: 500,
@@ -39,15 +47,15 @@ const SermonSidebar = () => {
     fontSize: number;
   }>({ number: 1, fontSize });
 
-  const [searchParamsDebouce] = useDebounce(searchParams, 1000);
-  const [selectedVerseDebounce] = useDebounce(selectedSermon, 1000);
+  const [searchParamsDebouce] = useDebounce(searchParams, 300);
+  const [selectedVerseDebounce] = useDebounce(selectedSermon, 300);
 
   const {
     data: sermons,
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["sermons", searchParamsDebouce, "lng"],
+    queryKey: ["sermons", searchParamsDebouce, lng],
     queryFn: () =>
       findAll(resources.sermons, lng, searchParamsDebouce, {
         column: "number",
@@ -76,11 +84,17 @@ const SermonSidebar = () => {
   }, [fontSize]);
 
   useEffect(() => {
-    router.navigate({
-      to: "/sermons",
-      search: selectedVerseDebounce,
-    });
-  }, [selectedVerseDebounce]);
+    setFontSize(selectedVerseDebounce.fontSize);
+  }, [selectedVerseDebounce.fontSize]);
+
+  useEffect(() => {
+    setNumber(selectedVerseDebounce.number);
+  }, [selectedVerseDebounce.number]);
+
+  useEffect(() => {
+    if (selectedVerseDebounce.verse_number)
+      setVerseNumber(selectedVerseDebounce.verse_number);
+  }, [selectedVerseDebounce.verse_number]);
 
   return (
     <Sidebar collapsible="none" className="hidden flex-1 md:flex bg-muted">
@@ -100,8 +114,8 @@ const SermonSidebar = () => {
               setFontSize={setFontSize}
             ></TextFontSizeBar>
           </div>
-          <Label className="flex items-center gap-2 text-sm cursor-pointer">
-            <span>Reorder</span>
+          <Label className="flex items-center gap-2 text-sm cursor-pointer mr-1">
+            <span className="ml-2">Reorder</span>
             <Switch
               checked={searchParamsDebouce.order === "DESC"}
               onCheckedChange={handleToggle}
@@ -110,59 +124,63 @@ const SermonSidebar = () => {
           </Label>
         </div>
 
-        <div className="flex">
-          <div className="flex justify-center items-center">
-            <div className="whitespace-nowrap px-1">
-              {tr("home.sermon_num")}:
-            </div>
-            <Input
-              className="bg-white h-7 mt-1 border-1 dark:border-white"
-              size={3}
-              type="text"
-              placeholder={tr("home.sermon_num")}
-              onChange={(e) => {
-                if (
-                  sermons &&
-                  e.target.value &&
-                  parseInt(e.target.value) > sermons?.pagination?.meta?.total
-                ) {
-                  setMessage(
-                    `Kacou ${e.target.value} ${tr("home.search_not_found_pred_message")}`
-                  );
-                  setOpen(true);
-                }
+        <div className="mr-1">
+          <div className="flex">
+            <div className="flex justify-center items-center">
+              <div className="whitespace-nowrap px-1">
+                {tr("home.sermon_num")}:
+              </div>
+              <Input
+                className="bg-white h-7 mt-1 border-1 dark:border-white"
+                size={3}
+                type="text"
+                placeholder={tr("home.sermon_num")}
+                value={!isNaN(number) ? number : ""}
+                onChange={(e) => {
+                  if (
+                    sermons &&
+                    e.target.value &&
+                    parseInt(e.target.value) > sermons?.pagination?.meta?.total
+                  ) {
+                    setMessage(
+                      `Kacou ${e.target.value} ${tr("home.search_not_found_pred_message")}`
+                    );
+                    setOpen(true);
+                  }
 
-                setSelectedSermon((prev) => {
-                  return {
-                    ...prev,
-                    number: Number.parseInt(e.target.value),
-                  };
-                });
-              }}
-            ></Input>
-          </div>
-          <div className="flex justify-center items-center">
-            <span className="whitespace-nowrap px-1">
-              {tr("home.verset_num")}:
-            </span>
-            <Input
-              className="bg-white h-7 mt-1 dark:border-white"
-              size={5}
-              type="text"
-              onChange={(e) => {
-                setSelectedSermon((prev) => {
-                  return {
-                    ...prev,
-                    verse_number: Number.parseInt(e.target.value),
-                  };
-                });
-              }}
-              placeholder={tr("home.verset_num")}
-            ></Input>
+                  setSelectedSermon((prev) => {
+                    return {
+                      ...prev,
+                      number: Number.parseInt(e.target.value),
+                    };
+                  });
+                }}
+              ></Input>
+            </div>
+            <div className="flex justify-center items-center">
+              <span className="whitespace-nowrap px-1">
+                {tr("home.verset_num")}:
+              </span>
+              <Input
+                className="bg-white h-7 mt-1 dark:border-white"
+                size={5}
+                type="text"
+                defaultValue={verseNumber}
+                onChange={(e) => {
+                  setSelectedSermon((prev) => {
+                    return {
+                      ...prev,
+                      verse_number: Number.parseInt(e.target.value),
+                    };
+                  });
+                }}
+                placeholder={tr("home.verset_num")}
+              ></Input>
+            </div>
           </div>
         </div>
         <SidebarInput
-          className="border-1 dark:border-white"
+          className="border-1 dark:border-white -ml-1"
           placeholder={tr("button.search")}
           onChange={(e) =>
             setSearchParams((prev) => {
@@ -180,14 +198,16 @@ const SermonSidebar = () => {
             {sermons?.data.map((sermon) => (
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => {
                   setSelectedSermon((prev) => {
                     return {
                       ...prev,
                       number: sermon.number,
                     };
-                  })
-                }
+                  });
+
+                  navigate({ to: "/sermons" });
+                }}
                 key={sermon.number}
                 className="cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               >
