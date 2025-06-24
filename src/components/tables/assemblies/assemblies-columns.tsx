@@ -67,13 +67,13 @@ export default function Menu({ assembly }: Readonly<{ assembly: Assembly }>) {
     </div>
   );
 }
-export const churchColumns: ColumnDef<Assembly>[] = [
+export const assembliesColumns: ColumnDef<Assembly>[] = [
   {
     accessorKey: "name",
     header: tr("table.name"),
     cell: ({ row }) => {
       const name = row.original.name;
-      return <span>{name}</span>;
+      return <span className="whitespace-break-spaces">{name}</span>;
     },
   },
   {
@@ -81,7 +81,7 @@ export const churchColumns: ColumnDef<Assembly>[] = [
     header: tr("table.address"),
     cell: ({ row }) => {
       const address = row.original.address;
-      return <span>{address}</span>;
+      return <span className="whitespace-break-spaces">{address}</span>;
     },
   },
   {

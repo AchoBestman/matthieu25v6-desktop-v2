@@ -34,7 +34,7 @@ interface DataTableProps<TData, TValue> {
   search: string;
 }
 
-export function HymnsDataTable<TData, TValue>({
+export function AssembliesDataTable<TData, TValue>({
   columns,
   data,
   setSearch,

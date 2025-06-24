@@ -76,7 +76,9 @@ export const songColumns: ColumnDef<SingList>[] = [
     accessorKey: "titre",
     cell: ({ row }) => {
       const original = row.original;
-      return <div className="w-75">{original.title}</div>;
+      return (
+        <div className="w-75 whitespace-break-spaces">{original.title}</div>
+      );
     },
     header: ({ column }) => {
       return (
