@@ -1,3 +1,4 @@
+import ListVideo from "@/components/videos/list-video";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/videos")({
@@ -6,11 +7,8 @@ export const Route = createFileRoute("/videos")({
 
 function RouteComponent() {
   return (
-    <div className="bg-red-700">
-      Hello "/videos"! Lorem ipsum dolor sit amet consectetur adipisicing elit.
-      Nihil adipisci architecto accusamus amet deleniti quidem nemo culpa quo
-      laborum veritatis at asperiores repellendus, neque eos nam perspiciatis
-      voluptatibus nulla incidunt?
+    <div className="mt-1">
+      <ListVideo></ListVideo>
     </div>
   );
 }
