@@ -9,7 +9,7 @@ import {
   useEffect,
 } from "react";
 import { findNextSong, findPreviousSong } from "@/lib/resources/song";
-import { getLocalFilePath } from "@/lib/utils";
+import { AudioFolder, getLocalFilePath } from "@/lib/utils";
 import { tr } from "@/translation";
 import { useLangue } from "./langue-context";
 
@@ -29,9 +29,9 @@ type AudioContextType = {
     albumId?: number,
     autoPlay?: boolean
   ) => void;
-  playNext?: (lng: string) => void;
-  setPlay?: (play: boolean) => void;
-  playPrevious?: (lng: string) => void;
+  playNext?: (lng: string, subFolder: AudioFolder) => void;
+  setPlay?: (play: boolean, subFolder: AudioFolder) => void;
+  playPrevious?: (lng: string, subFolder: AudioFolder) => void;
   togglePlayPause: () => void;
   audioRef: React.RefObject<HTMLAudioElement | null>;
 };
@@ -63,7 +63,16 @@ export function AudioPlayerProvider({
 
   useEffect(() => {
     if (audioId && audioTitle && audioUrl) {
-      fileUrl(audioUrl, audioTitle, lng);
+      if (albumId) {
+        fileUrl(audioUrl, audioTitle, lng, "Hymns");
+      } else {
+        fileUrl(
+          audioUrl,
+          audioTitle,
+          lng,
+          audioTitle.includes(" : ") ? "Sermons" : "Others"
+        );
+      }
     }
     return () => {};
   }, [audioUrl, audioTitle, audioId, albumId, autoPlay]);
@@ -82,14 +91,14 @@ export function AudioPlayerProvider({
     setAudioId(audioId);
   };
 
-  const playNext = async (lng: string) => {
+  const playNext = async (lng: string, subFolder: AudioFolder) => {
     if (audioId) {
       const response = await findNextSong(lng, audioId, albumId);
       const [song] = response as { [key: string]: string | number }[];
       const title = song.album_id
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
-      const canPlay = await getCanPlay(title).catch(() => {
+      const canPlay = await getCanPlay(title, subFolder).catch(() => {
         alert(tr("alert.cannot_download"));
       });
 
@@ -103,14 +112,14 @@ export function AudioPlayerProvider({
     }
   };
 
-  const playPrevious = async (lng: string) => {
+  const playPrevious = async (lng: string, subFolder: AudioFolder) => {
     if (audioId) {
       const response = await findPreviousSong(lng, audioId, albumId);
       const [song] = response as { [key: string]: string | number }[];
       const title = song.album_id
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
-      const canPlay = await getCanPlay(title).catch(() => {
+      const canPlay = await getCanPlay(title, subFolder).catch(() => {
         alert(tr("alert.cannot_download"));
       });
 
@@ -134,13 +143,9 @@ export function AudioPlayerProvider({
     }
   };
 
-  const getCanPlay = async (audioFileName: string) => {
+  const getCanPlay = async (audioFileName: string, subFolder: AudioFolder) => {
     if (!navigator.onLine) {
-      await getLocalFilePath(
-        lng,
-        audioFileName.includes(" : ") ? "Sermons" : "Hymns",
-        audioFileName.replace(" : ", "_")
-      );
+      await getLocalFilePath(lng, subFolder, audioFileName.replace(" : ", "_"));
 
       return true;
     }
@@ -148,14 +153,19 @@ export function AudioPlayerProvider({
     return true;
   };
 
-  const fileUrl = async (audio: string, audioFileName: string, lng: string) => {
+  const fileUrl = async (
+    audio: string,
+    audioFileName: string,
+    lng: string,
+    subFolder: AudioFolder
+  ) => {
     // Custom char map
 
     try {
       // Read all entries in Downloads directory
       const fileName = await getLocalFilePath(
         lng,
-        audioFileName.includes(" : ") ? "Sermons" : "Hymns",
+        subFolder,
         audioFileName.replace(" : ", "_")
       );
 
@@ -165,7 +175,7 @@ export function AudioPlayerProvider({
       if (!navigator.onLine) {
         alert(tr("alert.cannot_download"));
         audioRef.current?.pause();
-        setAudio("", "", 0, undefined, undefined);
+        setAudio("", "", 0);
         return;
       }
       console.log(error, "error file");

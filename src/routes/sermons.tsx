@@ -71,10 +71,10 @@ function RouteComponent() {
 
   const navigateToSermon = (sermon_number: number, verse_number: number) => {
     if (sermon_number) {
-      setNumber(sermon_number);
+      setNumber(sermon_number.toString());
     }
     if (verse_number) {
-      setVerseNumber(verse_number);
+      setVerseNumber(verse_number.toString());
     }
   };
 
@@ -85,7 +85,7 @@ function RouteComponent() {
         item.content.toLowerCase().includes(term.toLowerCase())
       );
       if (index?.number) {
-        setVerseNumber(index?.number);
+        setVerseNumber(index?.number.toString());
       }
       setSearch(term);
     }
@@ -93,13 +93,13 @@ function RouteComponent() {
 
   const handleSearch = useCallback(() => {
     if (!verseNumber) return;
-    if (sermon?.verses && verseNumber > sermon.verses.length) {
+    if (sermon?.verses && Number.parseInt(verseNumber) > sermon.verses.length) {
       setMessage(
         `${sermon.chapter} ${tr("home.search_not_found_vers_message")} ${verseNumber}`
       );
       setOpen(true);
     }
-    const index = verseNumber - 1; // Convert search to 0-based index
+    const index = Number.parseInt(verseNumber) - 1; // Convert search to 0-based index
     if (sermon?.verses && index >= 0 && index < sermon.verses.length) {
       refs.current[index]?.scrollIntoView({
         behavior: "smooth", // Smooth scrolling
@@ -124,15 +124,27 @@ function RouteComponent() {
     let canPlay = true;
 
     if (!navigator.onLine) {
-      await getLocalFilePath(lng, "Sermons", title).catch(() => {
+      await getLocalFilePath(lng, "Others", title).catch(() => {
         alert(tr("alert.cannot_download"));
         canPlay = false;
       });
     }
     if (canPlay && sermon) {
-      setAudio(url, `${title} : `, sermon.id, undefined, true);
+      setAudio(url, title, sermon.id, undefined, true);
     }
   };
+
+  useEffect(() => {
+    if (sermon) {
+      getLocalFilePath(lng, "Sermons", `${sermon.chapter} : ${sermon.title}`)
+        .then(() => {
+          setFinishedDownload(true);
+        })
+        .catch(() => {
+          setFinishedDownload(false);
+        });
+    }
+  }, [sermon]);
 
   return (
     <>
@@ -207,7 +219,7 @@ function RouteComponent() {
                   {verset.url_content && verset.link_at_content ? (
                     <div className="mb-4">
                       <button
-                        className="text-left cursor-cursor"
+                        className="text-left cursor-pointers"
                         onClick={() =>
                           playAudio(
                             verset.url_content as string,
@@ -217,14 +229,14 @@ function RouteComponent() {
                         dangerouslySetInnerHTML={{
                           __html: verset.content.replace(
                             verset.link_at_content,
-                            `<strong style="color:blue;">${verset.link_at_content}</strong>`
+                            `<strong style="color:blue; cursor:pointer">${verset.link_at_content}</strong>`
                           ),
                         }}
                       ></button>
                       <DownloadButton
                         audioUrl={verset.url_content}
                         fileName={fileUrlFormat(verset.link_at_content)}
-                        subFolder="Sermons"
+                        subFolder="Others"
                         setFinishedDownload={setFinishedDownload}
                       >
                         <Download className="text-red-500 cursor-pointer"></Download>
@@ -234,7 +246,10 @@ function RouteComponent() {
                     verset.content
                   )}
                 </div>
-                <div className="text-blue-600 dark:text-blue-400">
+                <div
+                  id="invoice-hidden"
+                  className="text-blue-600 dark:text-blue-400"
+                >
                   {verset.concordances?.concordance.map((value: any) => (
                     <button
                       className=" cursor-pointer"

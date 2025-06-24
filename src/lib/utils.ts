@@ -74,7 +74,7 @@ export const fileUrlFormat = (fileName: string) => {
 
 export async function getLocalFilePath(
   initial: string,
-  subFolder: "Hymns" | "Sermons",
+  subFolder: "Hymns" | "Sermons" | "Others",
   fileName: string
 ) {
   if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
@@ -86,8 +86,8 @@ export async function getLocalFilePath(
   const [country, langue] = initial.toLowerCase().split("-");
 
   const customFileName = fileUrlFormat(fileName);
-  const sermonsPath = `${basePath}/Sermons/${country}/${langue}/${customFileName}.mp3`;
-  const hymnsPath = `${basePath}/Hymns/${customFileName}.mp3`;
+  const sermonsPath = `${basePath}/${subFolder}/${country}/${langue}/${customFileName}.mp3`;
+  const hymnsPath = `${basePath}/${subFolder}/${customFileName}.mp3`;
   let filePath = sermonsPath;
 
   if (subFolder === "Hymns") {
@@ -99,8 +99,7 @@ export async function getLocalFilePath(
   await exists(filePath, {
     baseDir: baseDir,
   });
-
-  console.log(filePath, "filePath");
+console.log(filePath, "filePath");
   const bytes = await readFile(filePath, {
     baseDir: baseDir,
   });
@@ -116,3 +115,5 @@ export type downloadDrogressType = {
   downloadSize: number;
   totalSize: number;
 };
+
+export type AudioFolder = "Hymns" | "Sermons" | "Others";

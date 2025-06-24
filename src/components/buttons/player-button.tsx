@@ -18,7 +18,7 @@ const SongPlayer = ({
     dark: lightColor ?? "white",
     system: darkColor ?? "#e9d8a6",
   };
-  const {lng} = useLangue()
+  const { lng } = useLangue();
   const {
     audioUrl,
     autoPlay,
@@ -29,6 +29,7 @@ const SongPlayer = ({
     setAudio,
     setPlay,
     play,
+    albumId,
     playedAudioUrl,
   } = useAudioPlayer();
   if (!audioUrl) return null;
@@ -37,7 +38,7 @@ const SongPlayer = ({
     const confirmed = confirm(tr("alert.stop_playing"));
     if (confirmed) {
       audioRef.current?.pause();
-      setAudio("", "", 0, undefined, undefined);
+      setAudio("", "", 0);
     }
   };
 
@@ -55,6 +56,11 @@ const SongPlayer = ({
     >
       {playedAudioUrl && (
         <AudioPlayer
+          ref={(element) => {
+            if (element?.audio?.current) {
+              (audioRef as any).current = element.audio.current;
+            }
+          }}
           autoPlay={autoPlay}
           src={playedAudioUrl}
           showSkipControls={true}
@@ -64,19 +70,58 @@ const SongPlayer = ({
           layout="horizontal-reverse"
           onListen={() => {
             if (audioRef.current) {
-              setPlay?.(true);
+              if (albumId) {
+                setPlay?.(true, "Hymns");
+              } else {
+                setPlay?.(
+                  true,
+                  audioTitle.includes(" : ") ? "Sermons" : "Others"
+                );
+              }
             }
           }}
           onPause={() => {
-            if (audioRef.current) setPlay?.(false);
+            if (audioRef.current) {
+              if (albumId) {
+                setPlay?.(false, "Hymns");
+              } else {
+                setPlay?.(
+                  false,
+                  audioTitle.includes(" : ") ? "Sermons" : "Others"
+                );
+              }
+            }
           }}
-          onEnded={() => playNext?.(lng)}
-          onPlay={(e) => console.log(e)}
+          onEnded={() => {
+            if (albumId) {
+              playNext?.(lng, "Hymns");
+            } else {
+              playNext?.(
+                lng,
+                audioTitle.includes(" : ") ? "Sermons" : "Others"
+              );
+            }
+          }}
+          onPlay={(e) => console.log(e, "onPlay")}
           onClickPrevious={() => {
-            playPrevious?.(lng);
+            if (albumId) {
+              playPrevious?.(lng, "Hymns");
+            } else {
+              playPrevious?.(
+                lng,
+                audioTitle.includes(" : ") ? "Sermons" : "Others"
+              );
+            }
           }}
           onClickNext={() => {
-            playNext?.(lng);
+            if (albumId) {
+              playNext?.(lng, "Hymns");
+            } else {
+              playNext?.(
+                lng,
+                audioTitle.includes(" : ") ? "Sermons" : "Others"
+              );
+            }
           }}
           customAdditionalControls={[
             <div

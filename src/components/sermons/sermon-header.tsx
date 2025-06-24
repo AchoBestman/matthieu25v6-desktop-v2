@@ -30,15 +30,15 @@ const SermonHeader = ({
         <div className="flex justify-start items-center mr-4">
           <SongPlayerManualButton
             setFinishedDownload={setFinishedDownload}
-            type="Sermon"
+            type="Sermons"
             data={sermon}
             fileIsDownload={fileIsDownload}
           />
           <PrintButton
             elementId="invoice"
             style={`
-                  .invoice {line-height: 25px; text-align: justify;}
-                   .print-number {font-size: 2em;} #invoice {margin-left: 100px; font-size: 30px;}
+                  .invoice {line-height: 20px; text-align: justify;}
+                   .print-number {font-size: 2em;} #invoice {margin-left: 100px; font-size: 30px;} #invoice-hidden {display: none;}
                    `}
             documentTitle={sermon.title}
           >

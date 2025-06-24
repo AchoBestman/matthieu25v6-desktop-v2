@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { BaseDirectory, writeFile, mkdir } from "@tauri-apps/plugin-fs";
-import { downloadDrogressType } from "@/lib/utils";
+import { AudioFolder, downloadDrogressType } from "@/lib/utils";
 import { resources } from "@/lib/resources";
 import { API_URL } from "@/lib/env";
 import { tr } from "@/translation";
@@ -12,7 +12,7 @@ import { useLangue } from "@/context/langue-context";
 export async function downloadAudioWithProgress(
   initial: string,
   url: string,
-  subFolder: "Hymns" | "Sermons" | "Others",
+  subFolder: AudioFolder,
   fileName: string,
   onProgress?: (percent: downloadDrogressType) => void,
   signal?: boolean
@@ -123,11 +123,11 @@ export const DownloadButton = ({
 }: {
   audioUrl: string;
   fileName: string;
-  subFolder: "Hymns" | "Sermons";
+  subFolder: AudioFolder;
   setFinishedDownload: (state: boolean) => void;
   children?: React.ReactNode;
 }) => {
-  const {lng} = useLangue()
+  const { lng } = useLangue();
   const [isDownloading, setIsDownloading] = useState(false);
   const [progress, setProgress] = useState<downloadDrogressType>({
     percent: 0,

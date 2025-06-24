@@ -1,6 +1,43 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.audio-player-wrapper.playing .rhap_main-controls-button,
+.audio-player-wrapper.playing
+  .rhap_additional-controls
+  .rhap_volume-button
+  button {
+  color: oklch(47.3% 0.137 46.201) !important; /* change icon color */
+}
+
+@media print {
+  #invoice {
+    padding: 0; /* Remove padding */
+    margin: 0; /* Remove margin */
+  }
+
+  .py-4 {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Adjust other styles if necessary */
+}
+
+@media print {
+  #invoice {
+    page-break-inside: avoid; /* Avoid page breaks inside this container */
+  }
+
+  .py-1 {
+    page-break-before: auto; /* Allow break before verses if needed */
+    display: "flex";
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

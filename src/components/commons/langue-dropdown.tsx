@@ -260,20 +260,26 @@ const LangueDropdown = () => {
                       <button className="flex cursor-pointer">
                         {item.exist ? (
                           <>
-                            <RefreshCcw
+                            <button
+                              className="cursor-pointer"
                               onClick={() => downloadDb(item.lang)}
-                              className="w-5 text-primary dark:text-white mx-2"
-                            ></RefreshCcw>
-                            <Trash
+                            >
+                              <RefreshCcw className="w-5 text-primary dark:text-white mx-2"></RefreshCcw>
+                            </button>
+                            <button
+                              className="cursor-pointer"
                               onClick={() => removeDb(item.lang)}
-                              className="w-5 text-red-500"
-                            ></Trash>
+                            >
+                              <Trash className="w-5 text-red-500"></Trash>
+                            </button>
                           </>
                         ) : (
-                          <Download
+                          <button
+                            className="cursor-pointer"
                             onClick={() => downloadDb(item.lang)}
-                            className="w-5 text-primary dark:text-white"
-                          ></Download>
+                          >
+                            <Download className="w-5 text-primary dark:text-white"></Download>
+                          </button>
                         )}
                       </button>
                     </DropdownMenuItem>

@@ -42,10 +42,14 @@ const SermonSidebar = () => {
   });
 
   const [selectedSermon, setSelectedSermon] = useState<{
-    number: number;
-    verse_number?: number;
+    number: string;
+    verse_number: string;
     fontSize: number;
-  }>({ number: 1, fontSize });
+  }>({
+    number: number.toString(),
+    fontSize,
+    verse_number: verseNumber.toString(),
+  });
 
   const [searchParamsDebouce] = useDebounce(searchParams, 300);
   const [selectedVerseDebounce] = useDebounce(selectedSermon, 300);
@@ -88,12 +92,11 @@ const SermonSidebar = () => {
   }, [selectedVerseDebounce.fontSize]);
 
   useEffect(() => {
-    setNumber(selectedVerseDebounce.number);
+    if (selectedVerseDebounce.number) setNumber(selectedVerseDebounce.number);
   }, [selectedVerseDebounce.number]);
 
   useEffect(() => {
-    if (selectedVerseDebounce.verse_number)
-      setVerseNumber(selectedVerseDebounce.verse_number);
+    setVerseNumber(selectedVerseDebounce.verse_number);
   }, [selectedVerseDebounce.verse_number]);
 
   return (
@@ -135,7 +138,7 @@ const SermonSidebar = () => {
                 size={3}
                 type="text"
                 placeholder={tr("home.sermon_num")}
-                value={!isNaN(number) ? number : ""}
+                value={selectedSermon.number}
                 onChange={(e) => {
                   if (
                     sermons &&
@@ -151,7 +154,7 @@ const SermonSidebar = () => {
                   setSelectedSermon((prev) => {
                     return {
                       ...prev,
-                      number: Number.parseInt(e.target.value),
+                      number: e.target.value,
                     };
                   });
                 }}
@@ -165,12 +168,12 @@ const SermonSidebar = () => {
                 className="bg-white h-7 mt-1 dark:border-white"
                 size={5}
                 type="text"
-                defaultValue={verseNumber}
+                value={selectedSermon.verse_number}
                 onChange={(e) => {
                   setSelectedSermon((prev) => {
                     return {
                       ...prev,
-                      verse_number: Number.parseInt(e.target.value),
+                      verse_number: e.target.value,
                     };
                   });
                 }}
@@ -202,7 +205,7 @@ const SermonSidebar = () => {
                   setSelectedSermon((prev) => {
                     return {
                       ...prev,
-                      number: sermon.number,
+                      number: sermon.number.toString(),
                     };
                   });
 

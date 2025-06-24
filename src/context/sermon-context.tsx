@@ -3,13 +3,13 @@
 import { createContext, useContext, useMemo, useState, ReactNode } from "react";
 
 type SermonContextType = {
-  number: number;
+  number: string;
   fontSize: number;
-  verseNumber?: number;
+  verseNumber: string;
   search?: string;
-  setNumber: (number: number) => void;
+  setNumber: (number: string) => void;
   setFontSize: (fontSize: number) => void;
-  setVerseNumber: (verseNumber: number) => void;
+  setVerseNumber: (verseNumber: string) => void;
   setSearch: (search: string) => void;
 };
 
@@ -28,9 +28,9 @@ export function SermonProvider({
 }: Readonly<{
   children: ReactNode;
 }>) {
-  const [number, setNumber] = useState(1);
+  const [number, setNumber] = useState("1");
   const [fontSize, setFontSize] = useState(16);
-  const [verseNumber, setVerseNumber] = useState<number>();
+  const [verseNumber, setVerseNumber] = useState("");
   const [search, setSearch] = useState("");
 
   const value = useMemo(

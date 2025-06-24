@@ -1,6 +1,6 @@
 "use client";
 import { Download, PauseCircle, PlayCircle } from "lucide-react";
-import { fileUrlFormat, getLocalFilePath } from "@/lib/utils";
+import { AudioFolder, fileUrlFormat, getLocalFilePath } from "@/lib/utils";
 import { Sermon } from "@/schemas/sermon";
 import { SingList } from "@/schemas/song";
 import { useAudioPlayer } from "@/context/audio-player-context";
@@ -10,7 +10,7 @@ import { useLangue } from "@/context/langue-context";
 
 export type SongPlayerManualButtonType = {
   data: Sermon | SingList;
-  type: "Sermon" | "SingList";
+  type: AudioFolder;
   setFinishedDownload: (state: boolean) => void;
   fileIsDownload: boolean;
 };
@@ -26,20 +26,14 @@ const SongPlayerManualButton = ({
   const { lng } = useLangue();
 
   const title =
-    type === "Sermon"
+    type === "Sermons"
       ? `${(data as Sermon).chapter} : ${data.title}`
       : data.title;
-
-  const subFolder = type === "Sermon" ? "Sermons" : "Hymns";
 
   const putsongInPlayer = async () => {
     let canPlay = true;
     if (!navigator.onLine) {
-      await getLocalFilePath(
-        lng,
-        type === "Sermon" ? "Sermons" : "Hymns",
-        title.replace(" : ", "_")
-      ).catch(() => {
+      await getLocalFilePath(lng, type, title.replace(" : ", "_")).catch(() => {
         alert(tr("alert.cannot_download"));
         canPlay = false;
       });
@@ -49,13 +43,12 @@ const SongPlayerManualButton = ({
         data.audio,
         title,
         data.id,
-        type === "Sermon" ? undefined : (data as SingList).album_id,
+        type === "Hymns" ? (data as SingList).album_id : undefined,
         true
       );
     }
   };
 
-  console.log(audioUrl, playedAudioUrl, data, play);
   return (
     <div className="flex justify-start items-center">
       <div>
@@ -85,7 +78,7 @@ const SongPlayerManualButton = ({
           <DownloadButton
             audioUrl={data.audio}
             fileName={fileUrlFormat(title.replace(" : ", "_"))}
-            subFolder={subFolder}
+            subFolder={type}
             setFinishedDownload={setFinishedDownload}
           >
             <Download
