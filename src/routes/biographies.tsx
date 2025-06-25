@@ -6,6 +6,7 @@ import { findBy } from "@/lib/resources/biography";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import PageLoader from "@/components/loaders/page-loader";
 
 export const Route = createFileRoute("/biographies")({
   component: RouteComponent,
@@ -26,10 +27,17 @@ function RouteComponent() {
   });
 
   return (
-    <div className="mt-1">
+    <div className="mt-10">
       {isLoading && tr("home.waiting")}
       {isError && tr("home.search_not_found_pred_message")}
-      {biography && (
+      <PageLoader
+        loadMessage={
+          isLoading
+            ? tr("home.waiting")
+            : tr("home.search_not_found_pred_message")
+        }
+        isLoading={!biography || isLoading || isError}
+      >
         <div>
           <div className="w-full">
             <img
@@ -43,7 +51,7 @@ function RouteComponent() {
           <div
             style={{ fontSize }}
             dangerouslySetInnerHTML={{
-              __html: biography.description
+              __html: `${biography?.description}`
                 .replace(
                   /<(h1|h2)>/g,
                   `<strong style="color:${theme === "dark" ? "orange" : "#7b3d1a"} !important; font-size: 22px;"><$1>`
@@ -53,7 +61,7 @@ function RouteComponent() {
             className="text-justify w-11.5/12 mt-4 sm:mt-0 sm:w-full"
           ></div>
         </div>
-      )}
+      </PageLoader>
     </div>
   );
 }

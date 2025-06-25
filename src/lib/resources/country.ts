@@ -1,7 +1,7 @@
 import { ResourcesType } from "@/lib/resources";
-import { DataType } from "@/types/sermon";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { Country } from "@/types/country";
+import { Country } from "@/schemas/country";
+import { DataType } from "@/schemas/sermon";
 
 export const findAll = async (
   resource: ResourcesType,

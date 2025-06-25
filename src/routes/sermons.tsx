@@ -18,6 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { Download } from "lucide-react";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import PageLoader from "@/components/loaders/page-loader";
 
 export const Route = createFileRoute("/sermons")({
   component: RouteComponent,
@@ -163,14 +164,15 @@ function RouteComponent() {
         cancel={true}
         type="appLoad"
       />
-      {isLoading ? (
-        <div className="mt-16">
-          {isError
+      <PageLoader
+        isLoading={isLoading || !sermon}
+        loadMessage={
+          isError
             ? `${tr("home.sermon_unvailable")} ${langName}`
-            : tr("home.waiting")}
-        </div>
-      ) : (
-        <div className="relatives -mt-8">
+            : tr("home.waiting")
+        }
+      >
+        <div>
           <div
             className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-20`}
           >
@@ -271,7 +273,7 @@ function RouteComponent() {
             <div className="mt-4">{sermon?.similar_sermon}</div>
           </div>
         </div>
-      )}
+      </PageLoader>
     </>
   );
 }

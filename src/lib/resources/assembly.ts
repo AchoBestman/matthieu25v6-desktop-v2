@@ -1,8 +1,8 @@
 import { ResourcesType } from "@/lib/resources";
-import { DataType } from "@/types/sermon";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { Assembly, AssemblySerchParams } from "@/types/assembly";
-import { Head } from "@/types/brother";
+import { Assembly, AssemblySerchParams } from "@/schemas/assembly";
+import { Head } from "@/schemas/brother";
+import { DataType } from "@/schemas/sermon";
 
 export const findAll = async (
   resource: ResourcesType,
@@ -12,9 +12,9 @@ export const findAll = async (
 ): Promise<DataType<Assembly>> => {
   const conditions = [];
   const searchParams: any[] = [];
-  if (params?.name) {
+  if (params?.search) {
     conditions.push(`${resource}.name LIKE ?`);
-    searchParams.push(`%${params.name}%`);
+    searchParams.push(`%${params.search}%`);
   }
 
   if (params?.city_id) {

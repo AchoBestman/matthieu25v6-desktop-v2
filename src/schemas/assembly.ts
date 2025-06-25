@@ -33,7 +33,7 @@ export type Assembly = z.infer<typeof AssemblySchema>;
 
 // AssemblySearchParams schema
 export const AssemblySearchParamsSchema = z.object({
-  name: z.string().optional(),
+  search: z.string().optional(),
   city_id: z.number().optional(),
   country_id: z.number().optional(),
   per_page: z.number().optional(),

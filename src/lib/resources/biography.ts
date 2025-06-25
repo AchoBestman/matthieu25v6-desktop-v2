@@ -1,6 +1,6 @@
 import { ResourcesType } from "@/lib/resources";
 import database from "@/lib/database";
-import { Biography } from "@/types/biography";
+import { Biography } from "@/schemas/biography";
 
 export const findBy = async (resource: ResourcesType, lang: string) => {
   const db = await database(lang);

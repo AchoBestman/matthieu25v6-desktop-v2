@@ -1,8 +1,8 @@
 import { ResourcesType } from "@/lib/resources";
-import { DataType } from "@/types/sermon";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { SingList } from "@/types/sing";
 import database from "../database";
+import { DataType } from "@/schemas/sermon";
+import { SingList } from "@/schemas/song";
 
 export const findAll = async (
   resource: ResourcesType,

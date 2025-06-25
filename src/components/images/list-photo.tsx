@@ -1,119 +1,98 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { findAll } from "@/lib/resources/photo";
 import { resources } from "@/lib/resources";
 import PhotoCard from "./photo-card";
 import PaginationData from "./pagination-data";
 import { useLangue } from "@/context/langue-context";
-import { LinksType, MetaType } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { Photo, PhotoSearchParams } from "@/schemas/photo";
+import { useDebounce } from "use-debounce";
+import { useQuery } from "@tanstack/react-query";
+import PageLoader from "@/components/loaders/page-loader";
 
 export default function ListPhoto() {
   const { lng } = useLangue();
-  const [photos, setPhotos] = useState<Array<Photo> | undefined>(undefined);
-  const [load, setLoad] = useState<boolean>(true);
-  const [pagination, setPagination] = useState<{
-    links?: LinksType;
-    meta?: MetaType;
-  }>();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams, setSearchParams] = useState<PhotoSearchParams>({
     per_page: 12,
     page: 1,
   });
 
-  const getPhotos = async () => {
-    setLoad(true);
-    const response = await findAll(resources.photos, lng, {
-      search: searchParams.search as string,
-      per_page: searchParams.per_page as number,
-      current_page: searchParams.page as number,
-    });
+  const [searchTermDebounce] = useDebounce(searchTerm, 300);
 
-    setPhotos(response.data);
-    setLoad(false);
-    setPagination({
-      links: response.pagination.links,
-      meta: response.pagination.meta,
-    });
-  };
-  useEffect(() => {
-    getPhotos();
-  }, [setSearchParams, searchParams]);
-
-  useEffect(() => {
-    setSearchParams({ search: searchTerm });
-  }, [searchTerm, setSearchTerm]);
-
-  // Gérer la recherche
-  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
-    const term = event.target.value;
-    setSearchTerm(term);
-  };
+  const {
+    data: photos,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["photos", lng, searchParams, searchTermDebounce],
+    queryFn: () =>
+      findAll(resources.photos, lng, {
+        ...searchParams,
+        search: searchTermDebounce,
+      }),
+  });
 
   return (
     <>
-      <div className="w-full fixed z-40 bg-muted/100 -mt-8 pb-2">
-        <div className="mt-4 w-8/12">
-          <Input
-            type="text"
-            placeholder={tr("button.search") + "..."}
-            value={searchTerm}
-            onChange={handleSearch}
-            className="border-primary dark:border-white border-2 outline-none"
-          />
-        </div>
+      <div
+        className={`sticky top-16 w-full -mt-12 h-15 px-2 py-2 bg-muted z-20`}
+      >
+        <Input
+          type="text"
+          placeholder={tr("button.search") + "..."}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="border-amber-800 dark:border-white border-2 outline-none"
+        />
       </div>
-
-      <div className="mt-10">
-        {load && (
-          <div className="flex justify-center items-center py-4 ">
-            {tr("home.waiting")}
-          </div>
-        )}
-
-        {photos &&
-          photos.length > 0 &&
-          pagination?.links &&
-          pagination?.meta &&
-          pagination.meta.total > 10 && (
+      <PageLoader
+        loadMessage={
+          isLoading
+            ? tr("home.waiting")
+            : tr("home.search_not_found_pred_message")
+        }
+        isLoading={!photos?.data || isLoading || isError}
+      >
+        <div className="bg-muted/100 pl-4 pr-1 pt-12">
+          {photos && photos.pagination?.meta?.total > 10 && (
             <div className="py-4 pt-5">
               <PaginationData
-                pagination={pagination}
+                pagination={{
+                  links: photos.pagination.links,
+                  meta: photos.pagination.meta,
+                }}
                 setSearchParams={setSearchParams}
               />
             </div>
           )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-2">
-          {photos &&
-            photos.length > 0 &&
-            photos.map((photo) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-2">
+            {photos?.data.map((video: Photo) => (
               <PhotoCard
-                key={photo.id}
-                title={photo.title as string}
-                description={photo.description}
-                url={photo.url}
+                key={video.id}
+                title={video.title as string}
+                description={video.description}
+                url={video.url}
               />
             ))}
-        </div>
+          </div>
 
-        {photos &&
-          photos.length > 0 &&
-          pagination?.links &&
-          pagination?.meta && (
+          {photos?.pagination?.meta && (
             <div className="py-4 pt-5">
               <PaginationData
-                pagination={pagination}
+                pagination={{
+                  links: photos.pagination.links,
+                  meta: photos.pagination.meta,
+                }}
                 setSearchParams={setSearchParams}
               />
             </div>
           )}
-      </div>
+        </div>
+      </PageLoader>
     </>
   );
 }
