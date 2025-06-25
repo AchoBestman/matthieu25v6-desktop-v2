@@ -9,7 +9,7 @@ export function useAssemblies(
   search?: string
 ) {
   return useQuery({
-    queryKey: ["assemblies", lng, cityId, search],
+    queryKey: ["assemblies", lng, cityId, search, per_page],
     queryFn: () =>
       findAll(resources.assemblies, lng, {
         city_id: cityId,

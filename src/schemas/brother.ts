@@ -33,6 +33,20 @@ export const HeadSchema = z.lazy(() =>
 );
 export type Head = z.infer<typeof HeadSchema>;
 
+export const SingleHeadSchema = z.lazy(() =>
+  z.object({
+    id: ModelRefSchema,
+    is_pastor: z.number(),
+    principal: z.number(),
+    brother_id: z.number(),
+    assembly_id: z.number(),
+    country_id: z.number(),
+    country: CountrySchema,
+    assembly: AssemblySchema,
+  })
+);
+export type SingleHead = z.infer<typeof SingleHeadSchema>;
+
 // Brother schema and type
 export const BrotherSchema = z.object({
   id: ModelRefSchema,

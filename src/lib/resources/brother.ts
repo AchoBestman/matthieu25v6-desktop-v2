@@ -3,7 +3,7 @@ import { allModels, oneModel } from "@/lib/resources/base";
 import { toSingle } from "@/lib/utils";
 import database from "@/lib/database";
 import { DataType } from "@/schemas/sermon";
-import { BrotherList, Head, Ministre, Singer } from "@/schemas/brother";
+import { BrotherList, Ministre, Singer, SingleHead } from "@/schemas/brother";
 
 export const findAll = async (
   resource: ResourcesType,
@@ -114,7 +114,7 @@ export const findBy = async (
   const [model] = response as BrotherList[];
   const db = await database(lang);
   // 2. Get heads with country and assembly->city
-  const heads = await db.select<Array<Head>>(
+  const heads = await db.select<Array<SingleHead>>(
     `
   SELECT 
     heads.*,
@@ -198,7 +198,7 @@ export const findBy = async (
     })),
     singer:
       singer && singer.length > 0
-        ? { ...singer[0], country: JSON.parse(singer[0].country.toString()) }
+        ? { ...singer[0], country: singer[0].country }
         : null,
     ministres: ministres.map((row) => ({
       ...row,

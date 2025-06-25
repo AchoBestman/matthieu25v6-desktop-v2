@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Matius 25:6",
+    "sermon": "Khotbah",
+    "menu": "Menu",
+    "lng": "Bahasa",
+    "all_lng": "Semua bahasa",
+    "sermon_num": "No. Khotbah",
+    "verset_num": "No. Ayat",
+    "waiting": "Sedang memuat, harap tunggu...",
+    "sermon_unvailable": "Saat ini tidak ada khotbah tersedia dalam:",
+    "search_not_found_title": "Pencarian tidak ditemukan!",
+    "search_not_found_pred_message": "tidak tersedia saat ini",
+    "search_not_found_vers_message": "tidak memiliki ayat",
+    "hymns": "Nyanyian",
+    "church": "Sidang",
+    "biography": "Biografi Nabi",
+    "photos": "Foto",
+    "videos": "Video"
+  },
+  "button": {
+    "search": "Cari",
+    "pdf": "Unduh PDF",
+    "audio": "Unduh MP3",
+    "close": "Tutup",
+    "see_more": "Lihat lebih banyak"
+  },
+  "table": {
+    "select_all": "Pilih semua",
+    "name": "Nama",
+    "select": "Pilih",
+    "address": "Alamat",
+    "username": "Pemimpin",
+    "username_info": "Info Pemimpin",
+    "phone": "Telepon",
+    "actions": "Aksi",
+    "filter_by_name": "Filter berdasarkan nama...",
+    "columns": "Kolom",
+    "selected": "Terpilih",
+    "no_result": "Tidak ada hasil.",
+    "row": "baris",
+    "previous": "sebelumnya",
+    "next": "berikutnya",
+    "countries": "Negara",
+    "cities": "Kota",
+    "titre": "Judul",
+    "filter_by_title": "Filter berdasarkan judul...",
+    "singers": "Penyanyi",
+    "lien_audio": "Unduh",
+    "listen": "Dengarkan audio",
+    "line_per_page": "Baris per halaman",
+    "page": "Halaman"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Sedang mengunduh bahasa, harap tunggu.",
+    "waiting_for_downloaded_audio": "Sedang mengunduh audio, harap tunggu.",
+    "langue_is_downloaded": "Unduhan selesai! Silakan tutup jendela!",
+    "langue_not_found": "Anda harus mengunduh bahasa terlebih dahulu!"
+  },
+  "text": {
+    "font_size": "Ukuran teks"
+  },
+  "alert": {
+    "cannot_download": "Anda sedang offline. Harap sambungkan ke internet untuk mengunduh.",
+    "stop_playing": "Apakah Anda yakin ingin menghentikan audio dan menutup pemutar?"
+  }
+}

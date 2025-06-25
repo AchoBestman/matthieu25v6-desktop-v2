@@ -36,6 +36,8 @@ export default function ListPhoto() {
       }),
   });
 
+  console.log(searchParams, "searchParams");
+
   return (
     <>
       <div

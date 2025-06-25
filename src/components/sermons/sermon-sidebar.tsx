@@ -21,6 +21,7 @@ import { useDebounce } from "use-debounce";
 import { useLangue } from "@/context/langue-context";
 import { useSermon } from "@/context/sermon-context";
 import { useNavigate } from "@tanstack/react-router";
+import { ArrowDown10, ArrowUp10 } from "lucide-react";
 
 const SermonSidebar = () => {
   const { lng } = useLangue();
@@ -118,9 +119,15 @@ const SermonSidebar = () => {
             ></TextFontSizeBar>
           </div>
           <Label className="flex items-center gap-2 text-sm cursor-pointer mr-1">
-            <span className="ml-2">Reorder</span>
+            <div className="-mr-2">
+              {searchParamsDebouce.order === "DESC" ? (
+                <ArrowDown10></ArrowDown10>
+              ) : (
+                <ArrowUp10></ArrowUp10>
+              )}
+            </div>
             <Switch
-              checked={searchParamsDebouce.order === "DESC"}
+              checked={searchParamsDebouce.order === "ASC"}
               onCheckedChange={handleToggle}
               className="shadow-none border-1 dark:border-white cursor-pointer"
             />

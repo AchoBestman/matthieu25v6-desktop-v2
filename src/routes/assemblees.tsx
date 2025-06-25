@@ -10,6 +10,7 @@ import { useCountries } from "@/hooks/useCountries";
 import { useCities } from "@/hooks/useCities";
 import { useAssemblies } from "@/hooks/useAssemblies";
 import { useDebounce } from "use-debounce";
+import PageLoader from "@/components/loaders/page-loader";
 
 export const Route = createFileRoute("/assemblees")({
   component: RouteComponent,
@@ -35,17 +36,16 @@ function RouteComponent() {
 
   const [searchTermDebounce] = useDebounce(search, 300);
 
-  const { data: assembliesData } = useAssemblies(
-    lng,
-    cityId,
-    undefined,
-    searchTermDebounce
-  );
+  const {
+    data: assembliesData,
+    isError,
+    isLoading,
+  } = useAssemblies(lng, cityId, undefined, searchTermDebounce);
 
   return (
     <div>
       <div
-        className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-20`}
+        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-muted z-20`}
       >
         <div className="flex items-center justify-end my-5">
           {countriesLoaded && countriesData.data.length > 0 && (
@@ -72,15 +72,24 @@ function RouteComponent() {
         </div>
       </div>
 
-      <div className="container mx-auto py-0">
-        <AssembliesDataTable
-          key={`assembly-${assembliesData?.data.length}`}
-          columns={assembliesColumns}
-          data={assembliesData?.data ?? []}
-          setSearch={setSearch}
-          search={search}
-        />
-      </div>
+      <PageLoader
+        loadMessage={
+          isLoading
+            ? tr("home.waiting")
+            : tr("home.search_not_found_pred_message")
+        }
+        isLoading={!assembliesData?.data || isLoading || isError}
+      >
+        <div className="container mx-auto py-0 mt-10">
+          <AssembliesDataTable
+            key={`assembly-${assembliesData?.data.length}`}
+            columns={assembliesColumns}
+            data={assembliesData?.data ?? []}
+            setSearch={setSearch}
+            search={search}
+          />
+        </div>
+      </PageLoader>
     </div>
   );
 }

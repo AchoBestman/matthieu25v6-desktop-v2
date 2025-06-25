@@ -8,7 +8,7 @@ export function useCities(
   per_page: number = 1000
 ) {
   return useQuery({
-    queryKey: ["cities", lng, countryId],
+    queryKey: ["cities", lng, countryId, per_page],
     queryFn: () =>
       findAll(
         resources.cities,

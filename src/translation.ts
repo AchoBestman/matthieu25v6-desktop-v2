@@ -14,6 +14,11 @@ import ro from "@/locales/ro.json";
 import ru from "@/locales/ru.json";
 import ta from "@/locales/ta.json";
 import zh from "@/locales/zh.json";
+import id from "@/locales/id.json";
+import nl from "@/locales/nl.json";
+import no from "@/locales/no.json";
+import pl from "@/locales/pl.json";
+import trc from "@/locales/tr.json";
 import { DotNestedKeys } from "./lib/utils";
 
 export type TranslationSchema = typeof en;
@@ -62,6 +67,21 @@ const resources: ResourcesSchema = {
   },
   zh: {
     translation: zh,
+  },
+  tr: {
+    translation: trc,
+  },
+  id: {
+    translation: id,
+  },
+  nl: {
+    translation: nl,
+  },
+  no: {
+    translation: no,
+  },
+  pl: {
+    translation: pl,
   },
 };
 

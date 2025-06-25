@@ -1,109 +1,80 @@
 import SelectWithSearch from "@/components/commons/select-with-search";
 import { useLangue } from "@/context/langue-context";
-import { resources } from "@/lib/resources";
-import { findAll } from "@/lib/resources/song";
-import { Album } from "@/schemas/album";
 import { SelectEnum, SelectSearch } from "@/schemas/city";
-import { SingList } from "@/schemas/song";
 import { tr } from "@/translation";
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { findAll as findAllAlbums } from "@/lib/resources/album";
+import { useState } from "react";
 import { SongDataTable } from "@/components/tables/songs/song-table";
 import { songColumns } from "@/components/tables/songs/song-columns";
+import { useAlbums } from "@/hooks/useAlbums";
+import { useSongs } from "@/hooks/useSongs";
+import PageLoader from "@/components/loaders/page-loader";
+import { useDebounce } from "use-debounce";
 
 export const Route = createFileRoute("/hymns")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [select, setSelect] = useState<SelectSearch>({ id: 0, type: "" });
-  const [albums, setAlbums] = useState<Array<Album>>();
-  const [songs, setSongs] = useState<Array<SingList>>();
   const { lng } = useLangue();
 
+  const [select, setSelect] = useState<SelectSearch>({ id: 0, type: "" });
   const [search, setSearch] = useState<string>("");
-  const [albumId, setAlbumId] = useState<number | undefined>();
 
-  const getAlbums = async () => {
-    const response = await findAllAlbums(
-      resources.albums,
-      lng,
-      { is_active: true, per_page: 10000 },
-      { column: "order", direction: "ASC" }
-    );
+  const { data: albumsData } = useAlbums(lng);
+  const albumId = select.type === SelectEnum.singer ? select.id : undefined;
 
-    setAlbums(response.data);
-    setAlbumId(response.data[0].id);
-  };
+  const defaultAlbum = albumsData?.data?.[0];
+  const selectedAlbumId = albumId ?? defaultAlbum?.id;
+  const [searchTermDebounce] = useDebounce(search, 1000);
 
-  const getSons = async (album_id?: number) => {
-    const response = await findAll(
-      resources.sings,
-      lng,
-      {
-        is_active: true,
-        per_page: 10000,
-        search: search,
-        album_id: album_id,
-      },
-      {
-        column: "order",
-        direction: "ASC",
-      }
-    );
-    console.log(response.data, "songs");
-    setSongs(response.data);
-  };
-
-  useEffect(() => {
-    if (select.type === SelectEnum.singer) {
-      setAlbumId(select.id);
-    }
-  }, [select, search]);
-
-  useEffect(() => {
-    getSons(albumId);
-  }, [albumId]);
-
-  useEffect(() => {
-    getSons();
-    setAlbumId(undefined);
-  }, [search]);
-
-  useEffect(() => {
-    getAlbums();
-  }, [lng]);
+  const {
+    data: songsData,
+    isError,
+    isLoading,
+  } = useSongs(lng, selectedAlbumId, undefined, searchTermDebounce);
 
   return (
     <div>
-      <div className="mt-1">
-        <div className={`flex items-center justify-end my-5`}>
-          {albums && albums.length > 0 && (
+      <div
+        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-muted z-20`}
+      >
+        <div className="flex items-center justify-end my-5">
+          {albumsData?.data && albumsData.data.length > 0 && (
             <SelectWithSearch
+              key={`select-albums-${albumsData.data.length}`}
               setSelect={setSelect}
               type={SelectEnum.singer}
               title={
-                albumId
-                  ? (albums.find((item) => item.id === albumId)
+                selectedAlbumId
+                  ? (albumsData.data.find((a) => a.id === selectedAlbumId)
                       ?.title as string)
                   : tr("table.singers")
               }
               column="title"
-              body={albums}
+              body={albumsData.data}
             />
           )}
         </div>
       </div>
 
-      <div className="container mx-auto py-0">
-        <SongDataTable
-          columns={songColumns}
-          data={songs}
-          setSearch={setSearch}
-          search={search}
-        />
-      </div>
+      <PageLoader
+        loadMessage={
+          isLoading
+            ? tr("home.waiting")
+            : tr("home.search_not_found_pred_message")
+        }
+        isLoading={!songsData?.data || isLoading || isError}
+      >
+        <div className="container mx-auto py-0 mt-10">
+          <SongDataTable
+            columns={songColumns}
+            data={songsData?.data ?? []}
+            setSearch={setSearch}
+            search={search}
+          />
+        </div>
+      </PageLoader>
     </div>
   );
 }

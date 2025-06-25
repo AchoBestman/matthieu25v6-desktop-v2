@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Matta 25:6",
+    "sermon": "Vaazlar",
+    "menu": "Menü",
+    "lng": "Diller",
+    "all_lng": "Tüm diller",
+    "sermon_num": "Vaaz No",
+    "verset_num": "Ayet No",
+    "waiting": "Yükleniyor, lütfen bekleyin...",
+    "sermon_unvailable": "Şu anda şu dilde vaaz yok:",
+    "search_not_found_title": "Arama bulunamadı!",
+    "search_not_found_pred_message": "şu anda mevcut değil",
+    "search_not_found_vers_message": "ayet içermiyor",
+    "hymns": "İlahiler",
+    "church": "Topluluklar",
+    "biography": "Peygamberin biyografisi",
+    "photos": "Fotoğraflar",
+    "videos": "Videolar"
+  },
+  "button": {
+    "search": "Ara",
+    "pdf": "PDF indir",
+    "audio": "MP3 indir",
+    "close": "Kapat",
+    "see_more": "Daha fazla göster"
+  },
+  "table": {
+    "select_all": "Tümünü seç",
+    "name": "Ad",
+    "select": "Seç",
+    "address": "Adres",
+    "username": "Lider",
+    "username_info": "Lider bilgisi",
+    "phone": "Telefon",
+    "actions": "İşlemler",
+    "filter_by_name": "İsme göre filtrele...",
+    "columns": "Sütunlar",
+    "selected": "Seçildi",
+    "no_result": "Sonuç yok.",
+    "row": "satır",
+    "previous": "önceki",
+    "next": "sonraki",
+    "countries": "Ülkeler",
+    "cities": "Şehirler",
+    "titre": "Başlık",
+    "filter_by_title": "Başlığa göre filtrele...",
+    "singers": "Şarkıcılar",
+    "lien_audio": "İndir",
+    "listen": "Ses dosyasını dinle",
+    "line_per_page": "Sayfa başına satır",
+    "page": "Sayfa"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Dil indiriliyor, lütfen bekleyin.",
+    "waiting_for_downloaded_audio": "Ses indiriliyor, lütfen bekleyin.",
+    "langue_is_downloaded": "İndirme tamamlandı! Lütfen pencereyi kapatın!",
+    "langue_not_found": "Önce dili indirmeniz gerekiyor!"
+  },
+  "text": {
+    "font_size": "Yazı tipi boyutu"
+  },
+  "alert": {
+    "cannot_download": "Çevrimdışısınız. İndirmek için internete bağlanın.",
+    "stop_playing": "Sesi durdurup oynatıcıyı kapatmak istediğinizden emin misiniz?"
+  }
+}

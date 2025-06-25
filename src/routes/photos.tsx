@@ -7,7 +7,7 @@ export const Route = createFileRoute("/photos")({
 
 function RouteComponent() {
   return (
-    <div className="mt-1">
+    <div className="mt-10">
       <ListPhoto></ListPhoto>
     </div>
   );

@@ -12,12 +12,19 @@ import { menus } from "@/lib/menu";
 import { ThemeToggleButton } from "@/components/buttons/heme-toggle-button";
 import LangueDropdown from "@/components/commons/langue-dropdown";
 import { tr } from "@/translation";
+import { useLangue } from "@/context/langue-context";
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
 
 function RootComponent() {
+  const { lng } = useLangue();
+  const [topMenus, setTopMenus] = React.useState(menus);
+
+  React.useEffect(() => {
+    setTopMenus(menus);
+  }, [lng]);
   return (
     <React.Fragment>
       <AppSidebar />
@@ -26,7 +33,7 @@ function RootComponent() {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                {menus.map((menu) => (
+                {topMenus.map((menu) => (
                   <Link
                     key={menu.url}
                     to={menu.url}

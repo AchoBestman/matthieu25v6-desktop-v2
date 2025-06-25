@@ -21,7 +21,7 @@ export default function ListVideo() {
     page: 1,
   });
 
-  const [searchTermDebounce] = useDebounce(searchTerm, 300);
+  const [searchTermDebounce] = useDebounce(searchTerm, 1000);
 
   const {
     data: videos,

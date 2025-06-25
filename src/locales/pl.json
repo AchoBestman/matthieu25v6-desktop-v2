@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Mateusza 25:6",
+    "sermon": "Kazania",
+    "menu": "Menu",
+    "lng": "Języki",
+    "all_lng": "Wszystkie języki",
+    "sermon_num": "Nr kazania",
+    "verset_num": "Nr wersetu",
+    "waiting": "Ładowanie, proszę czekać...",
+    "sermon_unvailable": "Brak dostępnych kazań w języku:",
+    "search_not_found_title": "Nie znaleziono!",
+    "search_not_found_pred_message": "obecnie niedostępne",
+    "search_not_found_vers_message": "nie zawiera wersetu",
+    "hymns": "Hymny",
+    "church": "Zgromadzenia",
+    "biography": "Biografia Proroka",
+    "photos": "Zdjęcia",
+    "videos": "Filmy"
+  },
+  "button": {
+    "search": "Szukaj",
+    "pdf": "Pobierz PDF",
+    "audio": "Pobierz MP3",
+    "close": "Zamknij",
+    "see_more": "Zobacz więcej"
+  },
+  "table": {
+    "select_all": "Zaznacz wszystko",
+    "name": "Nazwa",
+    "select": "Wybierz",
+    "address": "Adres",
+    "username": "Lider",
+    "username_info": "Informacje o liderze",
+    "phone": "Telefon",
+    "actions": "Akcje",
+    "filter_by_name": "Filtruj po nazwie...",
+    "columns": "Kolumny",
+    "selected": "Zaznaczone",
+    "no_result": "Brak wyników.",
+    "row": "wiersz(e)",
+    "previous": "poprzednia",
+    "next": "następna",
+    "countries": "Kraje",
+    "cities": "Miasta",
+    "titre": "Tytuł",
+    "filter_by_title": "Filtruj po tytule...",
+    "singers": "Śpiewacy",
+    "lien_audio": "Pobierz",
+    "listen": "Odsłuchaj dźwięk",
+    "line_per_page": "Wierszy na stronę",
+    "page": "Strona"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Trwa pobieranie języka, proszę czekać.",
+    "waiting_for_downloaded_audio": "Trwa pobieranie dźwięku, proszę czekać.",
+    "langue_is_downloaded": "Pobieranie zakończone! Zamknij okno!",
+    "langue_not_found": "Najpierw musisz pobrać język!"
+  },
+  "text": {
+    "font_size": "Rozmiar tekstu"
+  },
+  "alert": {
+    "cannot_download": "Jesteś offline. Połącz się z internetem, aby pobrać.",
+    "stop_playing": "Czy na pewno chcesz zatrzymać dźwięk i zamknąć odtwarzacz?"
+  }
+}

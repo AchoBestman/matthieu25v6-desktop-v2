@@ -33,6 +33,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { setOpen } = useSidebar();
   const navigate = useNavigate();
   const { lng, langName } = useLangue();
+
+  const [sideMenus, setSideMenus] = React.useState(menus);
+
+  React.useEffect(() => {
+    setSideMenus(menus);
+  }, [lng]);
+
   return (
     <Sidebar
       collapsible="icon"
@@ -82,7 +89,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarGroup>
             <SidebarGroupContent className="px-1.5 md:px-0">
               <SidebarMenu>
-                {menus.map((item) => (
+                {sideMenus.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       tooltip={{

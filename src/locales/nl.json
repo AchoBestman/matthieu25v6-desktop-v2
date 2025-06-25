@@ -1,0 +1,67 @@
+{
+  "home": {
+    "title": "Mattheüs 25:6",
+    "sermon": "Preken",
+    "menu": "Menu",
+    "lng": "Talen",
+    "all_lng": "Alle talen",
+    "sermon_num": "Preeknr.",
+    "verset_num": "Versnr.",
+    "waiting": "Bezig met laden, even geduld aub...",
+    "sermon_unvailable": "Er zijn momenteel geen preken beschikbaar in:",
+    "search_not_found_title": "Zoekopdracht niet gevonden!",
+    "search_not_found_pred_message": "is momenteel niet beschikbaar",
+    "search_not_found_vers_message": "bevat geen vers",
+    "hymns": "Gezangen",
+    "church": "Gemeenten",
+    "biography": "Biografie van de Profeet",
+    "photos": "Foto's",
+    "videos": "Video's"
+  },
+  "button": {
+    "search": "Zoeken",
+    "pdf": "Download pdf",
+    "audio": "Download mp3",
+    "close": "Sluiten",
+    "see_more": "Meer weergeven"
+  },
+  "table": {
+    "select_all": "Alles selecteren",
+    "name": "Naam",
+    "select": "Selecteer",
+    "address": "Adres",
+    "username": "Leider",
+    "username_info": "Leidersinformatie",
+    "phone": "Telefoon",
+    "actions": "Acties",
+    "filter_by_name": "Filter op naam...",
+    "columns": "Kolommen",
+    "selected": "Geselecteerd",
+    "no_result": "Geen resultaten.",
+    "row": "rij(en)",
+    "previous": "vorige",
+    "next": "volgende",
+    "countries": "Landen",
+    "cities": "Steden",
+    "titre": "Titel",
+    "filter_by_title": "Filter op titel...",
+    "singers": "Zangers",
+    "lien_audio": "Download",
+    "listen": "Luister naar de audio",
+    "line_per_page": "Regels per pagina",
+    "page": "Pagina"
+  },
+  "download": {
+    "waiting_for_downloaded_langue": "Bezig met het downloaden van taal, even geduld.",
+    "waiting_for_downloaded_audio": "Bezig met het downloaden van audio, even geduld.",
+    "langue_is_downloaded": "Download voltooid! Sluit het venster!",
+    "langue_not_found": "Je moet de taal eerst downloaden!"
+  },
+  "text": {
+    "font_size": "Tekstgrootte"
+  },
+  "alert": {
+    "cannot_download": "Je bent offline. Verbind met internet om te downloaden.",
+    "stop_playing": "Weet je zeker dat je de audio wilt stoppen en de speler wilt sluiten?"
+  }
+}
