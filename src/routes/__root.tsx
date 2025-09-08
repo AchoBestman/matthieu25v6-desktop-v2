@@ -13,6 +13,8 @@ import { ThemeToggleButton } from "@/components/buttons/heme-toggle-button";
 import LangueDropdown from "@/components/commons/langue-dropdown";
 import { tr } from "@/translation";
 import { useLangue } from "@/context/langue-context";
+import { SearchCodeIcon } from "lucide-react";
+import { SearchDrawer } from "@/components/commons/search-drawer";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -25,11 +27,14 @@ function RootComponent() {
   React.useEffect(() => {
     setTopMenus(menus);
   }, [lng]);
+
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
   return (
     <React.Fragment>
       <AppSidebar />
       <SidebarInset className="bg-muted">
-        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4 z-30">
+        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4 z-1">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -48,6 +53,10 @@ function RootComponent() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex items-center">
+            <SearchCodeIcon
+              onClick={() => setIsSearchOpen(true)}
+              className="m-2 p-1 cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
+            />
             <SidebarTrigger className="cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
             <ThemeToggleButton />
             <LangueDropdown />
@@ -58,7 +67,11 @@ function RootComponent() {
           <Outlet />
         </div>
       </SidebarInset>
-
+      {/* composant Search */}
+      <SearchDrawer
+        open={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
       {/* <TanStackRouterDevtools /> */}
     </React.Fragment>
   );

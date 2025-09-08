@@ -39,7 +39,7 @@ export default function ListVideo() {
   return (
     <>
       <div
-        className={`sticky top-16 w-full -mt-12 h-15 px-2 py-2 bg-muted z-20`}
+        className={`sticky top-16 w-full -mt-12 h-15 px-2 py-2 bg-muted z-1`}
       >
         <Input
           type="text"

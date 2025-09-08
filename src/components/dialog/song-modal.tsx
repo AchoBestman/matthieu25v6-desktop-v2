@@ -10,6 +10,7 @@ import { SingList } from "@/schemas/song";
 import { tr } from "@/translation";
 import { Printer } from "lucide-react";
 import PrintButton from "@/components/buttons/print-button";
+import { useSermon } from "@/context/sermon-context";
 
 const SongModal = ({
   open,
@@ -24,6 +25,7 @@ const SongModal = ({
   cancel?: boolean;
   albumTitle?: string;
 }) => {
+  const { fontSize} = useSermon();
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -53,7 +55,7 @@ const SongModal = ({
               </span>
             </AlertDialogTitle>
             <AlertDialogDescription className="text-dark dark:text-white">
-              <span id="song">
+              <span id="song" style={{ fontSize }}>
                 <span className="flex justify-center items-center">
                   {song.title}
                   <span className="italic text-sm">{albumTitle}</span>

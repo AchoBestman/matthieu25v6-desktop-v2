@@ -20,13 +20,20 @@ import { SermonSearchParams } from "@/schemas/sermon";
 import { useDebounce } from "use-debounce";
 import { useLangue } from "@/context/langue-context";
 import { useSermon } from "@/context/sermon-context";
-import { useNavigate } from "@tanstack/react-router";
 import { ArrowDown10, ArrowUp10 } from "lucide-react";
+import SermonItem from "./sermon-item";
+
+export type SelectSermonType = {
+  number: string;
+  verse_number: string;
+  fontSize: number;
+};
 
 const SermonSidebar = () => {
   const { lng } = useLangue();
   const [open, setOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
+  const [finishedDownload, setFinishedDownload] = useState<boolean>(false);
   const {
     fontSize,
     setFontSize,
@@ -35,18 +42,13 @@ const SermonSidebar = () => {
     number,
     verseNumber,
   } = useSermon();
-  const navigate = useNavigate();
 
   const [searchParams, setSearchParams] = useState<SermonSearchParams>({
     per_page: 500,
     order: "ASC",
   });
 
-  const [selectedSermon, setSelectedSermon] = useState<{
-    number: string;
-    verse_number: string;
-    fontSize: number;
-  }>({
+  const [selectedSermon, setSelectedSermon] = useState<SelectSermonType>({
     number: number.toString(),
     fontSize,
     verse_number: verseNumber.toString(),
@@ -60,7 +62,7 @@ const SermonSidebar = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["sermons", searchParamsDebouce, lng],
+    queryKey: ["sermons", searchParamsDebouce, lng, finishedDownload],
     queryFn: () =>
       findAll(resources.sermons, lng, searchParamsDebouce, {
         column: "number",
@@ -206,34 +208,14 @@ const SermonSidebar = () => {
         <SidebarGroup className="px-0">
           <SidebarGroupContent>
             {sermons?.data.map((sermon) => (
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedSermon((prev) => {
-                    return {
-                      ...prev,
-                      number: sermon.number.toString(),
-                    };
-                  });
-
-                  navigate({ to: "/sermons" });
-                }}
+              <SermonItem
                 key={sermon.number}
-                className="cursor-pointer hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0 text-left w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-              >
-                <div className="flex w-full items-center gap-2">
-                  <span className="font-medium">{sermon.chapter}</span>{" "}
-                  <span className="ml-auto text-xs text-blue-600 dark:text-blue-400">
-                    {sermon.publication_date}
-                  </span>
-                </div>
-                <span className="line-clamp-2 font-medium w-[260px] whitespace-break-spaces">
-                  {sermon.title}
-                </span>
-                <span className="line-clamp-2 w-[260px] text-xs whitespace-break-spaces">
-                  {sermon.sub_title}
-                </span>
-              </button>
+                sermon={sermon}
+                setSelectedSermon={setSelectedSermon}
+                selectedSermon={selectedVerseDebounce}
+                setFinishedDownload={setFinishedDownload}
+                finishedDownload={finishedDownload}
+              />
             ))}
             {isError && <span>{tr("home.sermon_unvailable")}</span>}
             {isLoading && <span>{tr("home.waiting")}</span>}

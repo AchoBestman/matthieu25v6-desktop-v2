@@ -33,7 +33,6 @@ export default function Menu({ song }: Readonly<{ song: SingList }>) {
     getLocalFilePath(lng, "Hymns", song.title)
       .then(() => {
         setFileIsDownload(true);
-        console.log(song.title, "song.title");
       })
       .catch(() => {});
 

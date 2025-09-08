@@ -52,9 +52,20 @@ export const VersesSchema = z.object({
   info: z.string().optional().nullable(),
   link_at_content: z.string().optional().nullable(),
   url_content: z.string().optional().nullable(),
+  title: z.string().optional().nullable(),
   sermon_id: ModelRefSchema,
   concordances: ConcordanceSchema.optional().nullable(),
   concordance: z.string().optional().nullable(),
+  verse_links: z
+    .array(
+      z.object({
+        url: z.string().nonempty(),
+        type: z.string().nonempty(),
+        fileName: z.string().nullable(),
+        content: z.string().nullable(),
+      })
+    )
+    .nullable(),
 });
 
 export const SermonSchema = z.object({
@@ -85,6 +96,7 @@ export const SermonSearchParamsSchema = z.object({
   limit: z.number().optional(),
   page: z.number().optional(),
   order: z.enum(["ASC", "DESC"]),
+  is_active: z.coerce.number().optional(),
 });
 
 export const LinksTypeSchema = z.object({

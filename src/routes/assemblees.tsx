@@ -45,7 +45,7 @@ function RouteComponent() {
   return (
     <div>
       <div
-        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-muted z-20`}
+        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-muted z-1`}
       >
         <div className="flex items-center justify-end my-5">
           {countriesLoaded && countriesData.data.length > 0 && (

@@ -21,6 +21,8 @@ export const resources = Object.freeze({
   statistics: "statistics",
   heads: "heads",
   downloadAudio: "download-audio",
+  searchVerses: "search-verses",
+  imageSermons: "image_sermons",
 });
 
 export type ResourcesType = (typeof resources)[keyof typeof resources];

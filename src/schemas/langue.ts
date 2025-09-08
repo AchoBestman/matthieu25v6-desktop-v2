@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const LangueSchema = z.object({
-  id: z.number().optional(),
+  id: z.number(),
   libelle: z.string(),
   initial: z.string(),
   main: z.number(),

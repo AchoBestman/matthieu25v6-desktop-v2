@@ -42,7 +42,6 @@ const LangueDropdown = () => {
   });
   const [open, setOpen] = useState<boolean>(false);
   const abortRef = useRef(false);
-
   const onOpenChange = () => {
     setOpen(!open);
   };

@@ -43,6 +43,7 @@ export const SingleHeadSchema = z.lazy(() =>
     country_id: z.number(),
     country: CountrySchema,
     assembly: AssemblySchema,
+    brother: BrotherSchema,
   })
 );
 export type SingleHead = z.infer<typeof SingleHeadSchema>;

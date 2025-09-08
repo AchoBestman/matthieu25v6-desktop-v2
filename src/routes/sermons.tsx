@@ -1,32 +1,75 @@
-import { DownloadButton } from "@/components/buttons/download-button";
 import DisplayAlert from "@/components/dialog/display-alert";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import SermonHeader from "@/components/sermons/sermon-header";
-import { useAudioPlayer } from "@/context/audio-player-context";
 import { useLangue } from "@/context/langue-context";
 import { useSermon } from "@/context/sermon-context";
 import { resources } from "@/lib/resources";
-import { findBy } from "@/lib/resources/sermon";
-import {
-  downloadDrogressType,
-  fileUrlFormat,
-  getLocalFilePath,
-} from "@/lib/utils";
+import { findBy, findImage } from "@/lib/resources/sermon";
+import { downloadDrogressType, getLocalFilePath } from "@/lib/utils";
 import { Verses } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { Download } from "lucide-react";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import PageLoader from "@/components/loaders/page-loader";
+import { hasInternet, openCenteredPopup } from "@/hooks/use-online-status";
 
 export const Route = createFileRoute("/sermons")({
   component: RouteComponent,
 });
 
+export const DownloadVerseLink = ({ verset }: { verset: Verses }) => {
+  const [isLoad, setIsLoad] = useState(false);
+  const download = async (value: { fileName: string | null; url: string }) => {
+    setIsLoad(true);
+    const online = await hasInternet();
+    setIsLoad(false);
+    if (!online) {
+      alert(tr("alert.cannot_download"));
+      return;
+    }
+    const w = value.fileName?.endsWith(".pdf") ? 700 : 400;
+    const h = value.fileName?.endsWith(".pdf") ? 400 : 50;
+    // créer dynamiquement un <a> et simuler le clic
+    openCenteredPopup(value.url, value.fileName || "", w, h);
+  };
+
+  if (!verset?.verse_links?.length) return <></>;
+  if (isLoad)
+    return <span className="inline-block animate-spin text-blue-600">⟳</span>;
+
+  return (
+    <div className="text-blue-600 mb-2 pr-2 flex flex-wrap print-hidden">
+      {verset.verse_links?.map((value, key) => {
+        const label =
+          value.type === "audio"
+            ? `${tr("table.lien_audio")} ${value.content}`
+            : `${tr("table.lien_audio")} ${value.content}(${value.fileName})`;
+        const suffix =
+          verset?.verse_links?.length && verset?.verse_links?.length > 1
+            ? `(${key + 1})`
+            : "";
+
+        return (
+          <button
+            key={key}
+            className="cursor-pointer capitalize pr-2 text-left text-blue-600"
+            onClick={() => download(value)}
+          >
+            <span>
+              {label}
+              {suffix}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 function RouteComponent() {
   const { lng, langName } = useLangue();
-  const { setAudio } = useAudioPlayer();
+  //const { setAudio } = useAudioPlayer();
   const refs = useRef<(HTMLParagraphElement | null)[]>([]);
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
@@ -37,6 +80,10 @@ function RouteComponent() {
     totalSize: 0,
   });
   const [finishedDownload, setFinishedDownload] = useState<boolean>(false);
+  const [sermonImage, setSermonImage] = useState<{
+    name: string;
+    blobUrl: string | null;
+  }>();
 
   const {
     fontSize,
@@ -107,11 +154,20 @@ function RouteComponent() {
         block: "center", // Align to the top of the viewport
       });
     }
-  }, [verseNumber, sermon]);
+  }, [verseNumber]);
 
   useEffect(() => {
     handleSearch();
   }, [handleSearch]);
+
+  useEffect(() => {
+    // if sermon change navigate to the first sermon
+    refs.current[0]?.scrollIntoView({
+      behavior: "smooth", // Smooth scrolling
+      block: "center", // Align to the top of the viewport
+    });
+    setSearch("");
+  }, [sermon]);
 
   const onOpenChange = () => {
     setOpen(!open);
@@ -121,19 +177,19 @@ function RouteComponent() {
     setOpenProgress(!openProgress);
   };
 
-  const playAudio = async (url: string, title: string) => {
-    let canPlay = true;
+  // const playAudio = async (url: string, title: string) => {
+  //   let canPlay = true;
 
-    if (!navigator.onLine) {
-      await getLocalFilePath(lng, "Others", title).catch(() => {
-        alert(tr("alert.cannot_download"));
-        canPlay = false;
-      });
-    }
-    if (canPlay && sermon) {
-      setAudio(url, title, sermon.id, undefined, true);
-    }
-  };
+  //   if (!navigator.onLine) {
+  //     await getLocalFilePath(lng, "Others", title).catch(() => {
+  //       alert(tr("alert.cannot_download"));
+  //       canPlay = false;
+  //     });
+  //   }
+  //   if (canPlay && sermon) {
+  //     setAudio(url, title, sermon.id, undefined, true);
+  //   }
+  // };
 
   useEffect(() => {
     if (sermon) {
@@ -145,7 +201,24 @@ function RouteComponent() {
           setFinishedDownload(false);
         });
     }
+    console.log(sermon, "sermon", isError);
+    if (sermon?.cover) {
+      findImage(lng, sermon.cover)
+        .then((value) => {
+          setSermonImage(value);
+        })
+        .catch((err) => {
+          console.log(err, "image error");
+        });
+    } else {
+      setSermonImage({ name: "", blobUrl: null });
+    }
   }, [sermon]);
+
+  useEffect(() => {
+    setNumber("1");
+    setVerseNumber("");
+  }, [lng]);
 
   return (
     <>
@@ -174,7 +247,7 @@ function RouteComponent() {
       >
         <div>
           <div
-            className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-20`}
+            className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-1`}
           >
             {sermon && (
               <SermonHeader
@@ -191,70 +264,64 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min`}
           >
-            <div className="text-center pb-4" style={{ fontSize }}>
+            <div
+              className="print-title flex items-center justify-center pb-4"
+              style={{ fontSize }}
+            >
               {" "}
               {sermon?.chapter} :{" "}
               {sermon &&
                 `${sermon.title} ${sermon.sub_title}`.replace("null", "")}
             </div>
+
+            <div className="flex">
+              {sermonImage?.blobUrl && (
+                <img
+                  alt=""
+                  className="float-left pr-4 mt-2"
+                  src={sermonImage?.blobUrl}
+                />
+              )}
+            </div>
             {sermon?.verses?.map((verset: Verses, key: number) => (
-              <div key={verset.number} className="px-2" style={{ fontSize }}>
+              <div key={verset.number} style={{ fontSize }}>
                 <div
                   ref={(el) => {
                     refs.current[key] = el;
                   }}
-                  style={{
-                    backgroundColor:
-                      verseNumber?.toString() === verset.number.toString()
-                        ? "yellow"
-                        : "transparent",
-                    color:
-                      verseNumber?.toString() === verset.number.toString()
-                        ? "black"
-                        : "",
-                  }}
-                  className="py-1"
+                  className={`py-1 ${verseNumber?.toString() === verset.number.toString() ? "bg-blue-600 dark:bg-yellow-300" : "bg-transparent"} ${verseNumber?.toString() === verset.number.toString() ? "text-white dark:text-black" : ""}`}
                 >
-                  <span className="font-bold dark:text-red-500 pr-1 float-start">
-                    {verset.number}.
-                  </span>
-                  {verset.url_content && verset.link_at_content ? (
-                    <div className="mb-4">
-                      <button
-                        className="text-left cursor-pointers"
-                        onClick={() =>
-                          playAudio(
-                            verset.url_content as string,
-                            verset.link_at_content as string
-                          )
-                        }
-                        dangerouslySetInnerHTML={{
-                          __html: verset.content.replace(
-                            verset.link_at_content,
-                            `<strong style="color:blue; cursor:pointer">${verset.link_at_content}</strong>`
-                          ),
-                        }}
-                      ></button>
-                      <DownloadButton
-                        audioUrl={verset.url_content}
-                        fileName={fileUrlFormat(verset.link_at_content)}
-                        subFolder="Others"
-                        setFinishedDownload={setFinishedDownload}
-                      >
-                        <Download className="text-red-500 cursor-pointer"></Download>
-                      </DownloadButton>
-                    </div>
-                  ) : (
-                    verset.content
+                  {verset.title && (
+                    <h1 className="py-1 text-left font-bold">{verset.title}</h1>
                   )}
+                  <div>
+                    <span className="font-bold dark:text-red-500">
+                      {verset.number}.
+                    </span>
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: ` ${verset.content.replace(/\n/g, "<br>")}`,
+                      }}
+                    ></span>
+                  </div>
                 </div>
-                <div
-                  id="invoice-hidden"
-                  className="text-blue-600 dark:text-blue-400"
-                >
+                <DownloadVerseLink verset={verset} />
+
+                <div>
+                  {/** not use button because in the pdf button give bad content */}
                   {verset.concordances?.concordance.map((value: any) => (
-                    <button
-                      className=" cursor-pointer"
+                    <span
+                      className="cursor-pointer
+                          print-concordance
+                          px-2 py-1
+                          bg-blue-100 dark:bg-blue-900
+                          text-blue-800 dark:text-blue-200
+                          rounded
+                          hover:bg-blue-200 dark:hover:bg-blue-700
+                          active:bg-blue-300 dark:active:bg-blue-600
+                          transition-colors
+                          duration-200
+                          mr-1 mb-1 text-sm"
                       onClick={() =>
                         navigateToSermon(
                           value.sermon_number,
@@ -264,8 +331,7 @@ function RouteComponent() {
                       key={`${value.sermon_number}-${value.verse_number}`}
                     >
                       {value.label}
-                      {""}
-                    </button>
+                    </span>
                   ))}
                 </div>
               </div>

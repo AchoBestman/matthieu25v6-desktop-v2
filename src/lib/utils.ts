@@ -99,7 +99,7 @@ export async function getLocalFilePath(
   await exists(filePath, {
     baseDir: baseDir,
   });
-console.log(filePath, "filePath");
+
   const bytes = await readFile(filePath, {
     baseDir: baseDir,
   });
@@ -117,3 +117,18 @@ export type downloadDrogressType = {
 };
 
 export type AudioFolder = "Hymns" | "Sermons" | "Others";
+
+export const toObject = (value: unknown) => {
+  const isObject = Object.prototype.toString.call(value) === "[object Object]";
+
+  if (!isObject) {
+    const isString =
+      Object.prototype.toString.call(value) === "[object String]";
+    if (isString) {
+      return JSON.parse(value as string);
+    }
+    return value;
+  }
+
+  return value;
+};

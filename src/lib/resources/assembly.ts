@@ -1,7 +1,7 @@
 import { ResourcesType } from "@/lib/resources";
 import { allModels, oneModel } from "@/lib/resources/base";
 import { Assembly, AssemblySerchParams } from "@/schemas/assembly";
-import { Head } from "@/schemas/brother";
+import { SingleHead } from "@/schemas/brother";
 import { DataType } from "@/schemas/sermon";
 
 export const findAll = async (
@@ -60,8 +60,13 @@ export const findBy = async (
   lang: string,
   params: { column: string; value: string | number | boolean },
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[]
-): Promise<Head> => {
-  const response = await oneModel<Head>(resource, lang, params, relationships);
+): Promise<SingleHead> => {
+  const response = await oneModel<SingleHead>(
+    resource,
+    lang,
+    params,
+    relationships
+  );
 
-  return response as Head;
+  return response as SingleHead;
 };

@@ -104,7 +104,7 @@ export const findNextSong = async (
   album_id?: number
 ) => {
   const db = await database(lang);
-  console.log(lang, "next");
+
   let result;
   if (album_id) {
     result = await db.select(
@@ -127,6 +127,6 @@ export const findNextSong = async (
       [id]
     );
   }
-  console.log(result, "result");
+
   return result;
 };

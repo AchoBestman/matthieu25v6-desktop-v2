@@ -52,7 +52,7 @@ export async function downloadWithProgress(
   });
 
   const bustCacheUrl = `${url}?t=${Date.now()}`;
-  console.log(url, "api url", bustCacheUrl);
+
   const res = await fetch(bustCacheUrl, { cache: "no-store" });
 
   if (!res.ok || !res.body) {
@@ -151,7 +151,6 @@ const database = async (
     }
   }
   return await Database.load(`sqlite:${dbPath}`).catch((err) => {
-    console.log(err);
     throw err;
   });
 };

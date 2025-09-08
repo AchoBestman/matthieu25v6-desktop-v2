@@ -6,6 +6,44 @@ import SongPlayerManualButton from "../buttons/manual-player";
 import PrintButton from "../buttons/print-button";
 import { Printer } from "lucide-react";
 
+const printStyle = `
+  /* Style du header de l’invoice */
+  #invoice > .print-title {
+    display: block !important;
+    text-align: center !important;
+    font-size: 30px !important;
+    font-weight: bold !important;
+  }
+
+  /* Style du numéro de verset */
+  #invoice span.font-bold {
+    font-weight: bold !important;
+  }
+
+  #invoice div, #invoice span {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.5 !important; /* ou 1.1 pour plus serré */
+  }
+
+  #invoice .print-concordance{
+   color: blue !important;
+  }
+
+  .print-hidden{
+    display: none !important;
+  }
+
+  /* Optionnel : ajuster images */
+  #invoice img {
+    max-width: 100% !important;
+    height: auto !important;
+    float: left;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+  }
+`;
+
 const SermonHeader = ({
   sermon,
   handleLocalSearch,
@@ -36,10 +74,7 @@ const SermonHeader = ({
           />
           <PrintButton
             elementId="invoice"
-            style={`
-                  .invoice {line-height: 20px; text-align: justify;}
-                   .print-number {font-size: 2em;} #invoice {margin-left: 100px; font-size: 30px;} #invoice-hidden {display: none;}
-                   `}
+            style={printStyle}
             documentTitle={sermon.title}
           >
             <Printer className="cursor-pointer mx-2 text-amber-800 dark:text-white"></Printer>

@@ -34,8 +34,8 @@ export default function Menu({ assembly }: Readonly<{ assembly: Assembly }>) {
         value: assembly.id,
       },
       [{ table: "brothers", type: "BelongsTo" }]
-    ).then(({ brother }: { brother: Brother }) => {
-      setUser(brother);
+    ).then((head) => {
+      setUser(head.brother);
     });
   };
 
