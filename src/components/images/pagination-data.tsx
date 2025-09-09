@@ -34,7 +34,10 @@ const PaginationData = ({
           <Select
             value={`${pagination.meta?.perPage}`}
             onValueChange={(value) => {
-              setSearchParams({ per_page: Number(value) });
+              setSearchParams({
+                per_page: Number(value),
+                page: pagination.meta?.currentPage,
+              });
             }}
           >
             <SelectTrigger className="h-8 w-[70px]">
@@ -60,7 +63,10 @@ const PaginationData = ({
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
             onClick={() =>
-              setSearchParams({ page: pagination.links?.first ?? 1 })
+              setSearchParams({
+                page: pagination.links?.first ?? 1,
+                per_page: pagination.meta?.perPage,
+              })
             }
             disabled={!pagination.links?.first}
           >
@@ -71,7 +77,10 @@ const PaginationData = ({
             variant="outline"
             className="h-8 w-8 p-0"
             onClick={() =>
-              setSearchParams({ page: pagination.links?.prev ?? 1 })
+              setSearchParams({
+                page: pagination.links?.prev ?? 1,
+                per_page: pagination.meta?.perPage,
+              })
             }
             disabled={!pagination.links?.prev}
           >
@@ -84,6 +93,7 @@ const PaginationData = ({
             onClick={() =>
               setSearchParams({
                 page: pagination.links?.next ?? 1,
+                per_page: pagination.meta?.perPage,
               })
             }
             disabled={!pagination.links?.next}
@@ -97,6 +107,7 @@ const PaginationData = ({
             onClick={() =>
               setSearchParams({
                 page: pagination.links?.last ?? 1,
+                per_page: pagination.meta?.perPage,
               })
             }
             disabled={!pagination.links?.last}

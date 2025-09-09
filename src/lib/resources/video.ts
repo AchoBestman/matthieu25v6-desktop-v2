@@ -24,6 +24,10 @@ export const findAll = async (
     searchParams.push(params.is_active === true ? 1 : 0);
   }
 
+  if (params?.page) {
+    params.current_page = params.page;
+  }
+
   if (params?.event_id) {
     conditions.push(`event_id = ?`);
     searchParams.push(params.event_id);

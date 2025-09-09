@@ -19,11 +19,19 @@ export const findAll = async (
     searchParams.push(`%${params.search}%`, `%${params.search}%`);
   }
 
+  if (params?.page) {
+    params.current_page = params.page;
+  }
+
   if (params?.is_active !== undefined) {
     conditions.push(`is_active = ?`);
     searchParams.push(params.is_active === true ? 1 : 0);
   }
 
+  if (params?.event_id) {
+    conditions.push(`event_id = ?`);
+    searchParams.push(params.event_id);
+  }
   if (params?.event_id) {
     conditions.push(`event_id = ?`);
     searchParams.push(params.event_id);

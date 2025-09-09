@@ -52,7 +52,7 @@ const SelectWithSearch = ({
   return (
     <div className=" mx-2 border-2 border-amber-800 dark:border-white rounded-lg">
       <Select onValueChange={handleValueChange}>
-        <SelectTrigger className="w-[280px]">
+        <SelectTrigger className="w-[280px] cursor-pointer">
           <SelectValue placeholder={title} />
         </SelectTrigger>
         <SelectContent className="bg-muted/100 border-2 border-amber-800 dark:border-white">

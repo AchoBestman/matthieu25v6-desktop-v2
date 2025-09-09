@@ -1,15 +1,14 @@
 "use client";
 
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { Table } from "@tanstack/react-table";
 import { Settings2 } from "lucide-react";
-
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { tr } from "@/translation";
@@ -33,7 +32,11 @@ export function DataTableViewOptions<TData>({
           {tr("table.columns")}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px] bg-muted/100">
+      <DropdownMenuContent
+        sideOffset={4}
+        align="end"
+        className="w-[150px] bg-muted/100 z-auto"
+      >
         <DropdownMenuLabel>{tr("table.columns")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table

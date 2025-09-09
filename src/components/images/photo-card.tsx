@@ -33,15 +33,20 @@ export default function PhotoCard({
         <img src={url} alt="background" className="object-cover" />
       </div>
       <div className="p-2 mb-10">
-        <h3 className="text-customPrimary">{title}</h3>
-        <p>{description}</p>
+        {title ? (
+          <p className="text-customPrimary">{title}</p>
+        ) : (
+          <p>{description}</p>
+        )}
       </div>
-      <Button
-        onClick={onOpenChange}
-        className="text-white border-2 dark:border-white"
-      >
-        {tr("button.see_more")}
-      </Button>
+      {description && (
+        <Button
+          onClick={onOpenChange}
+          className="text-white border-2 dark:border-white"
+        >
+          {tr("button.see_more")}
+        </Button>
+      )}
 
       <ShowPhotoModal
         title={description as string}

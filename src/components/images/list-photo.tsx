@@ -35,7 +35,7 @@ export default function ListPhoto() {
         search: searchTermDebounce,
       }),
   });
-console.log(photos, "photos");
+
   return (
     <>
       <div
