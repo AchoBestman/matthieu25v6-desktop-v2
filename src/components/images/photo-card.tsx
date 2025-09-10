@@ -25,32 +25,34 @@ export default function PhotoCard({
   };
 
   return (
-    <div className="relative">
-    <div className="rounded-lg overflow-hidden shadow-md relative">
-      <div
-        className="h-60 relative cursor-pointer"
-        onClick={() => setImageModalOpen(true)}
-      >
-        <img src={url} alt="background" className="w-full h-auto object-contain" />
+    <div className="relative shadow-md">
+      <div className="rounded-lg overflow-hidden relative">
+        <div
+          className="h-60 relative cursor-pointer"
+          onClick={() => setImageModalOpen(true)}
+        >
+          <img
+            src={url}
+            alt="background"
+            className="w-full h-auto object-contain"
+          />
+        </div>
+
+        <ShowPhotoModal
+          title={description as string}
+          url={url}
+          open={open}
+          onOpenChange={onOpenChange}
+        />
+
+        {/* Fullscreen Image Modal */}
+        <FullscreenImageModal
+          url={url}
+          open={imageModalOpen}
+          onOpenChange={setImageModalOpen}
+        />
       </div>
-      
-
-      <ShowPhotoModal
-        title={description as string}
-        url={url}
-        open={open}
-        onOpenChange={onOpenChange}
-      />
-
-      {/* Fullscreen Image Modal */}
-      <FullscreenImageModal
-        url={url}
-        open={imageModalOpen}
-        onOpenChange={setImageModalOpen}
-      />
-      
-    </div>
-    <div className="p-2 mb-10">
+      <div className="p-2 mb-10">
         {title ? (
           <p className="text-customPrimary">{title}</p>
         ) : (
