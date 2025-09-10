@@ -66,12 +66,14 @@ const SermonHeader = ({
       </div>
       <div className="flex items-center justify-end">
         <div className="flex justify-start items-center mr-4">
-          <SongPlayerManualButton
-            setFinishedDownload={setFinishedDownload}
-            type="Sermons"
-            data={sermon}
-            fileIsDownload={fileIsDownload}
-          />
+          {sermon.audio && (
+            <SongPlayerManualButton
+              setFinishedDownload={setFinishedDownload}
+              type="Sermons"
+              data={sermon}
+              fileIsDownload={fileIsDownload}
+            />
+          )}
           <PrintButton
             elementId="invoice"
             style={printStyle}

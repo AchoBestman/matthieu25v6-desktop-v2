@@ -20,7 +20,9 @@ export const findAll = async (
   params?: { [key: string]: string | number | boolean },
   order?: { column: string; direction: "ASC" | "DESC" }
 ): Promise<DataType<Sermon>> => {
-  const baseQuery = `SELECT * FROM ${resource}`;
+
+  const baseQuery = `SELECT s.*, v.number as verse_number FROM ${resource} s LEFT JOIN verses v ON v.sermon_id = s.id AND v.number = 1`;
+  //const baseQuery = `SELECT * FROM ${resource}`; is the old one
   let countQuery = `SELECT COUNT(*) as total FROM ${resource}`;
   const conditions = [];
   const searchParams: any[] = [];

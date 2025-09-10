@@ -1,5 +1,5 @@
 import * as React from "react";
-import {  useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { X, Search, ShieldClose } from "lucide-react";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
@@ -58,7 +58,6 @@ export function SearchDrawer({
       )
     );
   };
-  //className={`py-1 ${verseNumber?.toString() === verset.number.toString() ? "bg-blue-600 dark:bg-yellow-300" : "bg-transparent"} ${verseNumber?.toString() === verset.number.toString() ? "text-white dark:text-black" : ""}`}
   if (!open) return null;
 
   return (

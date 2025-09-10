@@ -73,6 +73,7 @@ export const SermonSchema = z.object({
   title: z.string(),
   sub_title: z.string().nullable().optional(),
   number: z.number(),
+  verse_number: z.union([z.number(), z.string()]).nullable().optional(),
   audio: z.string().nullable().optional(),
   audio_name: z.string().nullable().optional(),
   video: z.string().nullable().optional(),

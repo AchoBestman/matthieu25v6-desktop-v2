@@ -24,7 +24,7 @@ const SongPlayerManualButton = ({
     useAudioPlayer();
 
   const { lng } = useLangue();
-
+  console.log(data);
   const title =
     type === "Sermons"
       ? `${(data as Sermon).chapter} : ${data.title}`
@@ -53,7 +53,7 @@ const SongPlayerManualButton = ({
     <div className="flex justify-start items-center">
       <div>
         {(data.audio !== audioUrl ||
-          (!playedAudioUrl && data.audio === audioUrl)) && (
+          (!playedAudioUrl && data.audio === audioUrl && data.audio)) && (
           <PlayCircle
             className={`cursor-pointer h-6 w-6 text-amber-800 dark:text-white`}
             onClick={() => putsongInPlayer()}

@@ -5,7 +5,11 @@ import { useLangue } from "@/context/langue-context";
 import { useSermon } from "@/context/sermon-context";
 import { resources } from "@/lib/resources";
 import { findBy, findImage } from "@/lib/resources/sermon";
-import { downloadDrogressType, getLocalFilePath } from "@/lib/utils";
+import {
+  downloadDrogressType,
+  firstSermonVerse,
+  getLocalFilePath,
+} from "@/lib/utils";
 import { Verses } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
@@ -135,7 +139,14 @@ function RouteComponent() {
       if (index?.number) {
         setVerseNumber(index?.number.toString());
       }
+      if (!index?.number) {
+        //clear coloration if text is not found
+        setVerseNumber("");
+      }
       setSearch(term);
+    } else {
+      //clear coloration if text is not found
+      setVerseNumber("");
     }
   };
 
@@ -154,20 +165,21 @@ function RouteComponent() {
         block: "center", // Align to the top of the viewport
       });
     }
-  }, [verseNumber]);
+  }, [verseNumber, sermon]);
 
   useEffect(() => {
     handleSearch();
   }, [handleSearch]);
 
   useEffect(() => {
-    // if sermon change navigate to the first sermon
     refs.current[0]?.scrollIntoView({
-      behavior: "smooth", // Smooth scrolling
-      block: "center", // Align to the top of the viewport
+      behavior: "smooth",
+      block: "center",
     });
     setSearch("");
-  }, [sermon]);
+    setVerseNumber("");
+    setNumber("1");
+  }, [lng]);
 
   const onOpenChange = () => {
     setOpen(!open);
@@ -201,7 +213,7 @@ function RouteComponent() {
           setFinishedDownload(false);
         });
     }
-    console.log(sermon, "sermon", isError);
+
     if (sermon?.cover) {
       findImage(lng, sermon.cover)
         .then((value) => {
@@ -216,8 +228,10 @@ function RouteComponent() {
   }, [sermon]);
 
   useEffect(() => {
-    setNumber("1");
-    setVerseNumber("");
+    if (sermon) {
+      setNumber(`${sermon.number}`);
+      setVerseNumber(firstSermonVerse(sermon));
+    }
   }, [lng]);
 
   return (
@@ -289,7 +303,7 @@ function RouteComponent() {
                   ref={(el) => {
                     refs.current[key] = el;
                   }}
-                  className={`py-1 ${verseNumber?.toString() === verset.number.toString() ? "bg-blue-600 dark:bg-yellow-300" : "bg-transparent"} ${verseNumber?.toString() === verset.number.toString() ? "text-white dark:text-black" : ""}`}
+                  className={`py-1 ${verseNumber?.toString() === verset.number.toString() && ((!search && verset.number > 1) || search) ? "bg-blue-600 dark:bg-yellow-300" : "bg-transparent"} ${verseNumber?.toString() === verset.number.toString() && ((!search && verset.number > 1) || search) ? "text-white dark:text-black" : ""}`}
                 >
                   {verset.title && (
                     <h1 className="py-1 text-left font-bold">{verset.title}</h1>

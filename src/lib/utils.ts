@@ -2,6 +2,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import slug from "slug";
 import { BaseDirectory, exists, readFile } from "@tauri-apps/plugin-fs";
+import { Sermon } from "@/schemas/sermon";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -131,4 +132,11 @@ export const toObject = (value: unknown) => {
   }
 
   return value;
+};
+
+export const firstSermonVerse = (sermon: Sermon): string => {
+  if (sermon.verse_number) return `${sermon.verse_number}`;
+  if (!sermon.verses || sermon.verses.length === 0) return "";
+  const firstVerse = sermon.verses[0];
+  return `${firstVerse.number}`;
 };
