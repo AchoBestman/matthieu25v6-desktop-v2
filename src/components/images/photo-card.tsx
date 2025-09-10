@@ -25,28 +25,15 @@ export default function PhotoCard({
   };
 
   return (
+    <div className="relative">
     <div className="rounded-lg overflow-hidden shadow-md relative">
       <div
         className="h-60 relative cursor-pointer"
         onClick={() => setImageModalOpen(true)}
       >
-        <img src={url} alt="background" className="object-cover" />
+        <img src={url} alt="background" className="w-full h-auto object-contain" />
       </div>
-      <div className="p-2 mb-10">
-        {title ? (
-          <p className="text-customPrimary">{title}</p>
-        ) : (
-          <p>{description}</p>
-        )}
-      </div>
-      {description && (
-        <Button
-          onClick={onOpenChange}
-          className="text-white border-2 dark:border-white"
-        >
-          {tr("button.see_more")}
-        </Button>
-      )}
+      
 
       <ShowPhotoModal
         title={description as string}
@@ -61,6 +48,23 @@ export default function PhotoCard({
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
       />
+      
+    </div>
+    <div className="p-2 mb-10">
+        {title ? (
+          <p className="text-customPrimary">{title}</p>
+        ) : (
+          <p>{description}</p>
+        )}
+      </div>
+      {description && (
+        <Button
+          onClick={onOpenChange}
+          className="text-white border-2 dark:border-white"
+        >
+          {tr("button.see_more")}
+        </Button>
+      )}
     </div>
   );
 }

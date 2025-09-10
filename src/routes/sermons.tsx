@@ -162,7 +162,7 @@ function RouteComponent() {
     if (sermon?.verses && index >= 0 && index < sermon.verses.length) {
       refs.current[index]?.scrollIntoView({
         behavior: "smooth", // Smooth scrolling
-        block: "center", // Align to the top of the viewport
+        block: "start", // Align to the start of the viewport
       });
     }
   }, [verseNumber, sermon]);
