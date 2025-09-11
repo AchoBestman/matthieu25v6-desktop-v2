@@ -162,7 +162,7 @@ function RouteComponent() {
     if (sermon?.verses && index >= 0 && index < sermon.verses.length) {
       refs.current[index]?.scrollIntoView({
         behavior: "smooth", // Smooth scrolling
-        block: "start", // Align to the start of the viewport
+        block: search ? "center": "center", // Align to the start of the viewport
       });
     }
   }, [verseNumber, sermon]);
@@ -194,7 +194,7 @@ function RouteComponent() {
 
   //   if (!navigator.onLine) {
   //     await getLocalFilePath(lng, "Others", title).catch(() => {
-  //       alert(tr("alert.cannot_download"));
+  //       handleConfirmAlert(tr("alert.cannot_download"));
   //       canPlay = false;
   //     });
   //   }

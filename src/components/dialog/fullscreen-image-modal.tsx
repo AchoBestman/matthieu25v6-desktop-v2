@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useEffect } from "react";
 import { ZoomIn, ZoomOut, RotateCcw, X } from "lucide-react";
+import { tr } from "@/translation";
 
 interface FullscreenImageModalProps {
   url: string;
@@ -138,12 +139,13 @@ export function FullscreenImageModal({
             size="icon"
             onClick={zoomIn}
             className="text-white bg-transparent border-white/20 hover:bg-white/10"
-            title="Zoom avant"
+            title={tr("button.zoom_in")}
           >
             <ZoomIn size={20} />
           </Button>
 
           <Button
+            title={tr("button.zoom_out")}
             variant="outline"
             size="icon"
             onClick={zoomOut}
@@ -154,6 +156,7 @@ export function FullscreenImageModal({
           </Button>
 
           <Button
+            title={tr("button.reset_zoom")}
             variant="outline"
             size="icon"
             onClick={resetZoom}
@@ -164,6 +167,7 @@ export function FullscreenImageModal({
           </Button>
           <AlertDialogCancel className="outline-none">
             <Button
+              title={tr("button.close")}
               variant="outline"
               size="icon"
               className="text-white bg-transparent border-white/20 hover:bg-white/10"

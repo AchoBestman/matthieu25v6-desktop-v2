@@ -8,6 +8,7 @@ import { API_URL } from "@/lib/env";
 import { tr } from "@/translation";
 import DownloadProgressModal from "../dialog/download-progress-modal";
 import { useLangue } from "@/context/langue-context";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 
 export async function downloadAudioWithProgress(
   initial: string,
@@ -155,7 +156,7 @@ export const DownloadButton = ({
 
   const handleDownload = async () => {
     if (!navigator.onLine) {
-      alert(tr("alert.cannot_download"));
+      handleConfirmAlert(tr("alert.cannot_download"))
       return;
     }
     try {

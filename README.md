@@ -7,3 +7,6 @@ This template should help get you started developing with Tauri, React and Types
 ## Default color: bg-amber-800 text-amber-800
 
 ## rustup update stable if get he package requires the Cargo feature called `edition2024`
+
+## Translate language
+français(fr), anglaise(en), arabe(ar), allemand(de), espagnole(es), iran(fa), hindi(hi), Indonesia(id), italien(it), japan(ja), Netherlands(nl), Norsk(no), Polski(pl), portugais(pt), Româna(ro), russe(ru), Talmud(ta), Mandarin(zh), Türkçe(tr) 

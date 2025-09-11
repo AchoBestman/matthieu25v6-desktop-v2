@@ -1,3 +1,5 @@
+"use client";
+
 import { tr } from "@/translation";
 import { Button } from "../ui/button";
 import { useState, useEffect } from "react";
@@ -30,7 +32,8 @@ const PrintButton = ({
     }
   }, []);
 
-  const handlePrint = () => {
+  const handlePrintOld = () => {
+    console.log(isBrowser, printJS, "printJs")
     if (isBrowser && printJS) {
       printJS({
         printable: elementId,
@@ -41,6 +44,29 @@ const PrintButton = ({
       });
     }
   };
+
+const handlePrint = () => {
+
+  const isSafari = /Mac/.test(navigator.platform) && /AppleWebKit/.test(navigator.userAgent);
+console.log(isSafari, 'isSafari')
+  if (isBrowser && printJS) {
+    printJS({ // Make sure you're calling the function with ()
+      printable: elementId,
+      type: "html",
+      style: style,
+      ignoreElements: ["esc", "esc1", "esc2"],
+      documentTitle: documentTitle,
+      onPrintDialogClose: () => {
+        // Cleanup if needed
+      },
+      onError: (error) => {
+        console.error("Print error:", error);
+      }
+    });
+  } else {
+    console.error("PrintJS not available");
+  }
+};
 
   return (
     <div onClick={handlePrint} className="print-button">

@@ -5,6 +5,7 @@ import { tr } from "@/translation";
 import { XCircle } from "lucide-react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 
 const SongPlayer = ({
   lightColor,
@@ -35,16 +36,19 @@ const SongPlayer = ({
   if (!audioUrl) return null;
 
   const handleRemovePlayer = () => {
-    const confirmed = confirm(tr("alert.stop_playing"));
-    if (confirmed) {
-      audioRef.current?.pause();
-      setAudio("", "", 0);
-    }
+    handleConfirmAlert(tr("alert.stop_playing"), false, handleRemovePlayerConfirm);
+  };
+
+  const handleRemovePlayerConfirm = () => {
+    audioRef.current?.pause();
+    setAudio("", "", 0);
   };
 
   return (
     <div
-      className={`audio-player-wrapper ${play ? "playing" : ""} ${playedAudioUrl ? "" : "hidden"}`}
+      className={`audio-player-wrapper ${play ? "playing" : ""} ${
+        playedAudioUrl ? "" : "hidden"
+      }`}
       style={{
         position: "fixed",
         bottom: 0,

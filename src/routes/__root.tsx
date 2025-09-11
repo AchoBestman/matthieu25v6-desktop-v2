@@ -15,6 +15,7 @@ import { tr } from "@/translation";
 import { useLangue } from "@/context/langue-context";
 import { SearchCodeIcon } from "lucide-react";
 import { SearchDrawer } from "@/components/commons/search-drawer";
+import 'react-confirm-alert/src/react-confirm-alert.css';
 
 export const Route = createRootRoute({
   component: RootComponent,

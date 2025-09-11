@@ -38,6 +38,11 @@ body {
   }
 }
 
+/* css for personnalize react alert and confirm dialog */
+.overlay-custom-class-name .react-confirm-alert-button-group {
+  justify-content: flex-end;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

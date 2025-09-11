@@ -12,6 +12,7 @@ import { findNextSong, findPreviousSong } from "@/lib/resources/song";
 import { AudioFolder, getLocalFilePath } from "@/lib/utils";
 import { tr } from "@/translation";
 import { useLangue } from "./langue-context";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 
 type AudioContextType = {
   audioUrl: string | null;
@@ -99,7 +100,7 @@ export function AudioPlayerProvider({
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
       const canPlay = await getCanPlay(title, subFolder).catch(() => {
-        alert(tr("alert.cannot_download"));
+        handleConfirmAlert(tr("alert.cannot_download"))
       });
 
       if (song && canPlay) {
@@ -120,7 +121,7 @@ export function AudioPlayerProvider({
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
       const canPlay = await getCanPlay(title, subFolder).catch(() => {
-        alert(tr("alert.cannot_download"));
+        handleConfirmAlert(tr("alert.cannot_download"))
       });
 
       if (song && canPlay) {
@@ -173,7 +174,7 @@ export function AudioPlayerProvider({
       setIsDownloaded(true);
     } catch (error) {
       if (!navigator.onLine) {
-        alert(tr("alert.cannot_download"));
+        handleConfirmAlert(tr("alert.cannot_download"))
         audioRef.current?.pause();
         setAudio("", "", 0);
         return;

@@ -28,6 +28,7 @@ function RouteComponent() {
 
   return (
     <div className="mt-10">
+      
       {isLoading && tr("home.waiting")}
       {isError && tr("home.search_not_found_pred_message")}
       <PageLoader

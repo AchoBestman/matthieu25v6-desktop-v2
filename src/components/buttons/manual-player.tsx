@@ -7,6 +7,7 @@ import { useAudioPlayer } from "@/context/audio-player-context";
 import { tr } from "@/translation";
 import { DownloadButton } from "./download-button";
 import { useLangue } from "@/context/langue-context";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 
 export type SongPlayerManualButtonType = {
   data: Sermon | SingList;
@@ -34,7 +35,7 @@ const SongPlayerManualButton = ({
     let canPlay = true;
     if (!navigator.onLine) {
       await getLocalFilePath(lng, type, title.replace(" : ", "_")).catch(() => {
-        alert(tr("alert.cannot_download"));
+        handleConfirmAlert(tr("alert.cannot_download"))
         canPlay = false;
       });
     }
