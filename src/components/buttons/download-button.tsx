@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { BaseDirectory, writeFile, mkdir } from "@tauri-apps/plugin-fs";
 import { AudioFolder, downloadDrogressType } from "@/lib/utils";
 import { resources } from "@/lib/resources";

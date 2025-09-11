@@ -270,6 +270,7 @@ function RouteComponent() {
                 handleLocalSearch={handleLocalSearch}
                 fileIsDownload={finishedDownload}
                 setFinishedDownload={setFinishedDownload}
+                sermonImage={sermonImage}
               ></SermonHeader>
             )}
           </div>
@@ -303,7 +304,17 @@ function RouteComponent() {
                   ref={(el) => {
                     refs.current[key] = el;
                   }}
-                  className={`py-1 ${verseNumber?.toString() === verset.number.toString() && ((!search && verset.number > 1) || search) ? "bg-blue-600 dark:bg-yellow-300" : "bg-transparent"} ${verseNumber?.toString() === verset.number.toString() && ((!search && verset.number > 1) || search) ? "text-white dark:text-black" : ""}`}
+                  className={`py-1 ${
+                    verseNumber?.toString() === verset.number.toString() &&
+                    ((!search && verset.number > 1) || search)
+                      ? "bg-blue-600 dark:bg-yellow-300"
+                      : "bg-transparent"
+                  } ${
+                    verseNumber?.toString() === verset.number.toString() &&
+                    ((!search && verset.number > 1) || search)
+                      ? "text-white dark:text-black"
+                      : ""
+                  }`}
                 >
                   {verset.title && (
                     <h1 className="py-1 text-left font-bold">{verset.title}</h1>

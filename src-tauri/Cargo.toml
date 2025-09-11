@@ -38,3 +38,4 @@ serde_json = "1"
 tauri-plugin-fs = "2"
 tauri-plugin-sql = { version = "2", features = ["sqlite"] }
 sqlite_blob_reader = { path = "./libs/sqlite_blob_reader" }
+
