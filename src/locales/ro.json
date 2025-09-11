@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Se descarcă limba, vă rugăm să așteptați.",
     "waiting_for_downloaded_audio": "Se descarcă audio, vă rugăm să așteptați.",
     "langue_is_downloaded": "Descărcare completă! Vă rugăm să închideți fereastra!",
-    "langue_not_found": "Trebuie mai întâi să descărcați limba!"
+    "langue_not_found": "Trebuie mai întâi să descărcați limba!",
+    "pdf_download_title": "Descărcare finalizată",
+    "pdf_download_message": "Fișierul PDF a fost salvat în folderul Descărcări."
   },
   "text": {
     "font_size": "Dimensiune text"

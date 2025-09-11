@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "O idioma está sendo baixado, por favor, aguarde.",
     "waiting_for_downloaded_audio": "O áudio está sendo baixado, por favor, aguarde.",
     "langue_is_downloaded": "Download concluído! Por favor, feche a janela!",
-    "langue_not_found": "Você precisa baixar o idioma primeiro!"
+    "langue_not_found": "Você precisa baixar o idioma primeiro!",
+    "pdf_download_title": "Download concluído",
+    "pdf_download_message": "Seu arquivo PDF foi salvo na pasta Downloads."
   },
   "text": {
     "font_size": "Tamanho do texto"

@@ -66,7 +66,6 @@ const SermonHeader = ({
     blobUrl: string | null;
   };
 }) => {
-
   async function handleDownload(sermon: any, lng: string) {
     const blob = await pdf(
       <SermonPrinter sermon={sermon} sermonImage={sermonImage} />
@@ -74,16 +73,14 @@ const SermonHeader = ({
     const arrayBuffer = await blob.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
 
-    const fileName = `${sermon.chapter}-${lng}-${
-      new Date().toISOString().split("T")[0]
-    }.pdf`;
+    const fileName = `${sermon.chapter}-${lng}.pdf`;
 
     await writeFile(fileName, uint8Array, { baseDir: BaseDirectory.Download });
     handleConfirmAlert(
-      "Votre fichier PDF a été enregistré dans le dossier Téléchargements.",
+      tr("download.pdf_download_message"),
       true,
       undefined,
-      "Téléchargement terminé"
+      tr("download.pdf_download_title")
     );
   }
 

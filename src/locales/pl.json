@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Trwa pobieranie języka, proszę czekać.",
     "waiting_for_downloaded_audio": "Trwa pobieranie dźwięku, proszę czekać.",
     "langue_is_downloaded": "Pobieranie zakończone! Zamknij okno!",
-    "langue_not_found": "Najpierw musisz pobrać język!"
+    "langue_not_found": "Najpierw musisz pobrać język!",
+    "pdf_download_title": "Pobieranie zakończone",
+    "pdf_download_message": "Twój plik PDF został zapisany w folderze Pobrane."
   },
   "text": {
     "font_size": "Rozmiar tekstu"

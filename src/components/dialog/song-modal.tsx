@@ -9,8 +9,12 @@ import {
 import { SingList } from "@/schemas/song";
 import { tr } from "@/translation";
 import { Printer } from "lucide-react";
-import PrintButton from "@/components/buttons/print-button";
 import { useSermon } from "@/context/sermon-context";
+import { pdf } from "@react-pdf/renderer";
+import { SongPrinter } from "../tables/songs/song-printer";
+import { writeFile, BaseDirectory } from "@tauri-apps/plugin-fs";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import slug from "slug";
 
 const SongModal = ({
   open,
@@ -25,7 +29,28 @@ const SongModal = ({
   cancel?: boolean;
   albumTitle?: string;
 }) => {
-  const { fontSize} = useSermon();
+  const { fontSize } = useSermon();
+//console.log("Rendering SongModal with song:", song);
+  async function handleDownload() {
+
+    onOpenChange(false)
+    const blob = await pdf(
+      <SongPrinter song={song} albumTitle={albumTitle} />
+    ).toBlob();
+    const arrayBuffer = await blob.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    const fileName = `${slug(song.title)}-${slug(albumTitle ?? "")}.pdf`;
+
+    await writeFile(fileName, uint8Array, { baseDir: BaseDirectory.Download });
+    handleConfirmAlert(
+      tr("download.pdf_download_message"),
+      true,
+      undefined,
+      tr("download.pdf_download_title")
+    );
+  }
+
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -33,10 +58,14 @@ const SongModal = ({
           <AlertDialogHeader className="">
             <AlertDialogTitle className="relative flex justify-between">
               <span className="text-border-amber-800 dark:text-white">
-                {tr("home.hymns")}
+                {song.album?.title ?? tr("home.hymns")}
               </span>
               <span className="flex">
-                <PrintButton
+                <Printer
+                  onClick={() => handleDownload()}
+                  className="cursor-pointer mx-2 text-amber-800 dark:text-white"
+                ></Printer>
+                {/* <PrintButton
                   elementId="song"
                   style={`
                   .song {line-height: 25px; text-align: justify;}
@@ -45,7 +74,7 @@ const SongModal = ({
                   documentTitle={song.title}
                 >
                   <Printer className="cursor-pointer mx-2 text-border-amber-800 dark:text-white h-8"></Printer>
-                </PrintButton>
+                </PrintButton> */}
 
                 {cancel && (
                   <AlertDialogCancel className="h-8 border-border-amber-800 dark:border-white border-2">
@@ -56,11 +85,11 @@ const SongModal = ({
             </AlertDialogTitle>
             <AlertDialogDescription className="text-dark dark:text-white">
               <span id="song" style={{ fontSize }}>
-                <span className="flex justify-center items-center">
-                  {song.title}
+                {/* <span className="flex-row justify-center items-center">
+                  {song.album?.title}
                   <span className="italic text-sm">{albumTitle}</span>
-                </span>{" "}
-                <br />
+                </span>
+                <br /> */}
                 {song.content && (
                   <span
                     dangerouslySetInnerHTML={{

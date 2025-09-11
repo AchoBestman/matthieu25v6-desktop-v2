@@ -279,7 +279,7 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min`}
           >
-            <div
+            {/* <div
               className="print-title flex items-center justify-center pb-4"
               style={{ fontSize }}
             >
@@ -287,7 +287,7 @@ function RouteComponent() {
               {sermon?.chapter} :{" "}
               {sermon &&
                 `${sermon.title} ${sermon.sub_title}`.replace("null", "")}
-            </div>
+            </div> */}
 
             <div className="flex">
               {sermonImage?.blobUrl && (

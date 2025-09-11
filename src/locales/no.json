@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Laster ned språk, vennligst vent.",
     "waiting_for_downloaded_audio": "Laster ned lyd, vennligst vent.",
     "langue_is_downloaded": "Nedlasting fullført! Lukk vinduet!",
-    "langue_not_found": "Du må laste ned språket først!"
+    "langue_not_found": "Du må laste ned språket først!",
+    "pdf_download_title": "Nedlasting fullført",
+    "pdf_download_message": "PDF-filen din er lagret i Nedlastinger-mappen."
   },
   "text": {
     "font_size": "Tekststørrelse"

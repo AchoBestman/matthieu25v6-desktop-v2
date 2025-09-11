@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Sedang mengunduh bahasa, harap tunggu.",
     "waiting_for_downloaded_audio": "Sedang mengunduh audio, harap tunggu.",
     "langue_is_downloaded": "Unduhan selesai! Silakan tutup jendela!",
-    "langue_not_found": "Anda harus mengunduh bahasa terlebih dahulu!"
+    "langue_not_found": "Anda harus mengunduh bahasa terlebih dahulu!",
+    "pdf_download_title": "Unduhan selesai",
+    "pdf_download_message": "File PDF Anda telah disimpan di folder Downloads."
   },
   "text": {
     "font_size": "Ukuran teks"

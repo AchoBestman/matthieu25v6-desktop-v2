@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Language is being downloaded, please wait.",
     "waiting_for_downloaded_audio": "Audio is downloading, please wait.",
     "langue_is_downloaded": "Download complete! Please close the window!",
-    "langue_not_found": "You must download the language first!"
+    "langue_not_found": "You must download the language first!",
+    "pdf_download_title": "Download complete",
+    "pdf_download_message": "Your PDF file has been saved in the Downloads folder."
   },
   "text": {
     "font_size": "Text size"

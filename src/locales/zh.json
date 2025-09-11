@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "正在下载语言，请稍候.",
     "waiting_for_downloaded_audio": "正在下载音频，请稍候.",
     "langue_is_downloaded": "下载完成!请关闭窗口!",
-    "langue_not_found": "您需要先下载语言!"
+    "langue_not_found": "您需要先下载语言!",
+    "pdf_download_title": "下载完成",
+    "pdf_download_message": "您的PDF文件已保存到下载文件夹。"
   },
   "text": {
     "font_size": "文字大小"

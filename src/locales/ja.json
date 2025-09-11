@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "言語をダウンロード中、お待ちください.",
     "waiting_for_downloaded_audio": "オーディオをダウンロード中、お待ちください.",
     "langue_is_downloaded": "ダウンロード完了! ウィンドウを閉じてください!",
-    "langue_not_found": "まず言語をダウンロードする必要があります!"
+    "langue_not_found": "まず言語をダウンロードする必要があります!",
+    "pdf_download_title": "ダウンロード完了",
+    "pdf_download_message": "PDFファイルはダウンロードフォルダに保存されました。"
   },
   "text": {
     "font_size": "文字サイズ"

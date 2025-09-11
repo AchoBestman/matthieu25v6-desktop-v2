@@ -49,8 +49,6 @@ export const findBy = async (
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[]
 ) => {
   const response = await oneModel<Album>(resource, lang, params, relationships);
-
-  const [model] = response as Album[];
-
-  return model;
+  return response as Album;
 };
+

@@ -32,19 +32,6 @@ const PrintButton = ({
     }
   }, []);
 
-  const handlePrintOld = () => {
-    console.log(isBrowser, printJS, "printJs")
-    if (isBrowser && printJS) {
-      printJS({
-        printable: elementId,
-        type: "html",
-        style: style,
-        ignoreElements: ["esc", "esc1", "esc2"],
-        documentTitle: documentTitle,
-      });
-    }
-  };
-
 const handlePrint = () => {
 
   const isSafari = /Mac/.test(navigator.platform) && /AppleWebKit/.test(navigator.userAgent);

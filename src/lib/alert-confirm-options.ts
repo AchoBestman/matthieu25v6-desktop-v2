@@ -13,7 +13,7 @@ export const alertConfirmOptions = (
     ? [
         {
           label: tr("button.close"), // bouton unique pour alert
-          onClick: () => console.log("close"),
+          onClick: () => {},
         },
       ]
     : [

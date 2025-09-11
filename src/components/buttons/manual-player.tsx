@@ -25,7 +25,6 @@ const SongPlayerManualButton = ({
     useAudioPlayer();
 
   const { lng } = useLangue();
-  console.log(data);
   const title =
     type === "Sermons"
       ? `${(data as Sermon).chapter} : ${data.title}`

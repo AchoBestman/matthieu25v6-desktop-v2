@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Bezig met het downloaden van taal, even geduld.",
     "waiting_for_downloaded_audio": "Bezig met het downloaden van audio, even geduld.",
     "langue_is_downloaded": "Download voltooid! Sluit het venster!",
-    "langue_not_found": "Je moet de taal eerst downloaden!"
+    "langue_not_found": "Je moet de taal eerst downloaden!",
+    "pdf_download_title": "Download voltooid",
+    "pdf_download_message": "Uw PDF-bestand is opgeslagen in de map Downloads."
   },
   "text": {
     "font_size": "Tekstgrootte"

@@ -14,10 +14,13 @@ import { useLangue } from "@/context/langue-context";
 import SongPlayerManualButton from "@/components/buttons/manual-player";
 import SongModal from "@/components/dialog/song-modal";
 import { tr } from "@/translation";
+import { findBy } from "@/lib/resources/album";
+import { resources } from "@/lib/resources";
+
 
 export default function Menu({ song }: Readonly<{ song: SingList }>) {
   const [open, setOpen] = useState<boolean>(false);
-  const [songData, setSongData] = useState<SingList>(song);
+  const [loadedSong, setLoadedSong] = useState<SingList>(song);
   const onOpenChange = () => {
     setOpen(!open);
   };
@@ -25,9 +28,19 @@ export default function Menu({ song }: Readonly<{ song: SingList }>) {
   const [fileIsDownload, setFileIsDownload] = useState<boolean>(false);
   const { lng } = useLangue();
 
+
   useEffect(() => {
     if (song) {
-      setSongData(song);
+      setLoadedSong(song);
+
+      findBy(resources.albums, lng, {
+        column: "id",
+        value: loadedSong.album_id,
+      }).then((data) => {
+        if (data) {
+          setLoadedSong((prev) => ({ ...prev, album: data }));
+        }
+      });
     }
 
     getLocalFilePath(lng, "Hymns", song.title)
@@ -41,21 +54,22 @@ export default function Menu({ song }: Readonly<{ song: SingList }>) {
 
   return (
     <div className="flex items-center">
-      {songData.audio && (
+      {loadedSong?.audio && (
         <SongPlayerManualButton
           setFinishedDownload={setFinishedDownload}
           type="Hymns"
-          data={songData}
+          data={loadedSong}
           fileIsDownload={fileIsDownload}
         />
       )}
-      {songData.content && (
+      {loadedSong?.content && (
         <>
           <SongModal
-            song={songData}
+            song={loadedSong}
             cancel={true}
             open={open}
             onOpenChange={onOpenChange}
+            albumTitle={loadedSong.album?.title}
           />
           <PlusCircle
             onClick={() => {

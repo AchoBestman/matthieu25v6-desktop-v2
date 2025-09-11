@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Sprache wird heruntergeladen, bitte warten.",
     "waiting_for_downloaded_audio": "Audio wird heruntergeladen, bitte warten.",
     "langue_is_downloaded": "Download abgeschlossen! Bitte Fenster schließen!",
-    "langue_not_found": "Sie müssen zuerst die Sprache herunterladen!"
+    "langue_not_found": "Sie müssen zuerst die Sprache herunterladen!",
+    "pdf_download_title": "Download abgeschlossen",
+    "pdf_download_message": "Ihre PDF-Datei wurde im Downloads-Ordner gespeichert."
   },
   "text": {
     "font_size": "Schriftgröße"

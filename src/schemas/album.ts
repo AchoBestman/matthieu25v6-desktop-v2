@@ -5,6 +5,7 @@ export const AlbumSchema = z.object({
   id: z.number(),
   title: z.string(),
   description: z.string(),
+  order: z.number().optional(),
   uuid: z.string(),
   is_active: z.string(),
 });

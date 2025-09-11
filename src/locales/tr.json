@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Dil indiriliyor, lütfen bekleyin.",
     "waiting_for_downloaded_audio": "Ses indiriliyor, lütfen bekleyin.",
     "langue_is_downloaded": "İndirme tamamlandı! Lütfen pencereyi kapatın!",
-    "langue_not_found": "Önce dili indirmeniz gerekiyor!"
+    "langue_not_found": "Önce dili indirmeniz gerekiyor!",
+    "pdf_download_title": "İndirme tamamlandı",
+    "pdf_download_message": "PDF dosyanız İndirilenler klasörüne kaydedildi."
   },
   "text": {
     "font_size": "Yazı tipi boyutu"

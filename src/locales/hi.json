@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "भाषा डाउनलोड हो रही है, कृपया प्रतीक्षा करें.",
     "waiting_for_downloaded_audio": "ऑडियो डाउनलोड हो रहा है, कृपया प्रतीक्षा करें.",
     "langue_is_downloaded": "डाउनलोड पूर्ण! कृपया विंडो बंद करें!",
-    "langue_not_found": "आपको पहले भाषा डाउनलोड करनी होगी!"
+    "langue_not_found": "आपको पहले भाषा डाउनलोड करनी होगी!",
+    "pdf_download_title": "डाउनलोड पूरा हुआ",
+    "pdf_download_message": "आपकी PDF फ़ाइल Downloads फ़ोल्डर में सहेज ली गई है।"
   },
   "text": {
     "font_size": "टेक्स्ट आकार"

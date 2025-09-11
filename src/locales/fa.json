@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "در حال دانلود زبان، لطفاً صبر کنید.",
     "waiting_for_downloaded_audio": "در حال دانلود صدا، لطفاً صبر کنید.",
     "langue_is_downloaded": "دانلود کامل شد! لطفاً پنجره را ببندید!",
-    "langue_not_found": "ابتدا باید زبان را دانلود کنید!"
+    "langue_not_found": "ابتدا باید زبان را دانلود کنید!",
+    "pdf_download_title": "دانلود کامل شد",
+    "pdf_download_message": "فایل PDF شما در پوشه دانلودها ذخیره شد."
   },
   "text": {
     "font_size": "اندازه متن"

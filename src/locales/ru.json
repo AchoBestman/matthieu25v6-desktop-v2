@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Идёт загрузка языка, пожалуйста, подождите.",
     "waiting_for_downloaded_audio": "Идёт загрузка аудио, пожалуйста, подождите.",
     "langue_is_downloaded": "Загрузка завершена! Пожалуйста, закройте окно!",
-    "langue_not_found": "Сначала нужно загрузить язык!"
+    "langue_not_found": "Сначала нужно загрузить язык!",
+    "pdf_download_title": "Загрузка завершена",
+    "pdf_download_message": "Ваш PDF-файл был сохранён в папке «Загрузки»."
   },
   "text": {
     "font_size": "Размер шрифта"

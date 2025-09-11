@@ -20,6 +20,7 @@ export const SingSchema = z.object({
   audio: z.string(),
   file_name: z.string(),
   content: z.string().optional(),
+  order: z.number().optional(),
   time: z.number().optional(),
 });
 export type Sing = z.infer<typeof SingSchema>;
@@ -30,6 +31,7 @@ export const SingListSchema = SingSchema.extend({
   brother: BrotherSchema.optional(),
   singer_id: z.number(),
   album_id: z.number(),
+  order: z.number().optional(),
   is_active: z.number(),
   album: AlbumSchema.optional(),
 });

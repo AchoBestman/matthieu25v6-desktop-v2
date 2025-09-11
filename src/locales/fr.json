@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "Téléchargement de la langue en cours, veuillez patienter.",
     "waiting_for_downloaded_audio": "Téléchargement de l'audio en cours, veuillez patienter.",
     "langue_is_downloaded": "Téléchargement terminé! Veuillez fermer la fenêtre!",
-    "langue_not_found": "Vous devez d'abord télécharger la langue!"
+    "langue_not_found": "Vous devez d'abord télécharger la langue!",
+    "pdf_download_title": "Téléchargement terminé",
+    "pdf_download_message": "Votre fichier PDF a été enregistré dans le dossier Téléchargements."
   },
   "text": {
     "font_size": "Taille du texte"

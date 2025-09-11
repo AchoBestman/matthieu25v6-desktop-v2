@@ -87,7 +87,9 @@
     "waiting_for_downloaded_langue": "جاري تحميل اللغة، يرجى الانتظار.",
     "waiting_for_downloaded_audio": "جاري تحميل الصوت، يرجى الانتظار.",
     "langue_is_downloaded": "تم التحميل! يرجى إغلاق النافذة!",
-    "langue_not_found": "يجب تحميل اللغة أولاً!"
+    "langue_not_found": "يجب تحميل اللغة أولاً!",
+    "pdf_download_title": "اكتمل التنزيل",
+    "pdf_download_message": "تم حفظ ملف PDF الخاص بك في مجلد التنزيلات."
   },
   "text": {
     "font_size": "حجم الخط"
