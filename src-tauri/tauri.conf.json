@@ -25,10 +25,16 @@
     "withGlobalTauri": true
   },
   "bundle": {
+    
     "active": true,
     "targets": "all",
     "icon": ["icons/icon.ico"],
-    "resources": {},
+    "resources": [
+        "resources/fr/matth25v6_fr.db",
+        "resources/en/matth25v6_en.db",
+        "resources/es/matth25v6_es.db",
+        "resources/pt/matth25v6_pt.db"
+      ],
     "externalBin": [],
     "copyright": "",
     "category": "News",
