@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "nu conține verset",
     "hymns": "Imnuri",
     "church": "Biserici",
-    "biography": "Biografia Profetului",
+    "biography": "Biografia",
     "photos": "Fotografii",
     "videos": "Videoclipuri"
   },
@@ -55,7 +55,9 @@
     "last": "Ultimul",
     "go_to_page": "Mergi la pagină",
     "open_player": "Deschide player audio",
-    "close_player": "Închide player audio"
+    "close_player": "Închide player audio",
+    "clear_all_history": "Șterge istoricul descărcărilor.",
+    "confirm_action": "Sigur doriți să efectuați această acțiune?"
   },
   "table": {
     "select_all": "Selectează tot",

@@ -13,6 +13,7 @@ import { AudioFolder, getLocalFilePath } from "@/lib/utils";
 import { tr } from "@/translation";
 import { useLangue } from "./langue-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import { getHistory } from "@/lib/download-history";
 
 type AudioContextType = {
   audioUrl: string | null;
@@ -23,12 +24,14 @@ type AudioContextType = {
   play?: boolean;
   playedAudioUrl?: string;
   isDownloaded?: boolean;
+  fileOriginalName?: string,
   setAudio: (
     url: string,
     audioTitle: string,
     audioId: number,
     albumId?: number,
-    autoPlay?: boolean
+    autoPlay?: boolean,
+    fileOriginalName?: string
   ) => void;
   playNext?: (lng: string, subFolder: AudioFolder) => void;
   setPlay?: (play: boolean, subFolder: AudioFolder) => void;
@@ -61,7 +64,7 @@ export function AudioPlayerProvider({
   const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [play, setPlay] = useState<boolean>(false);
-
+  const [fileOriginalName, setFileOriginalName] = useState<string|undefined>('')
   useEffect(() => {
     if (audioId && audioTitle && audioUrl) {
       if (albumId) {
@@ -83,17 +86,33 @@ export function AudioPlayerProvider({
     title: string,
     audioId: number,
     albumId?: number,
-    autoPlay = false
+    autoPlay = false,
+    fileOriginalName?: string
   ) => {
     setAudioUrl(url);
     setAutoPlay(autoPlay);
     setAudioTitle(title);
     setAlbumId(albumId);
     setAudioId(audioId);
+    setFileOriginalName(fileOriginalName)
   };
 
   const playNext = async (lng: string, subFolder: AudioFolder) => {
+    
     if (audioId) {
+
+      if(fileOriginalName){
+        const song = getHistory(audioId,'+')
+        if(song){
+          setAudioUrl(song.url);
+          setAutoPlay(true);
+          setAudioTitle(song.fileOriginalName);
+          setAlbumId(song.albumId);
+          setAudioId(song.modelId);
+          return 
+        }
+        
+      }
       const response = await findNextSong(lng, audioId, albumId);
       const [song] = response as { [key: string]: string | number }[];
       const title = song.album_id
@@ -115,6 +134,20 @@ export function AudioPlayerProvider({
 
   const playPrevious = async (lng: string, subFolder: AudioFolder) => {
     if (audioId) {
+
+      if(fileOriginalName){
+        const song = getHistory(audioId,'-')
+        if(song){
+          setAudioUrl(song.url);
+          setAutoPlay(true);
+          setAudioTitle(song.fileOriginalName);
+          setAlbumId(song.albumId);
+          setAudioId(song.modelId);
+          return 
+        }
+        
+      }
+
       const response = await findPreviousSong(lng, audioId, albumId);
       const [song] = response as { [key: string]: string | number }[];
       const title = song.album_id
@@ -196,6 +229,7 @@ export function AudioPlayerProvider({
       audioRef,
       playedAudioUrl,
       isDownloaded,
+      fileOriginalName,
       setAudio,
       playNext,
       playPrevious,
@@ -211,6 +245,7 @@ export function AudioPlayerProvider({
       play,
       playedAudioUrl,
       isDownloaded,
+      fileOriginalName
     ]
   );
 

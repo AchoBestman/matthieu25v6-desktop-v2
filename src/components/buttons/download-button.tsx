@@ -1,118 +1,46 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { BaseDirectory, writeFile, mkdir } from "@tauri-apps/plugin-fs";
-import { AudioFolder, downloadDrogressType } from "@/lib/utils";
-import { resources } from "@/lib/resources";
-import { API_URL } from "@/lib/env";
+import { AudioFolder, cancelDownload, createPaths, downloadDrogressType, FileExtension, startDownload } from "@/lib/utils";
 import { tr } from "@/translation";
 import DownloadProgressModal from "../dialog/download-progress-modal";
 import { useLangue } from "@/context/langue-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import { clearHistory, DownloadHistoryItem, loadHistory, updateHistory } from "@/lib/download-history";
+import { downloadDir } from "@tauri-apps/api/path";
 
 export async function downloadAudioWithProgress(
   initial: string,
   url: string,
   subFolder: AudioFolder,
   fileName: string,
+  modelId: number,
   onProgress?: (percent: downloadDrogressType) => void,
-  signal?: boolean
+  fileOriginalName?: string,
+  albumId?:number,
+  extension: FileExtension = "mp3"
 ) {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
-    throw new Error(
-      `Invalid format: ${initial} must be in the format 'AA-AA{BC}'`
-    );
-  }
-  const basePath = "Philippekacou";
-  const [country, langue] = initial.toLowerCase().split("-");
-  const sermonsPath = `${basePath}/${subFolder}/${country}/${langue}/${fileName}.mp3`;
-  const hymnsPath = `${basePath}/${subFolder}/${fileName}.mp3`;
-  let filePath = hymnsPath;
-
-  const baseDir = BaseDirectory.Audio;
-  //create base path
-  await mkdir(basePath, {
-    baseDir: baseDir,
-    recursive: true,
-  });
-
-  // create subFolder path
-  await mkdir(`${basePath}/${subFolder}`, {
-    baseDir: baseDir,
-    recursive: true,
-  });
-
-  if (subFolder === "Sermons" || subFolder === "Others") {
-    filePath = sermonsPath;
-
-    //create country dir
-    await mkdir(`${basePath}/${subFolder}/${country}`, {
-      baseDir: baseDir,
-      recursive: true,
-    });
-
-    //create langue dir
-    await mkdir(`${basePath}/${subFolder}/${country}/${langue}`, {
-      baseDir: baseDir,
-      recursive: true,
-    });
-  }
-
   //, { redirect: "follow" }
-  const res = await fetch(
-    `${API_URL}/${initial}/${resources.downloadAudio}?url=${url}&name=${fileName}.mp3`
-  );
-  if (!res.ok || !res.body) {
-    throw new Error("Failed to fetch file.");
-  }
+  const filePath = await createPaths(initial,subFolder, fileName, extension);
+  const downloads = await downloadDir();
+  const fullPath = `${downloads}/${filePath}`;
 
-  const contentLength = res.headers.get("Content-Length");
-  if (!contentLength) {
-    throw new Error("No content-length header in response.");
-  }
+  let historyItem: DownloadHistoryItem = {
+    fileName,
+    fileOriginalName: fileOriginalName || "",
+    url,
+    lng: initial,
+    folder: subFolder,
+    progress: 0,
+    downloadedSize: 0,
+    totalSize: 0,
+    status: "downloading",
+    modelId,
+    albumId
+  };
+  updateHistory(historyItem);
 
-  const total = parseInt(contentLength, 10);
-  const reader = res.body.getReader();
-  const totalSize = total / (1024 * 1024);
-  let downloadSize = 0;
-
-  let received = 0;
-  const chunks: Uint8Array[] = [];
-
-  while (true) {
-    // Handle cancellation mid-stream
-    if (signal) {
-      reader.cancel(); // cancel the reader
-      throw new Error("Download cancelled by user.");
-    }
-
-    const { done, value } = await reader.read();
-    if (done) break;
-
-    if (value) {
-      chunks.push(value);
-      received += value.length;
-      const percent = Math.round((received / total) * 100);
-      downloadSize = received / (1024 * 1024);
-      onProgress?.({
-        percent,
-        downloadSize: Number.parseFloat(downloadSize.toFixed(1)),
-        totalSize: Number.parseFloat(totalSize.toFixed(1)),
-      });
-    }
-  }
-
-  // Combine chunks into one Uint8Array
-  const blob = new Uint8Array(received);
-  let position = 0;
-  for (const chunk of chunks) {
-    blob.set(chunk, position);
-    position += chunk.length;
-  }
-
-  await writeFile(filePath, blob, {
-    baseDir: baseDir,
-  });
+  await startDownload(modelId, url, fullPath, historyItem, onProgress);
 }
 
 export const DownloadButton = ({
@@ -121,12 +49,18 @@ export const DownloadButton = ({
   subFolder,
   setFinishedDownload,
   children,
+  fileOriginalName,
+  modelId,
+  albumId
 }: {
   audioUrl: string;
   fileName: string;
   subFolder: AudioFolder;
   setFinishedDownload: (state: boolean) => void;
   children?: React.ReactNode;
+  fileOriginalName?: string,
+  modelId: number,
+  albumId?:number
 }) => {
   const { lng } = useLangue();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -136,14 +70,16 @@ export const DownloadButton = ({
     totalSize: 0,
   });
   const [openProgress, setOpenProgress] = useState<boolean>(false);
-  const [abortDownloading, setAbortDownloading] = useState<boolean>(false);
 
   const onOpenChangeProgress = () => {
     setOpenProgress(!openProgress);
   };
 
-  const stopDownloading = () => {
-    setAbortDownloading((abortDownloading) => !abortDownloading);
+  const stopDownloading = async() => {
+    await cancelDownload(modelId)// clear before from the client and next clear locally
+    clearHistory(modelId)
+    console.log('start clear history',modelId,loadHistory())
+    window.dispatchEvent(new Event("downloadHistoryUpdated"));
   };
 
   useEffect(() => {
@@ -151,6 +87,7 @@ export const DownloadButton = ({
       setFinishedDownload(true);
     }
 
+    //console.log(progress, 'song progress')
     return () => {};
   }, [progress]);
 
@@ -168,10 +105,12 @@ export const DownloadButton = ({
         audioUrl,
         subFolder,
         fileName,
+        modelId,
         (percent) => {
           setProgress(percent);
         },
-        abortDownloading
+        fileOriginalName,
+        albumId
       );
     } catch (error) {
       console.error("❌ Download failed:", error);

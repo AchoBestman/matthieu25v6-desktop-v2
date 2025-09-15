@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "tidak memiliki ayat",
     "hymns": "Nyanyian",
     "church": "Sidang",
-    "biography": "Biografi Nabi",
+    "biography": "Biografi",
     "photos": "Foto",
     "videos": "Video"
   },
@@ -55,7 +55,9 @@
     "last": "Terakhir",
     "go_to_page": "Pergi ke halaman",
     "open_player": "Buka pemutar audio",
-    "close_player": "Tutup pemutar audio"
+    "close_player": "Tutup pemutar audio",
+    "clear_all_history": "Bersihkan riwayat unduhan.",
+    "confirm_action": "Apakah Anda yakin ingin melakukan tindakan ini?"
   },
   "table": {
     "select_all": "Pilih semua",

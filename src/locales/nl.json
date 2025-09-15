@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "bevat geen vers",
     "hymns": "Gezangen",
     "church": "Gemeenten",
-    "biography": "Biografie van de Profeet",
+    "biography": "Biografie",
     "photos": "Foto's",
     "videos": "Video's"
   },
@@ -55,7 +55,9 @@
     "last": "Laatste",
     "go_to_page": "Ga naar pagina",
     "open_player": "Audioplayer openen",
-    "close_player": "Audioplayer sluiten"
+    "close_player": "Audioplayer sluiten",
+    "clear_all_history": "Downloadgeschiedenis wissen.",
+    "confirm_action": "Weet je zeker dat je deze actie wilt uitvoeren?"
   },
   "table": {
     "select_all": "Alles selecteren",

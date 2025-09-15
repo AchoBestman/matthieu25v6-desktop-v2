@@ -6,41 +6,117 @@ import { useSermon } from "@/context/sermon-context";
 import { resources } from "@/lib/resources";
 import { findBy, findImage } from "@/lib/resources/sermon";
 import {
+  createPaths,
   downloadDrogressType,
+  FileExtension,
+  fileUrlFormat,
   firstSermonVerse,
   getLocalFilePath,
+  openFile,
 } from "@/lib/utils";
-import { Verses } from "@/schemas/sermon";
+import { Sermon, Verses } from "@/schemas/sermon";
 import { tr } from "@/translation";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import PageLoader from "@/components/loaders/page-loader";
-import { hasInternet, openCenteredPopup } from "@/hooks/use-online-status";
+import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import { useAudioPlayer } from "@/context/audio-player-context";
+import { downloadAudioWithProgress } from "@/components/buttons/download-button";
 
 export const Route = createFileRoute("/sermons")({
   component: RouteComponent,
 });
 
-export const DownloadVerseLink = ({ verset }: { verset: Verses }) => {
-  const [isLoad, setIsLoad] = useState(false);
-  const download = async (value: { fileName: string | null; url: string }) => {
-    setIsLoad(true);
-    const online = await hasInternet();
-    setIsLoad(false);
-    if (!online) {
-      alert(tr("alert.cannot_download"));
-      return;
+export const DownloadVerseLink = ({
+  verset,
+  sermon,
+  lng,
+}: {
+  verset: Verses;
+  sermon: Sermon;
+  lng: string;
+}) => {
+  const { setAudio } = useAudioPlayer();
+
+  const [progress, setProgress] = useState<downloadDrogressType>({
+    percent: 0,
+    downloadSize: 0,
+    totalSize: 0,
+  });
+
+  const openLocalFile = async (
+    url: string,
+    title: string,
+    extension: FileExtension
+  ) => {
+    await getLocalFilePath(lng, "Others", title, "pdf")
+      .then(async () => {
+        if (extension === "mp3" || extension === "mp4") {
+          setAudio(url, title, sermon.id, undefined, true);
+        } else {
+          const filePath = await createPaths(lng, "Others", title, extension);
+          await openFile(filePath);
+        }
+      })
+      .catch(async () => {
+        if (!navigator.onLine) {
+          handleConfirmAlert(tr("alert.cannot_download"));
+          return;
+        }
+        downloadAudio(url, title, extension);
+        if (extension === "mp3" || extension === "mp4") {
+          setAudio(url, title, sermon.id, undefined, true);
+        } else {
+          if (progress.percent === 100) {
+            const filePath = await createPaths(lng, "Others", title, extension);
+            await openFile(filePath);
+          }
+        }
+      });
+  };
+
+  const downloadAudio = async (
+    url: string,
+    title: string,
+    extension: FileExtension
+  ) => {
+    try {
+      await downloadAudioWithProgress(
+        lng,
+        url,
+        "Others",
+        title,
+        sermon.id,
+        (percent) => {
+          setProgress(percent);
+        },
+        title,
+        undefined, //file
+        extension
+      );
+    } catch (err) {
+      console.error("❌ Download failed:", err);
     }
-    const w = value.fileName?.endsWith(".pdf") ? 700 : 400;
-    const h = value.fileName?.endsWith(".pdf") ? 400 : 50;
-    // créer dynamiquement un <a> et simuler le clic
-    openCenteredPopup(value.url, value.fileName || "", w, h);
+  };
+
+  const download = async (value: {
+    fileName: string | null;
+    url: string;
+    content: string | null;
+    type: string;
+  }) => {
+    if (!value.url) return;
+    const title = fileUrlFormat(value?.fileName || "");
+
+    if (value.type === "audio" || value.type === "video") {
+      openLocalFile(value.url, title, value.type === "audio" ? "mp3" : "mp4");
+    } else {
+      openLocalFile(value.url, title, "pdf");
+    }
   };
 
   if (!verset?.verse_links?.length) return <></>;
-  if (isLoad)
-    return <span className="inline-block animate-spin text-blue-600">⟳</span>;
 
   return (
     <div className="text-blue-600 mb-2 pr-2 flex flex-wrap print-hidden">
@@ -67,13 +143,15 @@ export const DownloadVerseLink = ({ verset }: { verset: Verses }) => {
           </button>
         );
       })}
+      {progress.percent > 0 && progress.percent < 100 && (
+        <span className="ml-1 text-sm">{progress.percent}%</span>
+      )}
     </div>
   );
 };
 
 function RouteComponent() {
   const { lng, langName } = useLangue();
-  //const { setAudio } = useAudioPlayer();
   const refs = useRef<(HTMLParagraphElement | null)[]>([]);
   const [message, setMessage] = useState<string>("");
   const [open, setOpen] = useState<boolean>(false);
@@ -154,7 +232,9 @@ function RouteComponent() {
     if (!verseNumber) return;
     if (sermon?.verses && Number.parseInt(verseNumber) > sermon.verses.length) {
       setMessage(
-        `${sermon.chapter} ${tr("home.search_not_found_vers_message")} ${verseNumber}`
+        `${sermon.chapter} ${tr(
+          "home.search_not_found_vers_message"
+        )} ${verseNumber}`
       );
       setOpen(true);
     }
@@ -162,7 +242,7 @@ function RouteComponent() {
     if (sermon?.verses && index >= 0 && index < sermon.verses.length) {
       refs.current[index]?.scrollIntoView({
         behavior: "smooth", // Smooth scrolling
-        block: search ? "center": "center", // Align to the start of the viewport
+        block: search ? "center" : "center", // Align to the start of the viewport
       });
     }
   }, [verseNumber, sermon]);
@@ -188,20 +268,6 @@ function RouteComponent() {
   const onOpenChangeProgress = () => {
     setOpenProgress(!openProgress);
   };
-
-  // const playAudio = async (url: string, title: string) => {
-  //   let canPlay = true;
-
-  //   if (!navigator.onLine) {
-  //     await getLocalFilePath(lng, "Others", title).catch(() => {
-  //       handleConfirmAlert(tr("alert.cannot_download"));
-  //       canPlay = false;
-  //     });
-  //   }
-  //   if (canPlay && sermon) {
-  //     setAudio(url, title, sermon.id, undefined, true);
-  //   }
-  // };
 
   useEffect(() => {
     if (sermon) {
@@ -330,7 +396,7 @@ function RouteComponent() {
                     ></span>
                   </div>
                 </div>
-                <DownloadVerseLink verset={verset} />
+                <DownloadVerseLink verset={verset} sermon={sermon} lng={lng} />
 
                 <div>
                   {/** not use button because in the pdf button give bad content */}

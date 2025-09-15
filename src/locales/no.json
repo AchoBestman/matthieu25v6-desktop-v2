@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "inneholder ikke vers",
     "hymns": "Salmer",
     "church": "Menigheter",
-    "biography": "Profetens biografi",
+    "biography": "Biografi",
     "photos": "Bilder",
     "videos": "Videoer"
   },
@@ -55,7 +55,9 @@
     "last": "Siste",
     "go_to_page": "Gå til side",
     "open_player": "Åpne lydspiller",
-    "close_player": "Lukk lydspiller"
+    "close_player": "Lukk lydspiller",
+    "clear_all_history": "Tøm nedlastingshistorikk.",
+    "confirm_action": "Er du sikker på at du vil utføre denne handlingen?"
   },
   "table": {
     "select_all": "Velg alle",

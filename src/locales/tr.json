@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "ayet içermiyor",
     "hymns": "İlahiler",
     "church": "Topluluklar",
-    "biography": "Peygamberin biyografisi",
+    "biography": "Biyografisi",
     "photos": "Fotoğraflar",
     "videos": "Videolar"
   },
@@ -55,7 +55,9 @@
     "last": "Son",
     "go_to_page": "Sayfaya git",
     "open_player": "Ses oynatıcıyı aç",
-    "close_player": "Ses oynatıcıyı kapat"
+    "close_player": "Ses oynatıcıyı kapat",
+    "clear_all_history": "İndirme geçmişini temizle.",
+    "confirm_action": "Bu işlemi yapmak istediğinizden emin misiniz?"
   },
   "table": {
     "select_all": "Tümünü seç",

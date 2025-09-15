@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AudioPlayerProvider } from "./context/audio-player-context";
 import SongPlayer from "@/components/buttons/player-button";
 import { SermonProvider } from "@/context/sermon-context";
+import { DownloadHistoryProvider } from "./context/download-history-context";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -31,6 +32,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <LangueProvider>
         <QueryClientProvider client={queryClient}>
+          <DownloadHistoryProvider>
           <AudioPlayerProvider>
             <SongPlayer darkColor="white" lightColor="white" />
             <ThemeProvider>
@@ -47,6 +49,7 @@ if (!rootElement.innerHTML) {
               </SermonProvider>
             </ThemeProvider>
           </AudioPlayerProvider>
+          </DownloadHistoryProvider>
         </QueryClientProvider>
       </LangueProvider>
     </StrictMode>

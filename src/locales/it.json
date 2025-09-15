@@ -55,7 +55,9 @@
     "last": "Ultimo",
     "go_to_page": "Vai alla pagina",
     "open_player": "Apri lettore audio",
-    "close_player": "Chiudi lettore audio"
+    "close_player": "Chiudi lettore audio",
+    "clear_all_history": "Cancella la cronologia dei download.",
+    "confirm_action": "Sei sicuro di voler eseguire questa azione?"
   },
   "table": {
     "select_all": "Seleziona tutto",

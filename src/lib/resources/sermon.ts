@@ -1,6 +1,6 @@
 import { ResourcesType } from "@/lib/resources";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { downloadDrogressType, toObject } from "../utils";
+import { AppDatabaseDir, downloadDrogressType, toObject } from "../utils";
 import {
   createDataTypeSchema,
   DataType,
@@ -11,7 +11,7 @@ import {
 } from "@/schemas/sermon";
 import database, { dbExist } from "../database";
 import { invoke } from "@tauri-apps/api/core";
-import { BaseDirectory, mkdir } from "@tauri-apps/plugin-fs";
+import { mkdir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 
 export const findAll = async (
@@ -171,11 +171,11 @@ export const findImage = async (lang: string, name: string) => {
   }
   const [country, langue] = lang.toLowerCase().split("-");
   const relativePath = `${country}/matth25v6_${langue}.db`;
-  const baseDir = BaseDirectory.AppData;
+
   // Ensure the folder exists
 
   await mkdir(country, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
     recursive: true,
   });
 

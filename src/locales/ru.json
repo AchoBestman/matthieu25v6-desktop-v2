@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "не содержит стиха",
     "hymns": "Гимны",
     "church": "Церкви",
-    "biography": "Биография Пророка",
+    "biography": "Биография",
     "photos": "Фото",
     "videos": "Видео"
   },
@@ -55,7 +55,9 @@
     "last": "Последний",
     "go_to_page": "Перейти на страницу",
     "open_player": "Открыть аудиоплеер",
-    "close_player": "Закрыть аудиоплеер"
+    "close_player": "Закрыть аудиоплеер",
+    "clear_all_history": "Очистить историю загрузок.",
+    "confirm_action": "Вы уверены, что хотите выполнить это действие?"
   },
   "table": {
     "select_all": "Выбрать все",

@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "não contém versículo",
     "hymns": "Hinos",
     "church": "Congregações",
-    "biography": "Biografia do Profeta",
+    "biography": "Biografia",
     "photos": "Fotos",
     "videos": "Vidéos"
   },
@@ -55,7 +55,9 @@
     "last": "Último",
     "go_to_page": "Ir para a página",
     "open_player": "Abrir reprodutor de áudio",
-    "close_player": "Fechar reprodutor de áudio"
+    "close_player": "Fechar reprodutor de áudio",
+    "clear_all_history": "Limpar histórico de downloads.",
+    "confirm_action": "Tem certeza de que deseja realizar esta ação?"
   },
   "table": {
     "select_all": "Selecionar tudo",

@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/table";
 import React from "react";
 import { Input } from "@/components/ui/input";
-import { DataTableViewOptions } from "../table-sections/datatable-view-options";
 import { DataTablePagination } from "../table-sections/datatable-pagination";
 import { tr } from "@/translation";
 
@@ -76,7 +75,6 @@ export function AssembliesDataTable<TData, TValue>({
           onChange={(event) => setSearch(event.target.value)}
           className="max-w-sm border-2 border-amber-800 dark:border-white"
         />
-        <DataTableViewOptions table={table} />
       </div>
       <DataTablePagination table={table} />
       <div className="rounded-md border mt-4">

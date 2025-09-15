@@ -221,7 +221,7 @@ const LangueDropdown = () => {
         >
           <Input
             type="search"
-            placeholder="chercher une langue"
+            placeholder={tr("button.search")}
             className="mb-2"
             onChange={searchLangue}
           />
@@ -256,7 +256,7 @@ const LangueDropdown = () => {
                         </div>
                       </button>
 
-                      <button className="flex cursor-pointer">
+                      <button className="flex cursor-pointer mr-4">
                         {item.exist ? (
                           <>
                             <button
@@ -286,6 +286,7 @@ const LangueDropdown = () => {
                 );
               })}
           </ul>
+          
         </DropdownMenuContent>
       </DropdownMenu>
     </>

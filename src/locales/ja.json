@@ -55,7 +55,9 @@
     "last": "最後",
     "go_to_page": "ページへ移動",
     "open_player": "オーディオプレーヤーを開く",
-    "close_player": "オーディオプレーヤーを閉じる"
+    "close_player": "オーディオプレーヤーを閉じる",
+    "clear_all_history": "ダウンロード履歴をクリアします。",
+    "confirm_action": "この操作を実行してもよろしいですか？"
   },
   "table": {
     "select_all": "すべて選択",

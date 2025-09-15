@@ -55,7 +55,9 @@
     "last": "最后",
     "go_to_page": "跳转到页面",
     "open_player": "打开音频播放器",
-    "close_player": "关闭音频播放器"
+    "close_player": "关闭音频播放器",
+    "clear_all_history": "清除下载历史。",
+    "confirm_action": "您确定要执行此操作吗？"
   },
   "table": {
     "select_all": "全选",

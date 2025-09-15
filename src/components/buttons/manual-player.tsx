@@ -29,12 +29,14 @@ const SongPlayerManualButton = ({
     type === "Sermons"
       ? `${(data as Sermon).chapter} : ${data.title}`
       : data.title;
+  const albumId = type === "Hymns" ? (data as SingList)?.album_id : undefined
+  const modelId = data.id
 
   const putsongInPlayer = async () => {
     let canPlay = true;
     if (!navigator.onLine) {
       await getLocalFilePath(lng, type, title.replace(" : ", "_")).catch(() => {
-        handleConfirmAlert(tr("alert.cannot_download"))
+        handleConfirmAlert(tr("alert.cannot_download"));
         canPlay = false;
       });
     }
@@ -42,8 +44,8 @@ const SongPlayerManualButton = ({
       setAudio(
         data.audio,
         title,
-        data.id,
-        type === "Hymns" ? (data as SingList).album_id : undefined,
+        modelId,
+        albumId,
         true
       );
     }
@@ -80,9 +82,16 @@ const SongPlayerManualButton = ({
             fileName={fileUrlFormat(title.replace(" : ", "_"))}
             subFolder={type}
             setFinishedDownload={setFinishedDownload}
+            fileOriginalName={title}
+            modelId={modelId}
+            albumId={albumId}
           >
             <Download
-              className={`cursor-pointer ml-2 ${fileIsDownload ? "text-orange-500" : "text-amber-800 dark:text-white"}`}
+              className={`cursor-pointer ml-2 ${
+                fileIsDownload
+                  ? "text-orange-500"
+                  : "text-amber-800 dark:text-white"
+              }`}
             ></Download>
           </DownloadButton>
         )}

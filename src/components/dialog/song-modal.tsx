@@ -12,9 +12,10 @@ import { Printer } from "lucide-react";
 import { useSermon } from "@/context/sermon-context";
 import { pdf } from "@react-pdf/renderer";
 import { SongPrinter } from "../tables/songs/song-printer";
-import { writeFile, BaseDirectory } from "@tauri-apps/plugin-fs";
-import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import { writeFile } from "@tauri-apps/plugin-fs";
 import slug from "slug";
+import { createPaths, DownloadBaseDir, openFile } from "@/lib/utils";
+import { useLangue } from "@/context/langue-context";
 
 const SongModal = ({
   open,
@@ -30,6 +31,7 @@ const SongModal = ({
   albumTitle?: string;
 }) => {
   const { fontSize } = useSermon();
+  const {lng} = useLangue()
 //console.log("Rendering SongModal with song:", song);
   async function handleDownload() {
 
@@ -40,15 +42,12 @@ const SongModal = ({
     const arrayBuffer = await blob.arrayBuffer();
     const uint8Array = new Uint8Array(arrayBuffer);
 
-    const fileName = `${slug(song.title)}-${slug(albumTitle ?? "")}.pdf`;
+    const fileName = `${slug(song.title)}-${slug(albumTitle ?? "")}`;
 
-    await writeFile(fileName, uint8Array, { baseDir: BaseDirectory.Download });
-    handleConfirmAlert(
-      tr("download.pdf_download_message"),
-      true,
-      undefined,
-      tr("download.pdf_download_title")
-    );
+    //create filePath
+    const filePath = await createPaths(lng, 'Hymns', fileName, 'pdf');
+    await writeFile(filePath, uint8Array, { baseDir: DownloadBaseDir });
+    await openFile(filePath)
   }
 
   return (
@@ -65,17 +64,6 @@ const SongModal = ({
                   onClick={() => handleDownload()}
                   className="cursor-pointer mx-2 text-amber-800 dark:text-white"
                 ></Printer>
-                {/* <PrintButton
-                  elementId="song"
-                  style={`
-                  .song {line-height: 25px; text-align: justify;}
-                   .print-number {font-size: 2em;} #song {margin-left: 100px; font-size: 30px;}
-                   `}
-                  documentTitle={song.title}
-                >
-                  <Printer className="cursor-pointer mx-2 text-border-amber-800 dark:text-white h-8"></Printer>
-                </PrintButton> */}
-
                 {cancel && (
                   <AlertDialogCancel className="h-8 border-border-amber-800 dark:border-white border-2">
                     {tr("button.close")}

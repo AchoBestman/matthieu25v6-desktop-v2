@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "does not contain verse",
     "hymns": "Hymns",
     "church": "Assemblies",
-    "biography": "Biography of the Prophet",
+    "biography": "Biography",
     "photos": "Photos",
     "videos": "Videos"
   },
@@ -55,7 +55,9 @@
     "last": "Last",
     "go_to_page": "Go to page",
     "open_player": "Open audio player",
-    "close_player": "Close audio player"
+    "close_player": "Close audio player",
+    "clear_all_history": "Clear download history.",
+    "confirm_action": "Are you sure you want to perform this action?"
   },
   "table": {
     "select_all": "Select all",

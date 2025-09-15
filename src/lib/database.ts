@@ -1,7 +1,6 @@
 import Database from "@tauri-apps/plugin-sql";
-import { BaseDirectory } from "@tauri-apps/api/path";
 import { exists, mkdir, remove, writeFile } from "@tauri-apps/plugin-fs";
-import { downloadDrogressType } from "./utils";
+import { AppDatabaseDir, downloadDrogressType } from "./utils";
 import { API_URL } from "./env";
 
 /**
@@ -16,9 +15,8 @@ export async function deleteDb(initial: string) {
   }
   const [country, langue] = initial.toLowerCase().split("-");
   const dbPath = `${country}/matth25v6_${langue}.db`;
-  const baseDir = BaseDirectory.AppData;
   await remove(dbPath, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
     recursive: true,
   });
 }
@@ -45,9 +43,8 @@ export async function downloadWithProgress(
   const [country, langue] = initial.toLowerCase().split("-");
   const dbPath = `${country}/matth25v6_${langue}.db`;
 
-  const baseDir = BaseDirectory.AppData;
   await mkdir(country, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
     recursive: true,
   });
 
@@ -104,7 +101,7 @@ export async function downloadWithProgress(
   }
 
   await writeFile(dbPath, blob, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
   });
 }
 
@@ -126,11 +123,10 @@ const database = async (
   }
   const [country, langue] = initial.toLowerCase().split("-");
   const dbPath = `${country}/matth25v6_${langue}.db`;
-  const baseDir = BaseDirectory.AppData;
   // Ensure the folder exists
 
   await mkdir(country, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
     recursive: true,
   });
 
@@ -163,10 +159,9 @@ export const dbExist = async (initial: string) => {
   }
   const [country, langue] = initial.toLowerCase().split("-");
   const dbPath = `${country}/matth25v6_${langue}.db`;
-  const baseDir = BaseDirectory.AppData;
 
   const status = await exists(dbPath, {
-    baseDir: baseDir,
+    baseDir: AppDatabaseDir,
   });
 
   return status;

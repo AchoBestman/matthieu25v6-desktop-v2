@@ -55,7 +55,9 @@
     "last": "الأخير",
     "go_to_page": "اذهب إلى الصفحة",
     "open_player": "فتح مشغل الصوت",
-    "close_player": "إغلاق مشغل الصوت"
+    "close_player": "إغلاق مشغل الصوت",
+    "clear_all_history": "مسح سجل التنزيلات.",
+    "confirm_action": "هل أنت متأكد أنك تريد تنفيذ هذا الإجراء؟"
   },
   "table": {
     "select_all": "تحديد الكل",

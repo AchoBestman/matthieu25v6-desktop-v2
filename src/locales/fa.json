@@ -14,7 +14,7 @@
     "search_not_found_vers_message": "حاوی آیه نیست",
     "hymns": "سرودها",
     "church": "کلیساها",
-    "biography": "زندگینامه پیامبر",
+    "biography": "بیوگرافی",
     "photos": "عکس‌ها",
     "videos": "ویدئوها"
   },
@@ -55,7 +55,9 @@
     "last": "آخرین",
     "go_to_page": "رفتن به صفحه",
     "open_player": "باز کردن پخش‌کننده صدا",
-    "close_player": "بستن پخش‌کننده صدا"
+    "close_player": "بستن پخش‌کننده صدا",
+    "clear_all_history": "پاک کردن سابقه دانلود.",
+    "confirm_action": "آیا مطمئن هستید که می‌خواهید این عملیات را انجام دهید؟"
   },
   "table": {
     "select_all": "انتخاب همه",

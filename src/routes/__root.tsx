@@ -16,6 +16,7 @@ import { useLangue } from "@/context/langue-context";
 import { SearchCodeIcon } from "lucide-react";
 import { SearchDrawer } from "@/components/commons/search-drawer";
 import 'react-confirm-alert/src/react-confirm-alert.css';
+import DonwloadHistoryDropdown from "@/components/commons/download-history";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -54,6 +55,7 @@ function RootComponent() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex items-center">
+            <DonwloadHistoryDropdown />
             <SearchCodeIcon
               onClick={() => setIsSearchOpen(true)}
               className="m-2 p-1 cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white"
