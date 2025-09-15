@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import {
   CloudDownload,
+  File,
   FileAudio2,
   PlayCircle,
   Trash,
@@ -19,8 +20,9 @@ import { useAudioPlayer } from "@/context/audio-player-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 import { tr } from "@/translation";
 import { useDebounce } from "use-debounce";
-import { cancelDownload } from "@/lib/utils";
+import { cancelDownload, createPaths, openFile } from "@/lib/utils";
 import { useDownloadHistory } from "@/context/download-history-context";
+import { useLangue } from "@/context/langue-context";
 
 const DonwloadHistoryDropdown = () => {
   const { history, clearHistory, clearHistories } = useDownloadHistory();
@@ -30,6 +32,7 @@ const DonwloadHistoryDropdown = () => {
   const { setAudio } = useAudioPlayer();
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 300);
+  const  { lng } = useLangue();
 
   useEffect(() => {
   if (searchDebounce) {
@@ -45,14 +48,21 @@ const DonwloadHistoryDropdown = () => {
 
   const putAudioInPlayer = async (item: DownloadHistoryItem) => {
     // specially audioTitle and must have the same value. i can't pass item.fileName because it is slug with _
-    setAudio(
-      item.url,
-      item.fileOriginalName, // i pass here for display in the player
-      item.modelId,
-      item.albumId,
-      true,
-      item.fileOriginalName // i pass here to check if current audio has fileOriginalName,if it has, the next and previous audio be taken from local storage
-    );
+
+    if(item.fileName.endsWith('pdf') || item.fileName.endsWith('.m4a') || item.fileName.endsWith('.wav') || item.fileName.endsWith('.flac') ){
+      const filePath = await createPaths(lng, "Others", item.fileName, "pdf");
+      await openFile(filePath);
+      
+    }else{
+      setAudio(
+        item.url,
+        item.fileOriginalName, // i pass here for display in the player
+        item.modelId,
+        item.albumId,
+        true,
+        item.fileOriginalName // i pass here to check if current audio has fileOriginalName,if it has, the next and previous audio be taken from local storage
+      );
+    }
   };
 
   const stopDownloaded = async (modelId: number) => {
@@ -153,7 +163,8 @@ const DonwloadHistoryDropdown = () => {
                             className="cursor-pointer"
                             onClick={() => putAudioInPlayer(item)}
                           >
-                            <PlayCircle className="w-5 text-blue-500 dark:text-white"></PlayCircle>
+                            {item.fileName.endsWith('pdf') ? <File className="w-5 text-green-500 dark:text-white"></File> : <PlayCircle className="w-5 text-blue-500 dark:text-white"></PlayCircle>}
+                            
                           </button>
                           <button
                             className="cursor-pointer mx-1"
