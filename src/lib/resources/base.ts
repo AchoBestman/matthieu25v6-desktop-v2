@@ -46,6 +46,7 @@ export const allModels = async <T>(
       baseQuery += ` ORDER BY "id" DESC LIMIT ? OFFSET ?`;
     }
   }
+try {
 
   const result = await db.select(baseQuery, [...searchParams, perPage, offset]);
 
@@ -66,6 +67,10 @@ export const allModels = async <T>(
       },
     },
   };
+} catch (error) {
+  console.error("Error executing query:", error);
+  throw error;
+}
 };
 
 export const oneModel = async <T>(

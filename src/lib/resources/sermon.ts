@@ -29,22 +29,20 @@ export const findAll = async (
 
   if (params?.search) {
     conditions.push(
-      `(title LIKE ? OR chapter LIKE ? OR publication_date LIKE?)`
+      `(chapter LIKE ?)`
     );
     searchParams.push(
-      `%${params.search}%`,
-      `%${params.search}%`,
       `%${params.search}%`
     );
   }
 
   if (params?.number) {
-    conditions.push(`number = ?`);
+    conditions.push(`v.number = ?`);
     searchParams.push(params.number);
   }
   conditions.push(`is_active = ?`);
   searchParams.push(1);
-
+  
   if (conditions.length > 0) {
     const whereClause = ` WHERE ` + conditions.join(" AND ");
     countQuery += whereClause;

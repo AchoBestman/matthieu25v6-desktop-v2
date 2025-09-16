@@ -46,6 +46,7 @@ const SermonSidebar = () => {
   const [searchParams, setSearchParams] = useState<SermonSearchParams>({
     per_page: 500,
     order: "ASC",
+    search: ""
   });
 
   const [selectedSermon, setSelectedSermon] = useState<SelectSermonType>({
@@ -102,6 +103,14 @@ const SermonSidebar = () => {
     setVerseNumber(selectedVerseDebounce.verse_number);
   }, [selectedVerseDebounce.verse_number]);
 
+  useEffect(() => {
+    if (number) setSelectedSermon((prev) => ({ ...prev, number: number.toString() }));
+  }, [number]);
+
+   useEffect(() => {
+    setSelectedSermon((prev) => ({ ...prev, verse_number: verseNumber.toString() }));
+  }, [verseNumber]);
+
   return (
     <Sidebar collapsible="none" className="hidden flex-1 md:flex bg-muted">
       <DisplayAlert
@@ -144,7 +153,7 @@ const SermonSidebar = () => {
               </div>
               <Input
                 className="bg-white h-7 mt-1 border-1 dark:border-white"
-                size={3}
+                size={5}
                 type="text"
                 placeholder={tr("home.sermon_num")}
                 value={selectedSermon.number}

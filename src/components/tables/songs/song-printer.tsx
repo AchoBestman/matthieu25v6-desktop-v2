@@ -1,3 +1,4 @@
+import { renderHtmlToPdf } from "@/components/commons/render-html-to-pdf";
 import {
   Page,
   Text,
@@ -52,7 +53,6 @@ export const SongPrinter = ({
       <View style={styles.songContainer}>
         {/* Title + album */}
         <View style={styles.songHeader}>
-          {/* <Text style={styles.songTitle}>{song.title}</Text> */}
           {albumTitle && <Text style={styles.songTitle}>{albumTitle}</Text>}
         </View>
 
@@ -60,7 +60,7 @@ export const SongPrinter = ({
         {song.content &&
           song.content.split("\n").map((line, index) => (
             <Text key={index} style={styles.songContent}>
-              {line}
+              {renderHtmlToPdf(line)}
             </Text>
           ))}
       </View>

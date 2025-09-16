@@ -18,6 +18,7 @@ import DisplayAlert from "@/components/dialog/display-alert";
 import { Langue } from "@/schemas/langue";
 import { useLangue } from "@/context/langue-context";
 import { Avatar, AvatarImage } from "../ui/avatar";
+import { useSermon } from "@/context/sermon-context";
 
 type LangueDataType = {
   id: number;
@@ -31,6 +32,7 @@ type LangueDataType = {
 
 const LangueDropdown = () => {
   const { setLng, setLangName, lng } = useLangue();
+  const { setVerseNumber, setNumber } = useSermon();
   const [isOpen, setIsOpen] = useState(false);
   const [langues, setLangues] = useState<Array<LangueDataType>>([]);
   const [searchLangues, setSearchLangues] = useState<Array<LangueDataType>>([]);
@@ -125,6 +127,8 @@ const LangueDropdown = () => {
     setLng(langue.lang);
     setLangName(langue.name);
     setTr(langue.translation);
+    setNumber("1")
+    setVerseNumber("")
   };
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

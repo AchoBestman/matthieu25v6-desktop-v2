@@ -7,6 +7,7 @@ import {
   Document,
   StyleSheet,
 } from "@react-pdf/renderer";
+import { renderHtmlToPdf } from "../commons/render-html-to-pdf";
 
 const styles = StyleSheet.create({
   page: {
@@ -87,7 +88,7 @@ export const SermonPrinter = ({
       </Text>
 
       {/* Correction: Ajout d'un conteneur pour l'image */}
-      {sermonImage?.blobUrl && (
+      {sermonImage?.blobUrl && sermon.number !== 9 && (
         <View style={styles.imageContainer}>
           <Image src={sermonImage.blobUrl} style={styles.image} />
         </View>
@@ -102,7 +103,7 @@ export const SermonPrinter = ({
 
             <Text>
               <Text style={styles.verseNumber}>{verset.number}.</Text>
-              <Text style={styles.verseContent}>{verset.content}</Text>
+              <Text style={styles.verseContent}>{renderHtmlToPdf(verset.content)}</Text>
             </Text>
 
             <View style={styles.concordance}>
@@ -121,6 +122,13 @@ export const SermonPrinter = ({
 
       {sermon.similar_sermon && (
         <Text style={styles.similarSermon}>{sermon.similar_sermon}</Text>
+      )}
+
+      {/* Correction: Ajout d'un conteneur pour l'image */}
+      {sermonImage?.blobUrl && sermon.number === 9 && (
+        <View style={styles.imageContainer}>
+          <Image src={sermonImage.blobUrl} style={styles.image} />
+        </View>
       )}
     </Page>
   </Document>

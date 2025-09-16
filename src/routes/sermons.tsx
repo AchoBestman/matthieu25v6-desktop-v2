@@ -345,18 +345,8 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min`}
           >
-            {/* <div
-              className="print-title flex items-center justify-center pb-4"
-              style={{ fontSize }}
-            >
-              {" "}
-              {sermon?.chapter} :{" "}
-              {sermon &&
-                `${sermon.title} ${sermon.sub_title}`.replace("null", "")}
-            </div> */}
-
             <div className="flex">
-              {sermonImage?.blobUrl && (
+              {sermonImage?.blobUrl && sermon?.number !==9 && (
                 <img
                   alt=""
                   className="float-left pr-4 mt-2"
@@ -428,6 +418,15 @@ function RouteComponent() {
               </div>
             ))}
             <div className="mt-4">{sermon?.similar_sermon}</div>
+            <div className="flex">
+              {sermonImage?.blobUrl && sermon?.number ===9 && (
+                <img
+                  alt=""
+                  className="float-left pr-4 mt-2"
+                  src={sermonImage?.blobUrl}
+                />
+              )}
+            </div>
           </div>
         </div>
       </PageLoader>

@@ -1,14 +1,14 @@
 use futures_util::StreamExt;
 use reqwest::Client;
-use tokio::fs::File;
-use tokio::io::AsyncWriteExt;
-use tauri::{AppHandle, Emitter};
-use tokio_util::sync::CancellationToken;
 use serde::Serialize;
 use std::collections::HashMap;
-use std::sync::Mutex;
 use std::path::PathBuf;
+use std::sync::Mutex;
+use tauri::{AppHandle, Emitter};
 use tokio::fs;
+use tokio::fs::File;
+use tokio::io::AsyncWriteExt;
+use tokio_util::sync::CancellationToken;
 
 #[derive(Serialize, Clone)]
 #[serde(rename_all = "PascalCase")]
@@ -36,7 +36,9 @@ pub struct DownloadManager {
 impl DownloadManager {
     //constructor, don't forget to initialize in main.rs
     pub fn new() -> Self {
-        Self { tasks: Mutex::new(HashMap::new()) }
+        Self {
+            tasks: Mutex::new(HashMap::new()),
+        }
     }
 
     pub fn add_task(&self, id: String, token: CancellationToken) {
@@ -58,8 +60,6 @@ pub async fn download_audio(
     app_handle: AppHandle,
     manager: tauri::State<'_, DownloadManager>,
 ) -> Result<DownloadProgress, String> {
-    
-
     let cancel_token = CancellationToken::new();
     manager.add_task(id.clone(), cancel_token.clone());
 
@@ -69,13 +69,19 @@ pub async fn download_audio(
         manager.cancel_task(&id);
         let progress = DownloadProgress {
             id,
-            file_path: PathBuf::from(&file_full_path).file_name().unwrap().to_string_lossy().to_string(),
+            file_path: PathBuf::from(&file_full_path)
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string(),
             percent: 0.0,
             downloaded_mb: 0.0,
             total_mb: 0.0,
             status: DownloadStatus::Failed(format!("Upstream error: {}", res.status())),
         };
-        app_handle.emit("download_progress", Some(progress)).unwrap();
+        app_handle
+            .emit("download_progress", Some(progress))
+            .unwrap();
         return Err("Upstream error".into());
     }
 
@@ -95,13 +101,19 @@ pub async fn download_audio(
         if cancel_token.is_cancelled() {
             let progress = DownloadProgress {
                 id: id.clone(),
-                file_path: final_path.file_name().unwrap().to_string_lossy().to_string(),
+                file_path: final_path
+                    .file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .to_string(),
                 percent: (received as f64 / total as f64) * 100.0,
                 downloaded_mb: received as f64 / (1024.0 * 1024.0),
                 total_mb,
                 status: DownloadStatus::Cancelled,
             };
-            app_handle.emit("download_progress", Some(progress)).unwrap();
+            app_handle
+                .emit("download_progress", Some(progress))
+                .unwrap();
 
             // Supprimer le fichier temporaire en cas d'annulation
             let _ = fs::remove_file(&temp_path).await;
@@ -115,13 +127,19 @@ pub async fn download_audio(
 
         let progress = DownloadProgress {
             id: id.clone(),
-            file_path: final_path.file_name().unwrap().to_string_lossy().to_string(),
+            file_path: final_path
+                .file_name()
+                .unwrap()
+                .to_string_lossy()
+                .to_string(),
             percent: (received as f64 / total as f64) * 100.0,
             downloaded_mb: received as f64 / (1024.0 * 1024.0),
             total_mb,
             status: DownloadStatus::Downloading,
         };
-        app_handle.emit("download_progress", Some(progress)).unwrap();
+        app_handle
+            .emit("download_progress", Some(progress))
+            .unwrap();
     }
 
     file.flush().await.map_err(|e| e.to_string())?;
@@ -135,17 +153,22 @@ pub async fn download_audio(
 
     let progress = DownloadProgress {
         id,
-        file_path: final_path.file_name().unwrap().to_string_lossy().to_string(),
+        file_path: final_path
+            .file_name()
+            .unwrap()
+            .to_string_lossy()
+            .to_string(),
         percent: 100.0,
         downloaded_mb: total_mb,
         total_mb,
         status: DownloadStatus::Completed,
     };
-    app_handle.emit("download_progress", Some(progress.clone())).unwrap();
+    app_handle
+        .emit("download_progress", Some(progress.clone()))
+        .unwrap();
 
     Ok(progress)
 }
-
 
 #[tauri::command]
 pub fn cancel_download(id: String, manager: tauri::State<'_, DownloadManager>) -> bool {
@@ -160,4 +183,3 @@ pub fn cancel_download(id: String, manager: tauri::State<'_, DownloadManager>) -
         false
     }
 }
-
