@@ -26,9 +26,10 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdFMTNDOTlDMzVFMzI3RkYKUldUL0orTTFuTWtUZnFhengyK3Q5dVZBbFRJY$",
+      "dangerousInsecureTransportProtocol": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDY0MDcxMTA1NkI2MDk3OEEKUldTS2wyQnJCUkVIWk4rYUhiQU1rY1VobmFaS0hERWxBSjZJdFhKUHBKMnkzdUJoWTd1MzludGYK",
       "endpoints": [
-        "https://releases.myapp.com/{{target}}/{{arch}}/{{current_version}}"
+        "https://api.philippekacou.org/api/desktop/release/{{target}}/{{arch}}/{{current_version}}"
       ],
       "windows": {
         "installMode": "passive"
@@ -37,27 +38,28 @@
   },
   "bundle": {
     "createUpdaterArtifacts": true,
+    "publisher": "AIKPE ACHILE",
     "active": true,
     "targets": "all",
     "icon": ["icons/icon.ico"],
     "resources": [
-        "resources/fr/matth25v6_fr.db",
-        "resources/en/matth25v6_en.db",
-        "resources/es/matth25v6_es.db",
-        "resources/pt/matth25v6_pt.db"
-      ],
+      "resources/fr/matth25v6_fr.db",
+      "resources/en/matth25v6_en.db",
+      "resources/es/matth25v6_es.db",
+      "resources/pt/matth25v6_pt.db"
+    ],
     "externalBin": [],
     "copyright": "",
-    "category": "News",
+    "category": "Music",
     "shortDescription": "This app contains all the message of Prophet Kacou Philippe",
     "longDescription": "",
     "windows": {
       "allowDowngrades": true,
-      "certificateThumbprint": null,
-      "digestAlgorithm": null,
+      "certificateThumbprint": "04C52B727D1C247E48EB676B32E8EE4251B26EB8",
+      "digestAlgorithm": "SHA256",
+      "timestampUrl": "http://timestamp.comodoca.com",
       "nsis": null,
       "signCommand": null,
-      "timestampUrl": null,
       "tsp": false,
       "webviewInstallMode": {
         "silent": true,
