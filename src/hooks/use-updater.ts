@@ -5,7 +5,9 @@ import { relaunch } from "@tauri-apps/plugin-process";
 export function useUpdater() {
   const [update, setUpdate] = useState<Update | null>(null);
   const [progress, setProgress] = useState<number>(0);
-  const [status, setStatus] = useState<"idle" | "checking" | "downloading" | "finished" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "checking" | "downloading" | "finished" | "error"
+  >("idle");
   const [error, setError] = useState<string | null>(null);
 
   // Check if update available
@@ -14,12 +16,16 @@ export function useUpdater() {
     try {
       const result = await check();
       if (result) {
+        console.log(
+          `found update ${result.version} from ${result.date} with notes ${result.body} to update at ${result.currentVersion} version`
+        );
         setUpdate(result);
       } else {
         setUpdate(null);
       }
       setStatus("idle");
     } catch (err: any) {
+      console.log("checking for updates error...", err);
       setError(err.message ?? "Failed to check updates");
       setStatus("error");
     }

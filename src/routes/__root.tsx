@@ -17,6 +17,7 @@ import { SearchCodeIcon } from "lucide-react";
 import { SearchDrawer } from "@/components/commons/search-drawer";
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import DonwloadHistoryDropdown from "@/components/commons/download-history";
+import AppUpdaterDropdown from "@/components/commons/app-updater";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -55,6 +56,7 @@ function RootComponent() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex items-center">
+            <AppUpdaterDropdown/>
             <DonwloadHistoryDropdown />
             <SearchCodeIcon
               onClick={() => setIsSearchOpen(true)}

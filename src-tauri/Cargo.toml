@@ -4,7 +4,7 @@ version = "1.0.0"
 description = "This app contains all the message of Prophet Kacou Philippe"
 authors = ["aikpeachille55@gmail.com"]
 license = ""
-repository = "https://gitlab.com/matthieu25v61/matthieu25v6-desktop.git"
+repository = "https://gitlab.com/matthieu25v61/matthieu25v6-desktop-v2.git"
 edition = "2024"
 rust-version = "1.87.0"
 

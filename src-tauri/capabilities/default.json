@@ -19,6 +19,7 @@
     "fs:read-files",
     "fs:read-meta",
     "fs:allow-fstat",
+    "updater:default",
     {
       "identifier": "fs:scope",
       "allow": [
