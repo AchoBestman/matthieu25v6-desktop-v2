@@ -1,7 +1,7 @@
 {
   "name": "prophet-kacou-desktop-v2",
   "private": true,
-  "version": "2.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +11,8 @@
     "tauri:windows-build-signe": "powershell -ExecutionPolicy Bypass -File ./build-signed.ps1",
     "build:x64": "pnpm tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc",
     "build:x32": "pnpm tauri build --runner cargo-xwin --target i686-pc-windows-msvc",
-    "build:arm64": "pnpm tauri build --runner cargo-xwin --target aarch64-pc-windows-msvc"
+    "build:arm64": "pnpm tauri build --runner cargo-xwin --target aarch64-pc-windows-msvc",
+    "build:mac": "pnpm tauri build --bundles app --target universal-apple-darwin"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.14",

@@ -25,7 +25,7 @@ export function useUpdater() {
       }
       setStatus("idle");
     } catch (err: any) {
-      console.log("checking for updates error...", err);
+      console.log("checking for updates error from server...", err);
       setError(err.message ?? "Failed to check updates");
       setStatus("error");
     }
