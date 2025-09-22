@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
-"http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-  <dict>
-    <!-- Set to true if your app uses encryption -->
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
-  </dict>
+<dict>
+<!-- Set to true if your app uses encryption -->
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+  <key>NSUserActivityTypes</key>
+  <array>
+      <string>INSendMessageIntent</string>
+      <string>INStartCallIntent</string>
+  </array>
+</dict>
 </plist>

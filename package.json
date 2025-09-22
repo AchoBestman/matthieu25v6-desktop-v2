@@ -1,7 +1,7 @@
 {
   "name": "prophet-kacou-desktop-v2",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,11 @@
     "build:x64": "pnpm tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc",
     "build:x32": "pnpm tauri build --runner cargo-xwin --target i686-pc-windows-msvc",
     "build:arm64": "pnpm tauri build --runner cargo-xwin --target aarch64-pc-windows-msvc",
-    "build:mac": "pnpm tauri build --bundles app --target universal-apple-darwin"
+    "mac:build": "pnpm run tauri build -- --target universal-apple-darwin",
+    "mac:clean-quarantine": "xattr -rc \"src-tauri/target/universal-apple-darwin/release/bundle/macos/Prophet Kacou.app\"",
+    "mac:lonline:sign-app": "codesign --sign \"$APPLE_DISTRIBUTION_CERT_NAME\" --entitlements \"$PATH_TO_ENTITLEMENTS_FILE\" \"src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKP_MACOS_APP_NAME.app\"",
+    "mac:online:deploy": "xcrun productbuild --sign \"$MAC_INSTALLER_CERT_NAME\" --component \"src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKP_MACOS_APP_NAME.app\" \"/Applications\" \"$PKP_MACOS_APP_NAME.pkg\"",
+    "mac:online-ssh-deploy": "./ssh/mac-online-deploy.sh"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.14",
