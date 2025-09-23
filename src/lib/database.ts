@@ -2,6 +2,7 @@ import Database from "@tauri-apps/plugin-sql";
 import { exists, mkdir, remove, writeFile } from "@tauri-apps/plugin-fs";
 import { AppDatabaseDir, downloadDrogressType } from "./utils";
 import { API_URL } from "./env";
+import { appDataDir, join } from "@tauri-apps/api/path";
 
 /**
  * Delete file for local
@@ -122,7 +123,13 @@ const database = async (
     );
   }
   const [country, langue] = initial.toLowerCase().split("-");
+  //work on mac and windows but not work on linux
   const dbPath = `${country}/matth25v6_${langue}.db`;
+  let fullDbPath = dbPath;
+
+  //this work on linux
+  const baseDir = await appDataDir();                       // ~/.local/share/<appname>/
+  fullDbPath = await join(baseDir, country, `matth25v6_${langue}.db`);
   // Ensure the folder exists
 
   await mkdir(country, {
@@ -146,7 +153,7 @@ const database = async (
       console.error("Error downloading database:", err);
     }
   }
-  return await Database.load(`sqlite:${dbPath}`).catch((err) => {
+  return await Database.load(`sqlite:${fullDbPath}`).catch((err) => {
     throw err;
   });
 };
