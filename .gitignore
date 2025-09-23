@@ -36,3 +36,7 @@ src-tauri/Entitlements-local.plist
 src-tauri/Entitlements.plist
 src-tauri/tauri.offlineappstore.conf.json
 src-tauri/tauri.onlineappstore.conf.json
+artifacts
+screenshots
+artifacts-arm64
+artifacts-x86_64

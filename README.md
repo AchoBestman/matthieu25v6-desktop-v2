@@ -27,4 +27,13 @@ While building your update artifacts, you need to have the private key you gener
     <# optionally also add a password #>
     $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""
 
-    
+
+# Using Docker Compose directly
+docker compose -f docker-compose.x86_64.yml up --build
+
+# Or using the build script
+./build.sh x86_64
+
+AppImage (artifacts/appimage/) - Universal Linux executable
+DEB (artifacts/deb/) - Debian/Ubuntu package
+RPM (artifacts/rpm/) - RedHat/CentOS/Fedora package

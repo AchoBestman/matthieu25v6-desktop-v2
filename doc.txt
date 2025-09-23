@@ -7,3 +7,291 @@ New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=ProphetKacou" -KeyA
 pnpm tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc
 s'execute en mode admin et pas dans vs code à la racine du projet
 
+#!/bin/bash
+# -------------------------------------------------------------------
+# macOS Tauri App Build & Deployment Script
+# Author: Achile Aïkpé
+# Purpose:
+#   - Load environment variables from .env
+#   - Verify all required keys are set
+#   - Build Tauri macOS app
+#   - Remove quarantine flags
+#   - Sign the app
+#   - Create .pkg for local or Apple Store distribution
+#   - Optionally, submit an existing package to Apple Store
+# -------------------------------------------------------------------
+
+set -e
+
+# Ensure we are in the project root
+cd "/Users/aikpeachile/Desktop/Matthieu25v6/matthieu25v6-desktop-v2"
+
+which pnpm
+pnpm --v
+echo ""
+
+
+if ! command -v pnpm &>/dev/null; then
+  echo "pnpm not found. Please install pnpm and try again."
+  exit 1
+fi
+
+ENV_FILE=".env"
+
+# List of required environment keys
+REQUIRED_KEYS="
+PKP_MACOS_APP_NAME
+TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+TAURI_SIGNING_PRIVATE_KEY
+APPLE_API_ISSUER
+APPLE_API_KEY
+APPLE_API_KEY_PATH
+APPLE_DISTRIBUTION_CERT_NAME
+PKP_Apple_Developer_ID
+MAC_INSTALLER_CERT_NAME
+DEVELOPPER_ID_INSTALLER_CERT_NAME
+MAC_APP_BUILD_PATH
+PATH_TO_LOCAL_ENTITLEMENTS_FILE
+PATH_TO_ONLINE_ENTITLEMENTS_FILE
+"
+
+# ------------------------
+# Helper: trim spaces
+# ------------------------
+trim() {
+  echo "$1" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+# ------------------------
+# Load .env into plain variables
+# ------------------------
+while IFS= read -r line || [ -n "$line" ]; do
+  [[ "$line" =~ ^#.*$ || -z "$line" ]] && continue
+  key=$(echo "$line" | cut -d'=' -f1)
+  value=$(echo "$line" | cut -d'=' -f2-)
+  key=$(trim "$key")
+  value=$(trim "$value")
+  value=$(echo "$value" | sed -e 's/^"//' -e 's/"$//')
+  eval "ENV_$key=\"$value\""
+done < "$ENV_FILE"
+
+# ------------------------
+# Verify all required keys
+# ------------------------
+missing_keys=0
+for key in $REQUIRED_KEYS; do
+  current_value=$(printenv "$key" || echo "")
+  if [ -n "$current_value" ]; then
+    echo "$key found"
+  else
+    env_value=$(eval "echo \${ENV_$key}")
+    if [ -n "$env_value" ]; then
+      export "$key=$env_value"
+      echo "$key not found → set from .env with value $env_value"
+    else
+      echo "$key is not configured. Please configure it before running the build."
+      missing_keys=1
+    fi
+  fi
+done
+
+# Exit if missing keys
+if [ $missing_keys -eq 1 ]; then
+  echo "Please configure all missing keys and restart the script."
+  exit 1
+fi
+
+# ------------------------
+# Ask user what to do
+# ------------------------
+echo ""
+echo "Choose action:"
+echo "1) Build new package (default)"
+echo "2) Push existing .pkg to Apple Store"
+read -rp "Enter choice [1/2]: " START_CHOICE
+START_CHOICE=${START_CHOICE:-1}
+
+# ------------------------
+# Function: shared build steps
+# ------------------------
+build_app() {
+  local type=$1
+  echo ""
+  echo "$PKP_MACOS_APP_NAME build process started. Please wait..."
+
+  # Vérifier que le type est fourni
+  if [ -z "$type" ]; then
+    echo "Error: Build type required ('online' or 'offline')"
+    exit 1
+  fi
+
+  # Choose the bundle you want to package based on type offline-dmg
+  if [ "$type" = "online" ]; then
+    echo "Building online bundle..."
+    pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json
+  if [ "$type" = "offline-dmg" ]; then
+    echo "Building offline-dmg bundle..."
+    npm tauri build -- --bundles dmg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
+  elif [ "$type" = "offline" ]; then
+    echo "Building offline bundle..."
+    pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
+  else
+    echo "Error: Invalid build type '$type'. Use 'online' or 'offline'"
+    exit 1
+  fi
+  
+  echo "✓ Build completed for type: $type"
+
+  #Suppressions des données quarantaines
+  APP_PATH="$MAC_APP_BUILD_PATH/$PKP_MACOS_APP_NAME.app"
+  
+  while true; do
+    echo "Options :"
+    echo "1) Ouvrir un nouveau terminal pour suppression manuelle des quarantines"
+    echo "2) Continuer pour signer le build (ignorer les quarantines)"
+    read -p "Votre choix [1/2] : " choice
+    case $choice in
+        1)
+            echo "Ouverture d'un nouveau terminal dans le répertoire du projet..."
+            osascript << EOF
+            tell application "Terminal"
+            activate
+            do script "cd '$PWD' && echo 'Exécutez cette commande pour supprimer :' && echo 'xattr -rc \"$APP_PATH\"' && echo ' et pour voir les resultats exécuter ' && echo 'xattr -lr \"$APP_PATH\"' && echo ''"
+            end tell
+EOF
+            read -p "Commande exécutée ? Appuyez sur Entrée pour continuer..."
+            ;;
+        2) 
+            echo "Continuer pour signer le build..."
+            break
+            ;;
+        *)
+            echo "Choix invalide."
+            ;;
+    esac
+  done
+  
+  echo "Check quarantine keys..."
+  xattr -lr "$APP_PATH"
+}
+
+# ------------------------
+# Function: sign & create package
+# ------------------------
+sign_and_package() {
+  local build_type=$1
+  if [ "$build_type" -eq 1 ]; then
+
+    echo "Creating local package $PKP_MACOS_APP_NAME-local.pkg..."
+    xcrun productbuild \
+      --sign "$DEVELOPPER_ID_INSTALLER_CERT_NAME" \
+      --component "$MAC_APP_BUILD_PATH/$PKP_MACOS_APP_NAME.app" "/Applications" \
+      "$PKP_MACOS_APP_NAME-local.pkg"
+
+    echo "Local package created: $PKP_MACOS_APP_NAME-local.pkg"
+
+    echo ""
+
+  if [ "$build_type" -eq 3 ]; then
+    echo "Copy local package $PKP_MACOS_APP_NAME-local.dmg..."
+    cp "$MAC_APP_BUILD_PATH/$PKP_MACOS_APP_NAME.dmg" "$PKP_MACOS_APP_NAME-local.dmg"
+    echo "Local package copied: $PKP_MACOS_APP_NAME-local.dmg"
+
+    echo ""
+
+  elif [ "$build_type" -eq 2 ]; then
+    # Apple Store package
+    echo "Signing app with $APPLE_DISTRIBUTION_CERT_NAME..."
+    codesign \
+      --sign "$APPLE_DISTRIBUTION_CERT_NAME" \
+      --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
+      "$MAC_APP_BUILD_PATH/$PKP_MACOS_APP_NAME.app"
+
+    echo "Creating Apple Store package $PKP_MACOS_APP_NAME.pkg..."
+    xcrun productbuild \
+      --sign "$MAC_INSTALLER_CERT_NAME" \
+      --component "$MAC_APP_BUILD_PATH/$PKP_MACOS_APP_NAME.app" "/Applications" \
+      "$PKP_MACOS_APP_NAME.pkg"
+
+    echo "Apple Store package created: $PKP_MACOS_APP_NAME.pkg"
+
+    echo ""
+  fi
+}
+
+# ------------------------
+# Function: submit package to Apple Store
+# ------------------------
+submit_to_apple() {
+  local pkg_path=$1
+  if [ ! -f "$pkg_path" ]; then
+    echo "Error: File not found: $pkg_path"
+    exit 1
+  fi
+
+  echo "Submitting $pkg_path to Apple Notary Tool..."
+  xcrun notarytool submit "$pkg_path" \
+    --key "$APPLE_API_KEY_PATH" \
+    --key-id "$APPLE_API_KEY" \
+    --issuer "$APPLE_API_ISSUER" \
+    --wait --timeout 600
+
+  echo "Submission completed. You can now use Transporter or App Store Connect."
+}
+
+# ------------------------
+# Handle user choice
+# ------------------------
+if [ "$START_CHOICE" -eq 1 ]; then
+  # Build new package
+  echo ""
+  echo "Select build type:"
+  echo "1) Local .pkg shared package (default)"
+  echo "2) Apple Store .pkg package"
+  echo "3) Local .dmg shared package"
+  read -rp "Enter choice [1-3]: " BUILD_CHOICE
+  BUILD_CHOICE=${BUILD_CHOICE:-1}
+
+  # Déterminer le type de build basé sur BUILD_CHOICE
+  if [ "$BUILD_CHOICE" -eq 1 ]; then
+    BUILD_TYPE="offline"
+  if [ "$BUILD_CHOICE" -eq 2 ]; then
+    BUILD_TYPE="online"
+  elif [ "$BUILD_CHOICE" -eq 3 ]; then
+    BUILD_TYPE="offline-dmg"
+  else
+    echo "Invalid choice"
+    exit 1
+  fi
+
+  build_app "$BUILD_TYPE"
+  sign_and_package "$BUILD_CHOICE"
+
+  if [ "$BUILD_CHOICE" -eq 2 ]; then
+    read -rp "Do you want to submit to Apple Store now? (y/N): " PUBLISH_CHOICE
+    PUBLISH_CHOICE=${PUBLISH_CHOICE:-N}
+    if [[ "$PUBLISH_CHOICE" =~ ^[Yy]$ ]]; then
+      submit_to_apple "$PKP_MACOS_APP_NAME.pkg"
+    fi
+  fi
+
+  elif [ "$START_CHOICE" -eq 2 ]; then
+    # Push existing package
+    echo ""
+    DEFAULT_PKG="$PKP_MACOS_APP_NAME.pkg"
+    echo "You chose to push an existing package to Apple Store."
+    echo "Press Enter to use the default package path:"
+    echo "  $DEFAULT_PKG"
+    read -rp "Or enter a custom .pkg path: " EXISTING_PKG_PATH
+    EXISTING_PKG_PATH=$(trim "$EXISTING_PKG_PATH")
+
+    # Use default if input is empty
+    if [ -z "$EXISTING_PKG_PATH" ]; then
+      EXISTING_PKG_PATH="$DEFAULT_PKG"
+    fi
+
+    # Submit the package
+    submit_to_apple "$EXISTING_PKG_PATH"
+fi
+
+echo "End of operations."

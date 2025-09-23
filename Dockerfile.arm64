@@ -1,0 +1,96 @@
+# Use Ubuntu 22.04 ARM64
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV APPIMAGE_EXTRACT_AND_RUN=1
+ENV NO_STRIP=1
+ENV CI=true
+
+# Install system dependencies for Tauri on ARM64
+RUN apt-get update && apt-get install -y \
+    # Core build tools
+    build-essential \
+    gcc \
+    g++ \
+    libc6-dev \
+    # Tauri dependencies
+    libfuse2 \
+    xz-utils \
+    gzip \
+    xdg-utils \
+    squashfs-tools \
+    p7zip-full \
+    curl \
+    wget \
+    git \
+    libssl-dev \
+    pkg-config \
+    libgtk-3-dev \
+    libayatana-appindicator3-dev \
+    librsvg2-dev \
+    ca-certificates \
+    libwebkit2gtk-4.1-dev \
+    libjavascriptcoregtk-4.1-dev \
+    libsoup-3.0-dev \
+    file \
+    libxdo-dev \
+    # Additional ARM64 specific dependencies
+    libstdc++6 \
+    libgcc-s1 \
+    zlib1g-dev \
+    # X11 libraries (required for AppImage creation)
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libxrandr2 \
+    libxinerama1 \
+    libxcursor1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxfixes3 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 22.x and pnpm
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g pnpm
+
+# Create non-root user
+RUN useradd -m -s /bin/bash tauri
+USER tauri
+WORKDIR /app
+
+# Install Rust for ARM64
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+ENV PATH="/home/tauri/.cargo/bin:${PATH}"
+
+# Verify Rust installation
+RUN rustc --version && cargo --version
+
+# Set environment for building
+ENV RUST_BACKTRACE=1
+
+# Copy project files
+COPY --chown=tauri:tauri . .
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# Debug: Check what we have
+RUN echo "=== Project Structure ===" && \
+    ls -la && \
+    echo "=== Tauri Config ===" && \
+    cat src-tauri/tauri.conf.json | grep -A5 -B5 "bundle" || echo "Config check failed" && \
+    echo "=== Architecture ===" && \
+    uname -a
+
+# Try building with fallback options
+RUN echo "=== Attempting Tauri Build ===" && \
+    (pnpm tauri build --bundles appimage --verbose || \
+     (echo "AppImage failed, trying deb..." && pnpm tauri build --bundles deb) || \
+     (echo "Both failed, building binary only..." && pnpm tauri build)) && \
+    echo "=== Build Results ===" && \
+    find /app/src-tauri/target -name "*.AppImage" -o -name "*.deb" -o -name "ProphetKacou" 2>/dev/null || echo "No build artifacts found"

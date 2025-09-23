@@ -1,0 +1,63 @@
+services:
+  # ARM64 build (for your M4 Pro and ARM servers)
+  prophet-kacou-arm64:
+    build:
+      context: .
+      dockerfile: Dockerfile.arm64  # Your original ARM64 Dockerfile
+      platforms:
+        - linux/arm64
+    container_name: prophet-kacou-arm64
+    environment:
+      - CI=true
+      - APPIMAGE_EXTRACT_AND_RUN=1
+    volumes:
+      - ./artifacts-arm64:/artifacts
+      - node_modules_cache_arm64:/app/node_modules
+      - cargo_cache_arm64:/home/tauri/.cargo
+    working_dir: /app
+    user: tauri
+    command: >
+      sh -c "
+        echo 'ARM64 build completed! Copying artifacts...' &&
+        mkdir -p /artifacts &&
+        cp -r /app/src-tauri/target/release/bundle/* /artifacts/ 2>/dev/null &&
+        cp /app/src-tauri/target/release/ProphetKacou /artifacts/ 2>/dev/null &&
+        echo 'ARM64 artifacts:' &&
+        ls -la /artifacts/
+      "
+
+  # x86_64 build (for most Linux distributions)
+  prophet-kacou-x86_64:
+    build:
+      context: .
+      dockerfile: Dockerfile.x86_64
+      platforms:
+        - linux/amd64
+    container_name: prophet-kacou-x86_64
+    environment:
+      - CI=true
+      - APPIMAGE_EXTRACT_AND_RUN=1
+      - NO_STRIP=1
+    volumes:
+      - ./artifacts-x86_64:/artifacts
+      - node_modules_cache_x86_64:/app/node_modules
+      - cargo_cache_x86_64:/home/tauri/.cargo
+    working_dir: /app
+    user: tauri
+    command: >
+      sh -c "
+        echo 'x86_64 build completed! Copying artifacts...' &&
+        mkdir -p /artifacts &&
+        cp -r /app/src-tauri/target/release/bundle/* /artifacts/ 2>/dev/null &&
+        cp /app/src-tauri/target/release/ProphetKacou /artifacts/ 2>/dev/null &&
+        echo 'x86_64 artifacts:' &&
+        ls -la /artifacts/
+      "
+
+volumes:
+  # ARM64 caches
+  node_modules_cache_arm64:
+  cargo_cache_arm64:
+  # x86_64 caches
+  node_modules_cache_x86_64:
+  cargo_cache_x86_64:
