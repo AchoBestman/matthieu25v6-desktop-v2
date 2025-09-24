@@ -42,10 +42,18 @@ export function SearchDrawer({
       ),
   });
 
+  const stripHtml = (html: string) => {
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.textContent || div.innerText || "";
+};
+
   const highlightText = (text: string, keyword: string) => {
-    if (!keyword) return text;
+    const cleanText = stripHtml(text);
+    if (!keyword) return cleanText;
+
     const regex = new RegExp(`(${keyword})`, "gi");
-    return text.split(regex).map((part, i) =>
+    return cleanText.split(regex).map((part, i) =>
       regex.test(part) ? (
         <span
           key={i}
