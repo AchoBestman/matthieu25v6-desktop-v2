@@ -1,0 +1,182 @@
+name: Prophet Kacou Release Process
+on:
+  push:
+    branches:
+      - deploy
+concurrency:
+  #${{ github.workflow }} Value: "Prophet Kacou Release Process"
+  #${{ github.ref }} Value: "refs/heads/deploy"
+  group: ${{ github.workflow }}-${{ github.ref }} # value is: Prophet Kacou Release Process refs/heads/deploy
+  cancel-in-progress: true
+env:
+  CN_APPLICATION: "prophet-kacou/prophet-kacou"
+
+jobs:
+  draft:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: create draft release
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release draft ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
+
+  build:
+    needs: draft
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macOS Universal (combines x86_64 and aarch64)
+          - os: macos-latest
+            target: universal-apple-darwin
+            name: "macOS Universal"
+          
+          # Windows builds
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: "Windows x64"
+          - os: windows-latest
+            target: i686-pc-windows-msvc
+            name: "Windows x86"
+          - os: windows-latest
+            target: aarch64-pc-windows-msvc
+            name: "Windows ARM64"
+          
+          # Linux builds
+          - os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            name: "Linux x64"
+          - os: ubuntu-22.04
+            target: i686-unknown-linux-gnu
+            name: "Linux x86"
+          - os: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
+            name: "Linux ARM64"
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+          
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+          
+      # Linux dependencies for all Linux targets
+      - name: Install Linux dependencies
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          # For cross-compilation support
+          sudo apt-get install -y gcc-multilib
+          
+      # Install cross-compilation toolchains for Linux
+      - name: Install Linux cross-compilation dependencies
+        if: matrix.os == 'ubuntu-22.04' && matrix.target != 'x86_64-unknown-linux-gnu'
+        run: |
+          case "${{ matrix.target }}" in
+            "i686-unknown-linux-gnu")
+              sudo apt-get install -y gcc-i686-linux-gnu
+              echo "CC_i686_unknown_linux_gnu=i686-linux-gnu-gcc" >> $GITHUB_ENV
+              echo "CXX_i686_unknown_linux_gnu=i686-linux-gnu-g++" >> $GITHUB_ENV
+              ;;
+            "aarch64-unknown-linux-gnu")
+              sudo apt-get install -y gcc-aarch64-linux-gnu
+              echo "CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+              echo "CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+              ;;
+          esac
+          
+      # Add Rust targets
+      - name: Add Rust target
+        run: rustup target add ${{ matrix.target }}
+        
+      # Install dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        
+      # Configure Tauri for multiple bundle formats on Linux
+      - name: Configure Tauri bundle formats
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          # Update tauri.conf.json to include all Linux bundle formats
+          node -e "
+          const fs = require('fs');
+          const path = './src-tauri/tauri.conf.json';
+          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+          if (!config.tauri.bundle.targets) config.tauri.bundle.targets = {};
+          config.tauri.bundle.targets.linux = ['AppImage', 'deb', 'rpm'];
+          fs.writeFileSync(path, JSON.stringify(config, null, 2));
+          "
+          
+      # Configure Tauri for multiple bundle formats on Windows
+      - name: Configure Tauri bundle formats for Windows
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Update tauri.conf.json to include both MSI and NSIS (exe)
+          node -e "
+          const fs = require('fs');
+          const path = './src-tauri/tauri.conf.json';
+          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
+          if (!config.tauri.bundle.targets) config.tauri.bundle.targets = {};
+          config.tauri.bundle.targets.windows = ['msi', 'nsis'];
+          fs.writeFileSync(path, JSON.stringify(config, null, 2));
+          "
+          
+      # Build for macOS Universal
+      - name: Build macOS Universal
+        if: matrix.os == 'macos-latest'
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+          pnpm tauri build --target universal-apple-darwin
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          
+      # Build for Windows
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
+        run: pnpm tauri build --target ${{ matrix.target }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          
+      # Build for Linux
+      - name: Build Linux
+        if: matrix.os == 'ubuntu-22.04'
+        run: pnpm tauri build --target ${{ matrix.target }}
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          
+      - name: Upload assets
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
+          path: ./src-tauri
+
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish release
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
