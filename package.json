@@ -8,9 +8,10 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "tauri:windows": "powershell -ExecutionPolicy Bypass -File ./build-signed.ps1",
+    "tauri:windowsOld": "powershell -ExecutionPolicy Bypass -File ./build-signed.ps1",
     "tauri:mac": "./ssh/mac-online-deploy.sh",
-    "tauri:linux": "./docker-build.sh"
+    "tauri:linux": "./docker-build.sh",
+    "tauri:windows": "ssh\\windows-online-deploy.bat"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.14",

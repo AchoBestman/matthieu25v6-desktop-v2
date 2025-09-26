@@ -29,7 +29,8 @@
       "dangerousInsecureTransportProtocol": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIzMjFBN0MxQjg5NTFFNTQKUldSVUhwVzR3YWNoSXd1SWNLRG9UV1JjT3BZbUJBRE94c1ZYYVEraEhkYTZSWTZxVmk3L09RYjMK",
       "endpoints": [
-        "https://cdn.crabnebula.app/update/prophet-kacou/prophet-kacou/{{target}}-{{arch}}/{{current_version}}"
+        "https://cdn.crabnebula.app/update/prophet-kacou/prophet-kacou/{{target}}-{{arch}}/{{current_version}}",
+        "https://matthieu25v6-api-v2.test/api/desktop/release/{{target}}/{{arch}}/{{current_version}}"
       ],
       "windows": {
         "installMode": "passive"
@@ -42,11 +43,7 @@
     "publisher": "Matth25v6 App",
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/icon.icns",
-      "icons/icon.ico",
-      "icons/icon.png"
-    ],
+    "icon": ["icons/icon.icns", "icons/icon.ico", "icons/icon.png"],
     "resources": [
       "resources/fr/matth25v6_fr.db",
       "resources/en/matth25v6_en.db",
@@ -67,7 +64,7 @@
       "tsp": false,
       "webviewInstallMode": {
         "silent": true,
-        "type": "downloadBootstrapper"
+        "type": "embedBootstrapper"
       },
       "wix": null
     },
