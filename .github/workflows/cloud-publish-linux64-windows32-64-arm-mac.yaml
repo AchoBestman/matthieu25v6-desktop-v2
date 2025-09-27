@@ -21,6 +21,9 @@ env:
   KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
   TAURI_SIGNING_PRIVATE_KEY: ${{ vars.TAURI_SIGNING_PRIVATE_KEY }}
   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ vars.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  GPG_PRIVATE_KEY: ${{ vars.LINUX_SIGN_PRIVATE_KEY }}
+  LINUX_SIGN_KEY_ID: ${{ vars.LINUX_SIGN_KEY_ID }}
+  LINUX_APPIMAGETOOL_SIGN_PASSPHRASE: ${{ vars.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -243,9 +246,18 @@ jobs:
         run: rustup target add x86_64-unknown-linux-gnu
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Import GPG key
+        run: |
+          echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
+
       - name: Build Linux x86_64-unknown-linux-gnu
         run: pnpm tauri build --target x86_64-unknown-linux-gnu
         env:
+          SIGN: 1
+          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+          APPIMAGETOOL_FORCE_SIGN: 1
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       - name: Upload assets
@@ -289,9 +301,18 @@ jobs:
         run: rustup target add aarch64-unknown-linux-gnu
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Import GPG key
+        run: |
+          echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          
       - name: Build Linux aarch64-unknown-linux-gnu
         run: pnpm tauri build --target aarch64-unknown-linux-gnu
         env:
+          SIGN: 1
+          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+          APPIMAGETOOL_FORCE_SIGN: 1
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       - name: Upload assets
@@ -308,7 +329,6 @@ jobs:
   #     - build-windows-arm64
   #     - build-linux-x64
   #     - build-linux-aarch64
-  #     - build-linux-armv7
   #   runs-on: ubuntu-22.04
   #   steps:
   #     - uses: actions/checkout@v4
