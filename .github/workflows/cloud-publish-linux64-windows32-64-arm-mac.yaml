@@ -77,7 +77,9 @@ jobs:
           security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
           echo "certifcate success KEYCHAIN_PASSWORD $KEYCHAIN_PASSWORD"
           security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          echo "certifcate success check security KEYCHAIN_PASSWORD $KEYCHAIN_PASSWORD"
           security find-identity -v -p codesigning build.keychain
+          echo "certifcate success second check security KEYCHAIN_PASSWORD $KEYCHAIN_PASSWORD"
 
           set -e
           CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Development")
@@ -91,7 +93,7 @@ jobs:
         env:
           APPLE_API_KEY_PATH: /tmp/AuthKey.p8
 
-          
+
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
