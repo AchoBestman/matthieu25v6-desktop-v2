@@ -59,6 +59,39 @@ jobs:
         with:
           node-version: "20"
 
+      # Import Apple Developer Certificate
+      - name: Import Apple Developer Certificate
+        env:
+          APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
+        run: |
+          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          echo "certifcate success"
+          set +e
+          echo "certifcate success password $APPLE_CERTIFICATE_PASSWORD"
+          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          echo "certifcate success KEYCHAIN_PASSWORD $KEYCHAIN_PASSWORD"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          security find-identity -v -p codesigning build.keychain
+
+          set -e
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Development")
+          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+          echo "Apple certificate imported with ID: $CERT_ID"
+
+      # Set up Apple API key for notarization
+      - name: Set up Apple API key
+        run: echo "${{ vars.APPLE_API_PRIVATE_KEY }}" > /tmp/AuthKey.p8
+        env:
+          APPLE_API_KEY_PATH: /tmp/AuthKey.p8
+
+          
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -75,34 +108,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      # Import Apple Developer Certificate
-      - name: Import Apple Developer Certificate
-        env:
-          APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
-        run: |
-          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-          echo "certifcate success"
-          set +e
-          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
-          set -e
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Development")
-          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
-          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Apple certificate imported with ID: $CERT_ID"
-
-      # Set up Apple API key for notarization
-      - name: Set up Apple API key
-        run: echo "${{ vars.APPLE_API_PRIVATE_KEY }}" > /tmp/AuthKey.p8
-        env:
-          APPLE_API_KEY_PATH: /tmp/AuthKey.p8
 
       # Build all targets
       - name: Build macOS x86_64
