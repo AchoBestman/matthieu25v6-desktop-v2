@@ -14,12 +14,6 @@ env:
   CN_APPLICATION: ${{ vars.CN_APPLICATION }}
   CN_API_KEY: ${{ vars.CN_API_KEY }}
 
-  APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
-  KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
-  APPLE_ID: ${{ vars.APPLE_ID }}
-  APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-
   RELEASE_NOTE: ./release-notes.txt
 
   TAURI_SIGNING_PRIVATE_KEY: ${{ vars.TAURI_SIGNING_PRIVATE_KEY }}
@@ -49,8 +43,8 @@ jobs:
     needs: draft
     runs-on: macos-latest
     env:
-        APPLE_ID: ${{ env.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ env.APPLE_ID_PASSWORD }}
+        APPLE_ID: ${{ vars.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
     steps:
@@ -85,9 +79,9 @@ jobs:
       # Import Apple Developer Certificate
       - name: Import Apple Developer Certificate
         env:
-          APPLE_CERTIFICATE: ${{ env.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+          APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
         run: |
           echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
