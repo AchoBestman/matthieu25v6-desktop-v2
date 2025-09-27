@@ -11,7 +11,7 @@ on:
         #doit etre ici valeur en dure
         default: "prophet-kacou/prophet-kacou"
 env:
-  CN_APPLICATION: ${{ github.event.inputs.application || env.CN_APPLICATION }}
+  CN_APPLICATION: ${{ github.event.inputs.application || vars.CN_APPLICATION }}
   APPLE_ID: ${{ vars.APPLE_ID }}
   APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
   APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
