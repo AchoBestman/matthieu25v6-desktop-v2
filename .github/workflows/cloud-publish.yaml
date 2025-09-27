@@ -11,7 +11,7 @@ on:
         #doit etre ici valeur en dure
         default: "prophet-kacou/prophet-kacou"
 env:
-  CN_APPLICATION: ${{ github.event.inputs.application || var.CN_APPLICATION }}
+  CN_APPLICATION: ${{ github.event.inputs.application || env.CN_APPLICATION }}
   APPLE_ID: ${{ vars.APPLE_ID }}
   APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
   APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
@@ -19,7 +19,6 @@ env:
   RELEASE_NOTE: ./release-notes.txt
   APPLE_CERTIFICATE: ${{ vars.APPLE_CERTIFICATE }}
   KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }} #The password of my keychain
-  CN_API_KEY: ${{ vars.CN_API_KEY }}
   TAURI_SIGNING_PRIVATE_KEY: ${{ vars.TAURI_SIGNING_PRIVATE_KEY }}
   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ vars.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
