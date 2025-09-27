@@ -8,7 +8,8 @@ on:
       application:
         description: "The fully qualified slug of your app on CrabNebula Cloud"
         required: true
-        default: ${{ secrets.CN_APPLICATION }}
+        #doit etre ici valeur en dure
+        default: "prophet-kacou/prophet-kacou"
 env:
   CN_APPLICATION: ${{ github.event.inputs.application }}
   APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -147,7 +148,7 @@ jobs:
           security unlock-keychain -p "${{env.KEYCHAIN_PASSWORD}}" build.keychain
           security set-keychain-settings -t 3600 -u build.keychain
           security import certificate.p12 -k build.keychain -P "${{env.APPLE_EXPORT_CERTIFICATE_PASSWORD}}" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{env<KEYCHAIN_PASSWORD}}" build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{env.KEYCHAIN_PASSWORD}}" build.keychain
           security find-identity -v -p codesigning build.keychain
           
       # Verify Certificate
@@ -200,13 +201,13 @@ jobs:
           api-key: ${{ secrets.CN_API_KEY }}
           path: ./src-tauri
 
-publish:
-  needs: build
-  runs-on: ubuntu-22.04
-  steps:
-    - uses: actions/checkout@v4
-    - name: Publish release
-      uses: crabnebula-dev/cloud-release@v0
-      with:
-        command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-        api-key: ${{ secrets.CN_API_KEY }}
+  publish:
+    needs: build
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish release
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ secrets.CN_API_KEY }}
