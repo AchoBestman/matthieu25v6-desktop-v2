@@ -11,7 +11,7 @@ on:
         #doit etre ici valeur en dure
         default: "prophet-kacou/prophet-kacou"
 env:
-  CN_APPLICATION: ${{ github.event.inputs.application }}
+  CN_APPLICATION: ${{ github.event.inputs.application || secrets.CN_APPLICATION }}
   APPLE_ID: ${{ secrets.APPLE_ID }}
   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
   APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
@@ -34,6 +34,17 @@ jobs:
     steps:
       #Cette action sert uniquement à récupérer le code du repo dans ton job GitHub Actions.La version v4 est la version stable actuelle
       - uses: actions/checkout@v4
+
+      - name: Show all environment variables
+        run: |
+          echo "CN_APPLICATION=$CN_APPLICATION and ${{env.CN_APPLICATION}}"
+          echo "APPLE_ID=$APPLE_ID"
+          echo "APPLE_ID_PASSWORD=$APPLE_ID_PASSWORD"
+          echo "APPLE_EXPORT_CERTIFICATE_PASSWORD=$APPLE_EXPORT_CERTIFICATE_PASSWORD"
+          echo "CN_API_KEY=$CN_API_KEY"
+          echo "RELEASE_NOTE=$RELEASE_NOTE"
+          echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+          echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD"
       #C’est simplement le nom du step dans GitHub Actions. Il sert à décrire ce que fait le step dans l’interface GitHub Actions.
       - name: create draft release
         #Cela indique que tu utilises l’action GitHub cloud-release fournie par CrabNebula. L’@v0 signifie la version de l’action (ici la version initiale).
@@ -158,15 +169,7 @@ jobs:
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate imported."
-      - uses: actions/checkout@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{env.APPLE_EXPORT_CERTIFICATE_PASSWORD}}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-        with:
-          args: ${{ matrix.args }}
-          
+
       # Build for macOS Universal
       - name: Build macOS Universal
         if: matrix.os == 'macos-latest'
