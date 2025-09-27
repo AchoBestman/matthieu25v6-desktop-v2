@@ -11,14 +11,17 @@ on:
         #doit etre ici valeur en dure
         default: "prophet-kacou/prophet-kacou"
 env:
-  CN_APPLICATION: ${{ github.event.inputs.application || secrets.CN_APPLICATION }}
-  APPLE_ID: ${{ secrets.APPLE_ID }}
-  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-  CN_API_KEY: ${{ secrets.CN_API_KEY }}
-  RELEASE_NOTE: release-notes.txt
-  APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
-  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }} #The password of my keychain
+  CN_APPLICATION: ${{ github.event.inputs.application || vars.CN_APPLICATION }}
+  APPLE_ID: ${{ vars.APPLE_ID }}
+  APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
+  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  CN_API_KEY: ${{ vars.CN_API_KEY }}
+  RELEASE_NOTE: ./release-notes.txt
+  APPLE_CERTIFICATE: ${{ vars.APPLE_CERTIFICATE }}
+  KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }} #The password of my keychain
+  CN_API_KEY: ${{ vars.CN_API_KEY }}
+  TAURI_SIGNING_PRIVATE_KEY: ${{ vars.TAURI_SIGNING_PRIVATE_KEY }}
+  TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ vars.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
 #The concurrency block will prevent multiple releases from happening at the same time.
 concurrency:
@@ -178,30 +181,30 @@ jobs:
           rustup target add aarch64-apple-darwin
           pnpm tauri build --target ${{ matrix.target }} --config src-tauri/tauri.onlineappstore.conf.json
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           
       # Build for Windows
       - name: Build Windows
         if: matrix.os == 'windows-latest'
         run: pnpm tauri build --target ${{ matrix.target }} --config ./src-tauri/tauri.onlineappstore.conf.json
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
               
       # Build for Linux
       - name: Build Linux
         if: matrix.os == 'ubuntu-22.04'
         run: pnpm tauri build --target ${{ matrix.target }}
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       #Telecharchements des assets
       - name: Upload assets
         uses: crabnebula-dev/cloud-release@v0
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+          api-key: ${{ env.CN_API_KEY }}
           path: ./src-tauri
 
   publish:
@@ -213,4 +216,4 @@ jobs:
         uses: crabnebula-dev/cloud-release@v0
         with:
           command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+          api-key: ${{ env.CN_API_KEY }}
