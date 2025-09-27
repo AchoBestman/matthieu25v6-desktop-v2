@@ -64,16 +64,26 @@ jobs:
           rustup target add aarch64-apple-darwin
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build macOS Universal
-        run: |
-          pnpm tauri build --target x86_64-apple-darwin
-          pnpm tauri build --target aarch64-apple-darwin
-          pnpm tauri build --bundles app --target universal-apple-darwin
-          #--config src-tauri/tauri.onlineappstore.conf.json
+
+      - name: Build macOS x86_64-apple-darwin
+        run: pnpm tauri build --target x86_64-apple-darwin
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Build macOS aarch64-apple-darwin
+        run: pnpm tauri build --target aarch64-apple-darwin
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
       
+      - name: Build macOS universal-apple-darwin
+        run: pnpm tauri build --bundles app --target universal-apple-darwin
+          #pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
       # Debug: Check what was actually built
       - name: Debug - List build artifacts
         run: |
@@ -98,7 +108,6 @@ jobs:
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
-          #path: ./src-tauri/target/universal-apple-darwin/release
 
   build-windows-x64:
     name: Build Windows x64
@@ -124,7 +133,7 @@ jobs:
         run: rustup target add x86_64-pc-windows-msvc
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build Windows x64
+      - name: Build Windows x86_64-pc-windows-msvc
         run: pnpm tauri build --target x86_64-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
@@ -134,7 +143,6 @@ jobs:
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
-          #path: ./src-tauri
 
   build-windows-x86:
     name: Build Windows x86
@@ -160,7 +168,7 @@ jobs:
         run: rustup target add i686-pc-windows-msvc
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build Windows x86
+      - name: Build Windows i686-pc-windows-msvc
         run: pnpm tauri build --target i686-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
@@ -170,7 +178,6 @@ jobs:
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
-          #path: ./src-tauri
 
   build-windows-arm64:
     name: Build Windows ARM64
@@ -196,7 +203,7 @@ jobs:
         run: rustup target add aarch64-pc-windows-msvc
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build Windows ARM64
+      - name: Build Windows aarch64-pc-windows-msvc
         run: pnpm tauri build --target aarch64-pc-windows-msvc
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
@@ -206,7 +213,6 @@ jobs:
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
-          #path: ./src-tauri
 
   build-linux-x64:
     name: Build Linux x64
@@ -237,7 +243,7 @@ jobs:
         run: rustup target add x86_64-unknown-linux-gnu
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Build Linux x64
+      - name: Build Linux x86_64-unknown-linux-gnu
         run: pnpm tauri build --target x86_64-unknown-linux-gnu
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
@@ -247,20 +253,111 @@ jobs:
         with:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
-          #path: ./src-tauri
 
-  publish:
-    needs: 
-      - build-macos
-      - build-windows-x64
-      - build-windows-x86
-      - build-windows-arm64
-      - build-linux-x64
-    runs-on: ubuntu-22.04
+  build-linux-aarch64:
+    name: Build Linux aarch64
+    needs: draft
+    runs-on: ubuntu-22.04-arm
     steps:
+
       - uses: actions/checkout@v4
-      - name: Publish release
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'pnpm'
+
+      - name: Install stable Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y pkg-config build-essential
+      - name: Add Rust target
+        run: rustup target add aarch64-unknown-linux-gnu
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Linux aarch64-unknown-linux-gnu
+        run: pnpm tauri build --target aarch64-unknown-linux-gnu
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Upload assets
         uses: crabnebula-dev/cloud-release@v0
         with:
-          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
+
+  build-linux-armv7:
+    name: Build Linux ARMv7
+    needs: draft
+    runs-on: ubuntu-22.04-arm
+    steps:
+
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'pnpm'
+
+      - name: Install stable Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y pkg-config build-essential
+      - name: Add Rust target
+        run: rustup target add armv7-unknown-linux-gnueabihf
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Linux armv7-unknown-linux-gnueabihf
+        run: pnpm tauri build --target armv7-unknown-linux-gnueabihf
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Upload assets
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
+
+  # publish:
+  #   needs: 
+  #     - build-macos
+  #     - build-windows-x64
+  #     - build-windows-x86
+  #     - build-windows-arm64
+  #     - build-linux-x64
+  #     - build-linux-aarch64
+  #     - build-linux-armv7
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Publish release
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
