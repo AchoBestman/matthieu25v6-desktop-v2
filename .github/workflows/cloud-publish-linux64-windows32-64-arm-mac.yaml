@@ -107,6 +107,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Write Tauri offline config
+        run: |
+          echo "$PATH_TO_LOCAL_ENTITLEMENTS_FILE" > src-tauri/tauri.offlineappstore.conf.json
+
       # Build all targets
       - name: Build macOS x86_64
         run: |
