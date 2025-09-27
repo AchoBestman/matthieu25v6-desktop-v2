@@ -107,16 +107,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Write Tauri offline config
-        run: echo "${{ secrets.PATH_TO_LOCAL_ENTITLEMENTS_FILE }}" > src-tauri/tauri.offlineappstore.conf.json
-        env:
-          PATH_TO_DEVELOPERID_ENTITLEMENTS_FILE: src-tauri/tauri.offlineappstore.conf.json
-
       # Build all targets
       - name: Build macOS x86_64
         run: |
           ls -l src-tauri
-          pnpm tauri build --target x86_64-apple-darwin --config s{{ env.PATH_TO_DEVELOPERID_ENTITLEMENTS_FILE }}
+          pnpm tauri build --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
