@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!-- Application sandbox (requis pour la distribution) -->
+    <key>com.apple.security.app-sandbox</key>
+    <true/>
+
+    <key>com.apple.application-identifier</key>
+    <string>7KXD5D4D52.com.prophetkacou.org</string>
+            
+    <key>keychain-access-groups</key>
+    <array>
+        <string>7KXD5D4D52.*</string>
+    </array>
+            
+    <key>com.apple.developer.team-identifier</key>
+    <string>7KXD5D4D52</string>
+
+    <!-- Accès réseau sortant (pour télécharger les audios depuis le web + updater) -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+    
+    <!-- Accès en lecture aux fichiers sélectionnés par l'utilisateur -->
+    <key>com.apple.security.files.user-selected.read-only</key>
+    <true/>
+    
+    <!-- Accès en écriture aux fichiers sélectionnés par l'utilisateur -->
+    <key>com.apple.security.files.user-selected.read-write</key>
+    <true/>
+    
+    <!-- Accès complet au dossier Downloads (stockage des audios téléchargés) -->
+    <key>com.apple.security.files.downloads.read-write</key>
+    <true/>
+    
+    <!-- Permet la persistance des autorisations d'accès aux fichiers -->
+    <key>com.apple.security.files.bookmarks.app-scope</key>
+    <true/>
+    
+    <!-- Accès aux données d'application (AppData) pour les fichiers SQLite -->
+    <key>com.apple.security.application-groups</key>
+    <array>
+        <string>7KXD5D4D52.com.prophetkacou.org</string>
+    </array>
+    
+    <!-- Accès aux dossiers de support d'application -->
+    <key>com.apple.security.files.bookmarks.document-scope</key>
+    <true/>
+
+    <!-- Permet l'exécution de code dynamique (nécessaire pour Tauri/Webview) -->
+    <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+    <true/>
+    
+    <!-- Permet JIT compilation (nécessaire pour JavaScript/WebView) -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+</dict>
+</plist>
