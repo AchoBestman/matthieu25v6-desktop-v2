@@ -30,13 +30,13 @@ concurrency:
 jobs:
   draft:
     runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: create draft release
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
-          api-key: ${{ env.CN_API_KEY }}
+    # steps:
+    #   - uses: actions/checkout@v4
+    #   - name: create draft release
+    #     uses: crabnebula-dev/cloud-release@v0
+    #     with:
+    #       command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
+    #       api-key: ${{ env.CN_API_KEY }}
 
   build-macos:
     name: Build macOS (x86_64, ARM64, Universal)
@@ -59,36 +59,67 @@ jobs:
         with:
           node-version: "20"
 
-      # Import Apple Developer Certificate
+      # Import Apple Developer Certificate - FIXED VERSION
       - name: Import Apple Developer Certificate
         env:
           APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
           APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
         run: |
+          # Create certificate file
           echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+          
+          # Delete existing keychain if it exists
+          security delete-keychain build.keychain || true
+          
+          # Create and configure keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -u build.keychain
-          security import certificate.p12 -k build.keychain -P "$APPLE_CERTIFICATE_PASSWORD" -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+          
+          # Import certificate with proper flags
+          security import certificate.p12 \
+            -k build.keychain \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12
+          
+          # Set partition list for codesigning
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            build.keychain
+          
+          # Verify certificate import
           security find-identity -v -p codesigning build.keychain
-          echo "certifcate state done"
+          
+          # Clean up certificate file
+          rm -f certificate.p12
+          
+          echo "Certificate import completed"
 
       - name: Verify Certificate
         run: |
-          echo "start certifcate verification"
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application")
+          echo "Verifying certificate..."
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1)
+          if [ -z "$CERT_INFO" ]; then
+            echo "No Developer ID Application certificate found!"
+            security find-identity -v -p codesigning build.keychain
+            exit 1
+          fi
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Certificate imported."
+          echo "Certificate verified: $CERT_ID"
 
       # Set up Apple API key for notarization
       - name: Set up Apple API key
-        run: echo "${{ vars.APPLE_API_PRIVATE_KEY }}" > /tmp/AuthKey.p8
-        env:
-          APPLE_API_KEY_PATH: /tmp/AuthKey.p8
+        run: |
+          mkdir -p ~/.private_keys
+          echo "${{ vars.APPLE_API_PRIVATE_KEY }}" > ~/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8
+          echo "APPLE_API_KEY_PATH=$HOME/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8" >> $GITHUB_ENV
 
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -107,44 +138,43 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Build all targets
+      # Build all targets with improved error handling
       - name: Build macOS x86_64
         run: |
-          ls -l src-tauri
-          pnpm tauri build --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
+          echo "Building for x86_64-apple-darwin..."
+          echo "Using certificate: $CERT_ID"
+          pnpm tauri build --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
-          APPLE_CERTIFICATE: ${{ env.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Build macOS ARM64
-        run: pnpm tauri build --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
+        run: |
+          echo "Building for aarch64-apple-darwin..."
+          pnpm tauri build --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
-          APPLE_CERTIFICATE: ${{ env.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_CERTIFICATE_PASSWORD }}
 
       - name: Build macOS Universal
-        run: pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json
+        run: |
+          echo "Building universal binary..."
+          pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
-          APPLE_CERTIFICATE: ${{ env.APPLE_CERTIFICATE }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_CERTIFICATE_PASSWORD }}
 
       # Debug: list artifacts
       - name: List build artifacts
@@ -161,214 +191,214 @@ jobs:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
           api-key: ${{ env.CN_API_KEY }}
 
-  build-windows-x64:
-    name: Build Windows x64
-    needs: draft
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install stable toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Add Rust target
-        run: rustup target add x86_64-pc-windows-msvc
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build Windows x86_64-pc-windows-msvc
-        run: pnpm tauri build --target x86_64-pc-windows-msvc
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  # build-windows-x64:
+  #   name: Build Windows x64
+  #   needs: draft
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install stable toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Add Rust target
+  #       run: rustup target add x86_64-pc-windows-msvc
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #     - name: Build Windows x86_64-pc-windows-msvc
+  #       run: pnpm tauri build --target x86_64-pc-windows-msvc
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #     - name: Upload assets
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
 
-  build-windows-x86:
-    name: Build Windows x86
-    needs: draft
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install stable toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Add Rust target
-        run: rustup target add i686-pc-windows-msvc
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build Windows i686-pc-windows-msvc
-        run: pnpm tauri build --target i686-pc-windows-msvc
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  # build-windows-x86:
+  #   name: Build Windows x86
+  #   needs: draft
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install stable toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Add Rust target
+  #       run: rustup target add i686-pc-windows-msvc
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #     - name: Build Windows i686-pc-windows-msvc
+  #       run: pnpm tauri build --target i686-pc-windows-msvc
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #     - name: Upload assets
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
 
-  build-windows-arm64:
-    name: Build Windows ARM64
-    needs: draft
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install stable toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Add Rust target
-        run: rustup target add aarch64-pc-windows-msvc
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Build Windows aarch64-pc-windows-msvc
-        run: pnpm tauri build --target aarch64-pc-windows-msvc
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  # build-windows-arm64:
+  #   name: Build Windows ARM64
+  #   needs: draft
+  #   runs-on: windows-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install stable toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Add Rust target
+  #       run: rustup target add aarch64-pc-windows-msvc
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+  #     - name: Build Windows aarch64-pc-windows-msvc
+  #       run: pnpm tauri build --target aarch64-pc-windows-msvc
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #     - name: Upload assets
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
 
-  build-linux-x64:
-    name: Build Linux x64
-    needs: draft
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: Install stable toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-          sudo apt-get install -y pkg-config build-essential
-      - name: Add Rust target
-        run: rustup target add x86_64-unknown-linux-gnu
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  # build-linux-x64:
+  #   name: Build Linux x64
+  #   needs: draft
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install stable toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Install Linux dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+  #         sudo apt-get install -y pkg-config build-essential
+  #     - name: Add Rust target
+  #       run: rustup target add x86_64-unknown-linux-gnu
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Import GPG key
-        run: |
-          echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
+  #     - name: Import GPG key
+  #       run: |
+  #         echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
 
-      - name: Build Linux x86_64-unknown-linux-gnu
-        run: pnpm tauri build --target x86_64-unknown-linux-gnu
-        env:
-          SIGN: 1
-          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-          APPIMAGETOOL_FORCE_SIGN: 1
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  #     - name: Build Linux x86_64-unknown-linux-gnu
+  #       run: pnpm tauri build --target x86_64-unknown-linux-gnu
+  #       env:
+  #         SIGN: 1
+  #         SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+  #         APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  #         APPIMAGETOOL_FORCE_SIGN: 1
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #     - name: Upload assets
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
 
-  build-linux-aarch64:
-    name: Build Linux aarch64
-    needs: draft
-    runs-on: ubuntu-22.04-arm
-    steps:
+  # build-linux-aarch64:
+  #   name: Build Linux aarch64
+  #   needs: draft
+  #   runs-on: ubuntu-22.04-arm
+  #   steps:
 
-      - uses: actions/checkout@v4
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+  #     - uses: actions/checkout@v4
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: 'pnpm'
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #         cache: 'pnpm'
 
-      - name: Install stable Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
+  #     - name: Install stable Rust toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-          sudo apt-get install -y pkg-config build-essential
-          sudo apt-get install -y xdg-utils
-      - name: Add Rust target
-        run: rustup target add aarch64-unknown-linux-gnu
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Install Linux dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+  #         sudo apt-get install -y pkg-config build-essential
+  #         sudo apt-get install -y xdg-utils
+  #     - name: Add Rust target
+  #       run: rustup target add aarch64-unknown-linux-gnu
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Import GPG key
-        run: |
-          echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
+  #     - name: Import GPG key
+  #       run: |
+  #         echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
 
-      - name: Build Linux aarch64-unknown-linux-gnu
-        run: pnpm tauri build --target aarch64-unknown-linux-gnu
-        env:
-          SIGN: 1
-          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-          APPIMAGETOOL_FORCE_SIGN: 1
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      - name: Upload assets
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  #     - name: Build Linux aarch64-unknown-linux-gnu
+  #       run: pnpm tauri build --target aarch64-unknown-linux-gnu
+  #       env:
+  #         SIGN: 1
+  #         SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+  #         APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  #         APPIMAGETOOL_FORCE_SIGN: 1
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #     - name: Upload assets
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
 
   # publish:
   #   needs: 
