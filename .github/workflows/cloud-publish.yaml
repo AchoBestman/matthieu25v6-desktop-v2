@@ -104,15 +104,22 @@ jobs:
         run: |
           case "${{ matrix.target }}" in
             "aarch64-unknown-linux-gnu")
-              #Install ARM64 cross-compilation tools
+              # Install ARM64 cross-compilation tools
+              sudo dpkg --add-architecture arm64
+              sudo apt-get update
+              sudo apt-get install -y libssl-dev:arm64 pkg-config pkg-config-aarch64-linux-gnu
               sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
-              #Set up environment variables
-              echo "CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
-              echo "CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++" >> $GITHUB_ENV
-              echo "AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar" >> $GITHUB_ENV
-              echo "STRIP_aarch64_unknown_linux_gnu=aarch64-linux-gnu-strip" >> $GITHUB_ENV
-              # Note: ARM64 cross-compilation for GUI apps is complex, might need native runner
+
+              # Set up OpenSSL paths explicitly
+              echo "OPENSSL_LIB_DIR=/usr/lib/aarch64-linux-gnu" >> $GITHUB_ENV
+              echo "OPENSSL_INCLUDE_DIR=/usr/include" >> $GITHUB_ENV
               echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
+
+              # Set cross compiler environment variables (note the dashes)
+              echo "CC_aarch64-unknown-linux-gnu=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
+              echo "CXX_aarch64-unknown-linux-gnu=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+              echo "AR_aarch64-unknown-linux-gnu=aarch64-linux-gnu-ar" >> $GITHUB_ENV
+              echo "STRIP_aarch64-unknown-linux-gnu=aarch64-linux-gnu-strip" >> $GITHUB_ENV
               ;;
           esac
           
@@ -136,12 +143,8 @@ jobs:
       - name: Build macOS Universal
         if: matrix.os == 'macos-latest'
         run: |
-          echo "Building universal macOS binary..."
-          # Option 1: Use pnpm (current approach)
-          pnpm tauri build --target x86_64-apple-darwin
-          pnpm tauri build --target aarch64-apple-darwin
-          pnpm tauri build --target universal-apple-darwin
-          # Option 2: Alternative using global CLI (uncomment if pnpm fails)
+          echo "Building universal-apple-darwin macOS binary..."
+          pnpm run tauri build --verbose --target universal-apple-darwin
           # tauri build --target universal-apple-darwin --config ./src-tauri/tauri.onlineappstore.conf.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
