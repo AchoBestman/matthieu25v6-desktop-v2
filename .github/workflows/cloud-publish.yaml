@@ -99,7 +99,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-          sudo apt-get install -y gcc-multilib
+          sudo apt-get install -y gcc-multilib pkg-config
           
       # Install cross-compilation toolchains for Linux
       - name: Install Linux cross-compilation dependencies
@@ -107,34 +107,51 @@ jobs:
         run: |
           case "${{ matrix.target }}" in
             "i686-unknown-linux-gnu")
-              sudo apt-get install -y gcc-i686-linux-gnu
+              #nstall 32-bit libraries and development packages
+              sudo dpkg --add-architecture i386
+              sudo apt-get update
+              sudo apt-get install -y gcc-i686-linux-gnu g++-i686-linux-gnu
+              sudo apt-get install -y libwebkit2gtk-4.1-dev:i386 libgtk-3-dev:i386 libayatana-appindicator3-dev:i386 librsvg2-dev:i386
+              sudo apt-get install -y libglib2.0-dev:i386 libcairo2-dev:i386 libpango1.0-dev:i386 libatk1.0-dev:i386 libgdk-pixbuf-2.0-dev:i386
+              #Set up environment variables for cross-compilation
               echo "CC_i686_unknown_linux_gnu=i686-linux-gnu-gcc" >> $GITHUB_ENV
               echo "CXX_i686_unknown_linux_gnu=i686-linux-gnu-g++" >> $GITHUB_ENV
+              echo "AR_i686_unknown_linux_gnu=i686-linux-gnu-ar" >> $GITHUB_ENV
+              echo "STRIP_i686_unknown_linux_gnu=i686-linux-gnu-strip" >> $GITHUB_ENV
+              #Configure pkg-config for cross-compilation
+              echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
+              echo "PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig:/usr/share/pkgconfig" >> $GITHUB_ENV
+              echo "PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig:/usr/lib/pkgconfig" >> $GITHUB_ENV
               ;;
             "aarch64-unknown-linux-gnu")
-              sudo apt-get install -y gcc-aarch64-linux-gnu
+              #Install ARM64 cross-compilation tools
+              sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+              #Set up environment variables
               echo "CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc" >> $GITHUB_ENV
               echo "CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++" >> $GITHUB_ENV
+              echo "AR_aarch64_unknown_linux_gnu=aarch64-linux-gnu-ar" >> $GITHUB_ENV
+              echo "STRIP_aarch64_unknown_linux_gnu=aarch64-linux-gnu-strip" >> $GITHUB_ENV
+              # Note: ARM64 cross-compilation for GUI apps is complex, might need native runner
+              echo "PKG_CONFIG_ALLOW_CROSS=1" >> $GITHUB_ENV
               ;;
           esac
           
-      # Add Rust targets - Handle universal-apple-darwin specially
-      - name: Add Rust target
+      # For universal-apple-darwin only
+      - name: Add Rust targets for macOS Universal
+        if: matrix.target == 'universal-apple-darwin'
         run: |
-          if [ "${{ matrix.target }}" = "universal-apple-darwin" ]; then
-            echo "Setting up universal binary targets for macOS..."
-            rustup target add x86_64-apple-darwin
-            rustup target add aarch64-apple-darwin
-            echo "Targets installed for universal binary"
-          else
-            echo "Installing target: ${{ matrix.target }}"
-            rustup target add ${{ matrix.target }}
-          fi
-        
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+
+        # For all other targets    
+      - name: Add Rust target for other platforms
+        if: matrix.target != 'universal-apple-darwin'
+        run: rustup target add ${{ matrix.target }}
+
       # Install pnpm dependencies
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      
+
       # Build for macOS Universal - Let Tauri handle the universal binary
       - name: Build macOS Universal
         if: matrix.os == 'macos-latest'
