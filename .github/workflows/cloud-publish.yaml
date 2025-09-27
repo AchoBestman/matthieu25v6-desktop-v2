@@ -141,7 +141,7 @@ jobs:
         run: |
           echo "Building universal macOS binary..."
           # Option 1: Use pnpm (current approach)
-          pnpm tauri build --target universal-apple-darwin --config ./src-tauri/tauri.onlineappstore.conf.json
+          pnpm tauri build --target universal-apple-darwin
           
           # Option 2: Alternative using global CLI (uncomment if pnpm fails)
           # tauri build --target universal-apple-darwin --config ./src-tauri/tauri.onlineappstore.conf.json
