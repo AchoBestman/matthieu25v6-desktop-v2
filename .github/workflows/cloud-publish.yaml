@@ -3,43 +3,72 @@ on:
   push:
     branches:
       - deploy
+  workflow_dispatch:
+    inputs:
+      application:
+        description: "The fully qualified slug of your app on CrabNebula Cloud"
+        required: true
+        default: ${{ secrets.CN_APPLICATION }}
+env:
+  CN_APPLICATION: ${{ github.event.inputs.application }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  CN_API_KEY: ${{ secrets.CN_API_KEY }}
+  RELEASE_NOTE: release-notes.txt
+  APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }} #The password of my keychain
+
+#The concurrency block will prevent multiple releases from happening at the same time.
 concurrency:
   #${{ github.workflow }} Value: "Prophet Kacou Release Process"
   #${{ github.ref }} Value: "refs/heads/deploy"
   group: ${{ github.workflow }}-${{ github.ref }} # value is: Prophet Kacou Release Process refs/heads/deploy
   cancel-in-progress: true
-env:
-  CN_APPLICATION: "prophet-kacou/prophet-kacou"
 
 jobs:
   draft:
     runs-on: ubuntu-22.04
+
     steps:
+      #Cette action sert uniquement à récupérer le code du repo dans ton job GitHub Actions.La version v4 est la version stable actuelle
       - uses: actions/checkout@v4
+      #C’est simplement le nom du step dans GitHub Actions. Il sert à décrire ce que fait le step dans l’interface GitHub Actions.
       - name: create draft release
+        #Cela indique que tu utilises l’action GitHub cloud-release fournie par CrabNebula. L’@v0 signifie la version de l’action (ici la version initiale).
         uses: crabnebula-dev/cloud-release@v0
+        #Permet de passer des paramètres à l’action. Ici, il y a deux paramètres principaux
         with:
-          command: release draft ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+          #release draft → crée un draft release sur CrabNebula (équivalent à créer une release ou version mais pas encore publiée)
+          command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
+          #Fournit la clé API CrabNebula pour authentifier l’action et permettre la création du draft release.
+          api-key: ${{env.CN_API_KEY}}
 
   build:
+    #Tant que  le jobs draft n'est pas termine
     needs: draft
     strategy:
       fail-fast: false
+      #Definir la liste des sytemes d'éxploitation pour lesquels on va builder
       matrix:
         include:
           # macOS Universal (combines x86_64 and aarch64)
+            #os pour definir le sytem sur lequel on va builder
           - os: macos-latest
+            #Architecture de l'ínstallable
             target: universal-apple-darwin
+            #La description
             name: "macOS Universal"
           
           # Windows builds
           - os: windows-latest
             target: x86_64-pc-windows-msvc
             name: "Windows x64"
+
           - os: windows-latest
             target: i686-pc-windows-msvc
             name: "Windows x86"
+
           - os: windows-latest
             target: aarch64-pc-windows-msvc
             name: "Windows ARM64"
@@ -55,7 +84,9 @@ jobs:
             target: aarch64-unknown-linux-gnu
             name: "Linux ARM64"
 
+      #Lancer le job pour faire tous les build l'un apres l'autre
     runs-on: ${{ matrix.os }}
+
     steps:
       - uses: actions/checkout@v4
       
@@ -73,16 +104,15 @@ jobs:
         with:
           toolchain: stable
           cache: true
-          
-      # Linux dependencies for all Linux targets
+              
+      # Linux dependencies for all Linux targets, we only need to install linux dependencies for the os build
       - name: Install Linux dependencies
         if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-          # For cross-compilation support
           sudo apt-get install -y gcc-multilib
-          
+              
       # Install cross-compilation toolchains for Linux
       - name: Install Linux cross-compilation dependencies
         if: matrix.os == 'ubuntu-22.04' && matrix.target != 'x86_64-unknown-linux-gnu'
@@ -99,42 +129,42 @@ jobs:
               echo "CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++" >> $GITHUB_ENV
               ;;
           esac
-          
+              
       # Add Rust targets
       - name: Add Rust target
         run: rustup target add ${{ matrix.target }}
         
-      # Install dependencies
+      # Install pnpm dependencies
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
-      # Configure Tauri for multiple bundle formats on Linux
-      - name: Configure Tauri bundle formats
-        if: matrix.os == 'ubuntu-22.04'
+      
+      # Import Apple Developer Certificate
+      - name: Import Apple Developer Certificate
         run: |
-          # Update tauri.conf.json to include all Linux bundle formats
-          node -e "
-          const fs = require('fs');
-          const path = './src-tauri/tauri.conf.json';
-          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
-          if (!config.tauri.bundle.targets) config.tauri.bundle.targets = {};
-          config.tauri.bundle.targets.linux = ['AppImage', 'deb', 'rpm'];
-          fs.writeFileSync(path, JSON.stringify(config, null, 2));
-          "
+          echo ${{env.APPLE_CERTIFICATE}} | base64 --decode > certificate.p12
+          security create-keychain -p "${{env.KEYCHAIN_PASSWORD}}" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "${{env.KEYCHAIN_PASSWORD}}" build.keychain
+          security set-keychain-settings -t 3600 -u build.keychain
+          security import certificate.p12 -k build.keychain -P "${{env.APPLE_EXPORT_CERTIFICATE_PASSWORD}}" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${{env<KEYCHAIN_PASSWORD}}" build.keychain
+          security find-identity -v -p codesigning build.keychain
           
-      # Configure Tauri for multiple bundle formats on Windows
-      - name: Configure Tauri bundle formats for Windows
-        if: matrix.os == 'windows-latest'
+      # Verify Certificate
+      - name: Verify Certificate
         run: |
-          # Update tauri.conf.json to include both MSI and NSIS (exe)
-          node -e "
-          const fs = require('fs');
-          const path = './src-tauri/tauri.conf.json';
-          const config = JSON.parse(fs.readFileSync(path, 'utf8'));
-          if (!config.tauri.bundle.targets) config.tauri.bundle.targets = {};
-          config.tauri.bundle.targets.windows = ['msi', 'nsis'];
-          fs.writeFileSync(path, JSON.stringify(config, null, 2));
-          "
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Development")
+          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+          echo "Certificate imported."
+      - uses: actions/checkout@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{env.APPLE_EXPORT_CERTIFICATE_PASSWORD}}
+          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+        with:
+          args: ${{ matrix.args }}
           
       # Build for macOS Universal
       - name: Build macOS Universal
@@ -142,7 +172,7 @@ jobs:
         run: |
           rustup target add x86_64-apple-darwin
           rustup target add aarch64-apple-darwin
-          pnpm tauri build --target universal-apple-darwin
+          pnpm tauri build --target ${{ matrix.target }} --config src-tauri/tauri.onlineappstore.conf.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -150,11 +180,11 @@ jobs:
       # Build for Windows
       - name: Build Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm tauri build --target ${{ matrix.target }}
+        run: pnpm tauri build --target ${{ matrix.target }} --config ./src-tauri/tauri.onlineappstore.conf.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          
+              
       # Build for Linux
       - name: Build Linux
         if: matrix.os == 'ubuntu-22.04'
@@ -162,7 +192,7 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          
+      #Telecharchements des assets
       - name: Upload assets
         uses: crabnebula-dev/cloud-release@v0
         with:
@@ -170,13 +200,13 @@ jobs:
           api-key: ${{ secrets.CN_API_KEY }}
           path: ./src-tauri
 
-  publish:
-    needs: build
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish release
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ secrets.CN_API_KEY }}
+publish:
+  needs: build
+  runs-on: ubuntu-22.04
+  steps:
+    - uses: actions/checkout@v4
+    - name: Publish release
+      uses: crabnebula-dev/cloud-release@v0
+      with:
+        command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+        api-key: ${{ secrets.CN_API_KEY }}

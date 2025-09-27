@@ -19,7 +19,10 @@
     "fs:read-files",
     "fs:read-meta",
     "fs:allow-fstat",
+    "dialog:default",
     "updater:default",
+    "process:default",
+    "process:allow-restart",
     {
       "identifier": "fs:scope",
       "allow": [

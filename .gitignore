@@ -30,7 +30,6 @@ Prophet Kacou-local.pkg
 src-tauri/profiles/
 Prophet_Kacou_Developper_Id.plist
 Prophet_Kacou_Mac_App_Store_Connect.plist
-Keys/apple
 src-tauri/Entitlements-appstore.plist
 src-tauri/Entitlements-local.plist
 src-tauri/Entitlements.plist
