@@ -28,10 +28,12 @@
     "updater": {
       "dangerousInsecureTransportProtocol": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIzMjFBN0MxQjg5NTFFNTQKUldSVUhwVzR3YWNoSXd1SWNLRG9UV1JjT3BZbUJBRE94c1ZYYVEraEhkYTZSWTZxVmk3L09RYjMK",
+      "active": true,
       "endpoints": [
         "https://cdn.crabnebula.app/update/prophet-kacou/prophet-kacou/{{target}}-{{arch}}/{{current_version}}",
         "https://matthieu25v6-api-v2.test/api/desktop/release/{{target}}/{{arch}}/{{current_version}}"
       ],
+      "dialog": true,
       "windows": {
         "installMode": "passive"
       }
