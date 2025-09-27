@@ -141,10 +141,10 @@ jobs:
         run: |
           echo "Building universal macOS binary..."
           # Option 1: Use pnpm (current approach)
-          pnpm tauri build --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json
+          pnpm tauri build --target universal-apple-darwin --config ./src-tauri/tauri.onlineappstore.conf.json
           
           # Option 2: Alternative using global CLI (uncomment if pnpm fails)
-          # tauri build --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json
+          # tauri build --target universal-apple-darwin --config ./src-tauri/tauri.onlineappstore.conf.json
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -152,7 +152,7 @@ jobs:
       # Build for Windows
       - name: Build Windows
         if: matrix.os == 'windows-latest'
-        run: pnpm tauri build --target ${{ matrix.target }} --config ./src-tauri/tauri.onlineappstore.conf.json
+        run: pnpm tauri build --target ${{ matrix.target }}
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
