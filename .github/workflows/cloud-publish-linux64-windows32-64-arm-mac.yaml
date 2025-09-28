@@ -38,34 +38,34 @@ concurrency:
 #The listing of jobs to be executed
 jobs:
   # Step 1 : build without bundle (fast, for compilation validation)
-  # build-test:
-  #   name: Test Build vite app to prevent error (no bundle)
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v4
+  build-test:
+    name: Test Build vite app to prevent error (no bundle)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Install pnpm
-  #       uses: pnpm/action-setup@v3
-  #       with:
-  #         version: 9
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
 
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-  #     - name: Install Rust
-  #       uses: actions-rust-lang/setup-rust-toolchain@v1
-  #       with:
-  #         toolchain: stable
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
 
-  #     - name: Install Tauri CLI
-  #       run: pnpm add -g @tauri-apps/cli
+      - name: Install Tauri CLI
+        run: pnpm add -g @tauri-apps/cli
 
-  #     - name: Install dependencies
-  #       run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-  #     - name: Build (no bundle)
-  #       run: pnpm build
+      - name: Build (no bundle)
+        run: pnpm build
 
   # Step 2: Start building image for all plateforms
   # build-macos-out-apple-store:
@@ -239,7 +239,7 @@ jobs:
 
   build-macos-on-apple-store:
     name: Build Apple Store macOS (x86_64, ARM64, Universal)
-    # needs: build-test
+    needs: build-test
     runs-on: macos-latest
     env:
         APPLE_ID: ${{ vars.APPLE_ID }}
