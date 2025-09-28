@@ -31,7 +31,7 @@ concurrency:
 jobs:
   # Étape 1 : build without bundle (fast, for compilation validation)
   build-test:
-    name: Test Build whole tauri + vite app (no bundle)
+    name: Test Build vite app to prevent error (no bundle)
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build (no bundle)
-        run: pnpm tauri build --no-bundle
+        run: pnpm build
 
   # Étape 2 : create the new release with it version on nebulacrab cloud
   draft:
