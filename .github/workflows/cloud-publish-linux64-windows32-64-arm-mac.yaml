@@ -32,7 +32,7 @@ concurrency:
 
 #The listing of jobs to be executed
 jobs:
-  # Étape 1 : build without bundle (fast, for compilation validation)
+  # Step 1 : build without bundle (fast, for compilation validation)
   build-test:
     name: Test Build vite app to prevent error (no bundle)
     runs-on: macos-latest
@@ -62,7 +62,7 @@ jobs:
       - name: Build (no bundle)
         run: pnpm build
 
-  # Étape 2 : create the new release with it version on nebulacrab cloud
+  # Step 2 : create the new release with it version on nebulacrab cloud
   draft:
     name: Create new release version on nebulacrab cloud
     needs: build-test
@@ -75,7 +75,8 @@ jobs:
     #       command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
     #       api-key: ${{ env.CN_API_KEY }}
 
-  # Étape 3: build with bundle for Mac distribution
+
+  # Step 3: Start building image for all plateforms
   build-macos-out-apple-store:
     name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
@@ -245,13 +246,6 @@ jobs:
           find src-tauri/target -name "*.dmg"
           find src-tauri/target -name "*.pkg"
 
-      # Upload all artifacts to CrabNebula
-      # - name: Upload macOS builds to CrabNebula
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
-      #     api-key: ${{ env.CN_API_KEY }}
-
   build-macos-on-apple-store:
     name: Build Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
@@ -351,25 +345,6 @@ jobs:
             pnpm tauri build --no-bundle --target $target-apple-darwin
           done
 
-      # Bundle all targets with improved error handling
-      # - name: Bundle macOS x86_64 app
-      #   run: |
-      #     echo "Bundle for x86_64-apple-darwin..."
-      #     pnpm tauri bundle --bundles app --target x86_64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
-      #   env:
-      #     TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      #     APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-
-      # - name: Bundle macOS ARM64 app
-      #   run: |
-      #     echo "Bundle for aarch64-apple-darwin..."
-      #     pnpm tauri bundle --bundles app --target aarch64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
-      #   env:
-      #     TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      #     APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-
       - name: Bundle macOS Universal app
         run: |
           echo "Bundle universal binary..."
@@ -386,7 +361,7 @@ jobs:
         run: |
           APP_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.app"
           PKG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.pkg"
-          PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/tauri.onlineappstore.conf.json"
+          PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
           codesign \
           --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
           --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
@@ -397,7 +372,6 @@ jobs:
             --sign "${{ env.MAC_INSTALLER_CERT_NAME }}" \
             --component "$APP_PATH" "/Applications" \
             "$PKG_PATH"
-        #run: xcrun altool --upload-app -f src-tauri/target/universal-apple-darwin/release/bundle/macos/Prophet\ Kacou.app --apiKey $APPLE_API_KEY --apiIssuer $APPLE_API_ISSUER
 
   build-windows-x64:
     name: Build Windows x64
@@ -428,11 +402,6 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: Upload assets
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-      #     api-key: ${{ env.CN_API_KEY }}
 
   build-windows-x86:
     name: Build Windows x86
@@ -463,11 +432,6 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: Upload assets
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-      #     api-key: ${{ env.CN_API_KEY }}
 
   build-windows-arm64:
     name: Build Windows ARM64
@@ -498,11 +462,6 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: Upload assets
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-      #     api-key: ${{ env.CN_API_KEY }}
 
   build-linux-x64:
     name: Build Linux x64
@@ -547,11 +506,6 @@ jobs:
           APPIMAGETOOL_FORCE_SIGN: 0
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: Upload assets
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-      #     api-key: ${{ env.CN_API_KEY }}
 
   build-linux-aarch64:
     name: Build Linux aarch64
@@ -602,13 +556,30 @@ jobs:
           APPIMAGETOOL_FORCE_SIGN: 0
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-      # - name: Upload assets
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-      #     api-key: ${{ env.CN_API_KEY }}
 
-  # publish:
+  # Step 4: Upload assets to CrabNebula 
+  # upload-assets:
+  #   name: Upload assets to CrabNebula
+  #   runs-on: ubuntu-22.04
+  #   needs: 
+  #     - build-macos-out-apple-store
+  #     - build-macos-on-apple-store
+  #     - build-windows-x64
+  #     - build-windows-x86
+  #     - build-windows-arm64
+  #     - build-linux-x64
+  #     - build-linux-aarch64
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Upload assets to CrabNebula
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
+
+  # Step 5: publish release to CrabNebula 
+  # publish-release:
+  #   name: publish release to CrabNebula
   #   needs: 
   #     - build-macos-out-apple-store
   #     - build-macos-on-apple-store
@@ -620,7 +591,7 @@ jobs:
   #   runs-on: ubuntu-22.04
   #   steps:
   #     - uses: actions/checkout@v4
-  #     - name: Publish release
+  #     - name: Publish release to CrabNebula
   #       uses: crabnebula-dev/cloud-release@v0
   #       with:
   #         command: release publish ${{ env.CN_APPLICATION }} --framework tauri
