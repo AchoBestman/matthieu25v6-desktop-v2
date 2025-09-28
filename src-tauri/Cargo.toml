@@ -1,6 +1,6 @@
 [package]
 name = "ProphetKacou"
-version = "1.0.7"
+version = "1.0.5"
 description = "This app contains all the message of Prophet Kacou Philippe"
 authors = ["aikpeachille55@gmail.com"]
 license = ""
