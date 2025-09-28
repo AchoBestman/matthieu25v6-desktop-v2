@@ -323,30 +323,6 @@ jobs:
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate verified: $CERT_ID"
       
-      # Set up Apple API key for online notarization (Tauri v2 compatible)
-      - name: Set up Apple API key end Test if it work
-        env:
-            APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
-        run: |
-          # Create the directory structure
-          echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
-          
-          #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
-          API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
-
-          # Test with xcrun notarytool to validate credentials
-          echo "Testing credentials with notarytool..."
-          if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
-            echo "✅ Apple API credentials are valid"
-          else
-            echo "❌ Apple API credentials test failed"
-            echo "This could indicate: Invalid API key format or Wrong Key ID or Wrong Key Issuer or API key doesn't have notarization permissions"
-            exit 1
-          fi
-
-          # IMPORTANT: Set environment variable for next steps.  >> $GITHUB_ENV make variable be avalable in github action env
-          echo "APPLE_API_KEY_PATH=$API_KEY_FILE" >> $GITHUB_ENV
-
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -398,11 +374,14 @@ jobs:
 
       - name: Upload to App Store
         env: 
-          APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
+          APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
         run: |
+          echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
+          API_KEY_FILE="$(pwd)/private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
+
           echo "Submitting ${{env.PKG_PATH}} to Apple Notary Tool..."
           xcrun notarytool submit "${{env.PKG_PATH}}" \
-            --key "$APPLE_API_KEY_PATH" \
+            --key "$API_KEY_FILE" \
             --key-id "${{ env.APPLE_API_KEY }}" \
             --issuer "${{ env.APPLE_API_ISSUER }}" \
             --wait --timeout 600
