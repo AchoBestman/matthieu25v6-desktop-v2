@@ -61,6 +61,8 @@ jobs:
 
   # Étape 2 : create the new release with it version on nebulacrab cloud
   draft:
+    name: Create new release version on nebulacrab cloud
+    needs: build-test
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
