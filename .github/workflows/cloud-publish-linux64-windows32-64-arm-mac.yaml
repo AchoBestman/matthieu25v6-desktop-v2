@@ -194,10 +194,11 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build (no bundle) for prepare distribution bundle on MacOS
-        run: pnpm tauri build --no-bundle --target x86_64-apple-darwin
-        run: pnpm tauri build --no-bundle --target aarch64-apple-darwin
-        run: pnpm tauri build --no-bundle --target universal-apple-darwin
+      - name: Build (no bundle) for prepare all distribution bundle on MacOS
+        run: |
+          for target in x86_64 aarch64 universal; do
+            pnpm tauri build --no-bundle --target $target-apple-darwin
+          done
 
       # Bundle all targets with improved error handling
       - name: Bundle macOS x86_64 app and dmg
