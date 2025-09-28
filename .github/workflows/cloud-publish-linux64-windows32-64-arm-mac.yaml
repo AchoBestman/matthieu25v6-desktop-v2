@@ -150,7 +150,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_PATH: keys/apple/AuthKey_8V37C4L378.p8
 
       - name: Build macOS ARM64
         run: |
@@ -162,7 +162,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_PATH: keys/apple/AuthKey_8V37C4L378.p8
 
       - name: Build macOS Universal
         run: |
@@ -174,7 +174,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_PATH: keys/apple/AuthKey_8V37C4L378.p8
 
       # Debug: list artifacts
       - name: List build artifacts
