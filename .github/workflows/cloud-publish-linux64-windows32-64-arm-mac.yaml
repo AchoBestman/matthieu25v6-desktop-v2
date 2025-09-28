@@ -32,7 +32,7 @@ jobs:
   # Étape 1 : build without bundle (fast, for compilation validation)
   build-test:
     name: Test Build whole tauri + vite app (no bundle)
-    runs-on: ubuntu-22.04
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
