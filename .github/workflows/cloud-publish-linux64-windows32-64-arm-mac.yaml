@@ -76,191 +76,189 @@ jobs:
     #       api-key: ${{ env.CN_API_KEY }}
 
   # Étape 3: build with bundle for Mac distribution
-  build-macos-out-apple-store:
-    name: Build macOS (x86_64, ARM64, Universal)
-    needs: draft
-    runs-on: macos-latest
-    env:
-        APPLE_ID: ${{ vars.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-        APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-        APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-    steps:
-      - uses: actions/checkout@v4
+  # build-macos-out-apple-store:
+  #   name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
+  #   needs: draft
+  #   runs-on: macos-latest
+  #   env:
+  #       APPLE_ID: ${{ vars.APPLE_ID }}
+  #       APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
+  #       APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+  #       APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
 
-      # Import Apple Developer Certificate - FIXED VERSION
-      - name: Import Apple Developer Certificate
-        env:
-          APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
-        run: |
-          # Create certificate file by decode the encoding APPLE_CERTIFICATE
-          echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+  #     # Import Apple Developer Certificate - FIXED VERSION
+  #     - name: Import Apple Developer Certificate
+  #       env:
+  #         APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
+  #         APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  #         KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
+  #       run: |
+  #         # Create certificate file by decode the encoding APPLE_CERTIFICATE
+  #         echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
           
-          # Delete existing keychain if it exists
-          security delete-keychain build.keychain || true
+  #         # Delete existing keychain if it exists
+  #         security delete-keychain build.keychain || true
           
-          # Create and configure keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
-          security set-keychain-settings -t 3600 -l build.keychain
+  #         # Create and configure keychain
+  #         security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security default-keychain -s build.keychain
+  #         security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security set-keychain-settings -t 3600 -l build.keychain
           
-          # Import certificate with proper flags
-          security import certificate.p12 \
-            -k build.keychain \
-            -P "$APPLE_CERTIFICATE_PASSWORD" \
-            -A \
-            -t cert \
-            -f pkcs12
+  #         # Import certificate with proper flags
+  #         security import certificate.p12 \
+  #           -k build.keychain \
+  #           -P "$APPLE_CERTIFICATE_PASSWORD" \
+  #           -A \
+  #           -t cert \
+  #           -f pkcs12
           
-          # Set partition list for codesigning
-          security set-key-partition-list \
-            -S apple-tool:,apple: \
-            -s \
-            -k "$KEYCHAIN_PASSWORD" \
-            build.keychain
+  #         # Set partition list for codesigning
+  #         security set-key-partition-list \
+  #           -S apple-tool:,apple: \
+  #           -s \
+  #           -k "$KEYCHAIN_PASSWORD" \
+  #           build.keychain
           
-          # Verify certificate import
-          security find-identity -v -p codesigning build.keychain
+  #         # Verify certificate import
+  #         security find-identity -v -p codesigning build.keychain
           
-          # Clean up certificate file
-          rm -f certificate.p12
+  #         # Clean up certificate file
+  #         rm -f certificate.p12
           
-          echo "Certificate import completed"
+  #         echo "Certificate import completed"
 
-      - name: Verify Certificate
-        run: |
-          echo "Verifying certificate..."
-          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1)
-          if [ -z "$CERT_INFO" ]; then
-            echo "No Developer ID Application certificate found!"
-            security find-identity -v -p codesigning build.keychain
-            exit 1
-          fi
-          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
-          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
-          echo "Certificate verified: $CERT_ID"
+  #     - name: Verify Certificate
+  #       run: |
+  #         echo "Verifying certificate..."
+  #         CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1)
+  #         if [ -z "$CERT_INFO" ]; then
+  #           echo "No Developer ID Application certificate found!"
+  #           security find-identity -v -p codesigning build.keychain
+  #           exit 1
+  #         fi
+  #         CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+  #         echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+  #         echo "Certificate verified: $CERT_ID"
 
 
-      # Set up Apple API key for notarization (Tauri v2 compatible)
-      - name: Set up Apple API key end Test if it work
-        env:
-            APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
-        run: |
-          # Create the directory structure
-          echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
+  #     # Set up Apple API key for notarization (Tauri v2 compatible)
+  #     - name: Set up Apple API key end Test if it work
+  #       env:
+  #           APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
+  #       run: |
+  #         # Create the directory structure
+  #         echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
           
-          #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
-          API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
+  #         #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
+  #         API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
 
-          # Test with xcrun notarytool to validate credentials
-          echo "Testing credentials with notarytool..."
-          if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
-            echo "✅ Apple API credentials are valid"
-          else
-            echo "❌ Apple API credentials test failed"
-            echo "This could indicate: Invalid API key format or Wrong Key ID or Wrong Key Issuer or API key doesn't have notarization permissions"
-            exit 1
-          fi
+  #         # Test with xcrun notarytool to validate credentials
+  #         echo "Testing credentials with notarytool..."
+  #         if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
+  #           echo "✅ Apple API credentials are valid"
+  #         else
+  #           echo "❌ Apple API credentials test failed"
+  #           echo "This could indicate: Invalid API key format or Wrong Key ID or Wrong Key Issuer or API key doesn't have notarization permissions"
+  #           exit 1
+  #         fi
 
-          # IMPORTANT: Set environment variable for next steps.  >> $GITHUB_ENV make variable be avalable in github action env
-          echo "APPLE_API_KEY_PATH=$API_KEY_FILE" >> $GITHUB_ENV
+  #         # IMPORTANT: Set environment variable for next steps.  >> $GITHUB_ENV make variable be avalable in github action env
+  #         echo "APPLE_API_KEY_PATH=$API_KEY_FILE" >> $GITHUB_ENV
 
-      - name: Install stable Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
+  #     - name: Install stable Rust toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
 
-      - name: Add Rust targets
-        run: |
-          rustup target add x86_64-apple-darwin
-          rustup target add aarch64-apple-darwin
+  #     - name: Add Rust targets
+  #       run: |
+  #         rustup target add x86_64-apple-darwin
+  #         rustup target add aarch64-apple-darwin
           
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Build (no bundle) for prepare all distribution bundle on MacOS
-        run: |
-          for target in x86_64 aarch64 universal; do
-            pnpm tauri build --no-bundle --target $target-apple-darwin
-          done
+  #     - name: Build (no bundle) for prepare all distribution bundle on MacOS
+  #       run: |
+  #         for target in x86_64 aarch64 universal; do
+  #           pnpm tauri build --no-bundle --target $target-apple-darwin
+  #         done
 
-      # Bundle all targets with improved error handling
-      - name: Bundle macOS x86_64 app and dmg
-        run: |
-          echo "Bundle for x86_64-apple-darwin..."
-          pnpm tauri bundle --bundles app,dmg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+  #     # Bundle all targets with improved error handling
+  #     - name: Bundle macOS x86_64 app and dmg
+  #       run: |
+  #         echo "Bundle for x86_64-apple-darwin..."
+  #         pnpm tauri bundle --bundles app,dmg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Bundle macOS ARM64 app and dmg
-        run: |
-          echo "Bundle for aarch64-apple-darwin..."
-          pnpm tauri bundle --bundles app,dmg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+  #     - name: Bundle macOS ARM64 app and dmg
+  #       run: |
+  #         echo "Bundle for aarch64-apple-darwin..."
+  #         pnpm tauri bundle --bundles app,dmg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Bundle macOS Universal app and dmg
-        run: |
-          echo "Bundle universal binary..."
-          pnpm tauri bundle --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
+  #     - name: Bundle macOS Universal app and dmg
+  #       run: |
+  #         echo "Bundle universal binary..."
+  #         pnpm tauri bundle --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
 
-      # Debug: list artifacts
-      - name: List build artifacts
-        run: |
-          echo "=== Build Artifacts ==="
-          find src-tauri/target -name "*.app" -type d
-          find src-tauri/target -name "*.dmg"
-          find src-tauri/target -name "*.pkg"
+  #     # Debug: list artifacts
+  #     - name: List build artifacts
+  #       run: |
+  #         echo "=== Build Artifacts ==="
+  #         find src-tauri/target -name "*.app" -type d
+  #         find src-tauri/target -name "*.dmg"
+  #         find src-tauri/target -name "*.pkg"
 
-      # Upload all artifacts to CrabNebula
-      # - name: Upload macOS builds to CrabNebula
-      #   uses: crabnebula-dev/cloud-release@v0
-      #   with:
-      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
-      #     api-key: ${{ env.CN_API_KEY }}
+  #     # Upload all artifacts to CrabNebula
+  #     # - name: Upload macOS builds to CrabNebula
+  #     #   uses: crabnebula-dev/cloud-release@v0
+  #     #   with:
+  #     #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
+  #     #     api-key: ${{ env.CN_API_KEY }}
 
   build-macos-on-apple-store:
-    name: Build macOS (x86_64, ARM64, Universal)
+    name: Build Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
     runs-on: macos-latest
     env:
         APPLE_ID: ${{ vars.APPLE_ID }}
         APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-        APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-        APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
         APPLE_DISTRIBUTION_CERT_NAME: ${{ vars.APPLE_DISTRIBUTION_CERT_NAME }}
         MAC_INSTALLER_CERT_NAME:  ${{ vars.MAC_INSTALLER_CERT_NAME }}
     steps:
@@ -353,30 +351,24 @@ jobs:
             pnpm tauri build --no-bundle --target $target-apple-darwin
           done
 
-      # Bundle all targets with improved error handling
-      - name: Bundle macOS x86_64 app
-        run: |
-          echo "Bundle for x86_64-apple-darwin..."
-          pnpm tauri bundle --bundles app --target x86_64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+      # # Bundle all targets with improved error handling
+      # - name: Bundle macOS x86_64 app
+      #   run: |
+      #     echo "Bundle for x86_64-apple-darwin..."
+      #     pnpm tauri bundle --bundles app --target x86_64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+      #   env:
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      #     APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
 
-      - name: Bundle macOS ARM64 app
-        run: |
-          echo "Bundle for aarch64-apple-darwin..."
-          pnpm tauri bundle --bundles app --target aarch64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
-        env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+      # - name: Bundle macOS ARM64 app
+      #   run: |
+      #     echo "Bundle for aarch64-apple-darwin..."
+      #     pnpm tauri bundle --bundles app --target aarch64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+      #   env:
+      #     TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+      #     TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      #     APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
 
       - name: Bundle macOS Universal app
         run: |
@@ -386,9 +378,6 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
 
       # --------------------------
       # App Store Connect
@@ -515,54 +504,54 @@ jobs:
   #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
   #         api-key: ${{ env.CN_API_KEY }}
 
-  # build-linux-x64:
-  #   name: Build Linux x64
-  #   needs: draft
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Install pnpm
-  #       uses: pnpm/action-setup@v3
-  #       with:
-  #         version: 9
-  #     - uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #     - name: Install stable toolchain
-  #       uses: actions-rust-lang/setup-rust-toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         cache: true
-  #     - name: Install Tauri CLI
-  #       run: npm install -g @tauri-apps/cli
-  #     - name: Install Linux dependencies
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-  #         sudo apt-get install -y pkg-config build-essential
-  #     - name: Add Rust target
-  #       run: rustup target add x86_64-unknown-linux-gnu
-  #     - name: Install dependencies
-  #       run: pnpm install --frozen-lockfile
+  build-linux-x64:
+    name: Build Linux x64
+    needs: draft
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y pkg-config build-essential
+      - name: Add Rust target
+        run: rustup target add x86_64-unknown-linux-gnu
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-  #     - name: Import GPG key
-  #       run: |
-  #         echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
+      - name: Import GPG key
+        run: |
+          echo "${{ env.GPG_PRIVATE_KEY }}" | gpg --batch --import
 
-  #     - name: Build Linux x86_64-unknown-linux-gnu
-  #       run: pnpm tauri build --target x86_64-unknown-linux-gnu
-  #       env:
-  #         SIGN: 1
-  #         SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-  #         APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-  #         APPIMAGETOOL_FORCE_SIGN: 1
-  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
-  #     - name: Upload assets
-  #       uses: crabnebula-dev/cloud-release@v0
-  #       with:
-  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-  #         api-key: ${{ env.CN_API_KEY }}
+      - name: Build Linux x86_64-unknown-linux-gnu
+        run: pnpm tauri build --target x86_64-unknown-linux-gnu
+        env:
+          SIGN: 1
+          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+          APPIMAGETOOL_FORCE_SIGN: 0
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+      - name: Upload assets
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
 
   # build-linux-aarch64:
   #   name: Build Linux aarch64
