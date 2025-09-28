@@ -120,6 +120,8 @@ jobs:
           mkdir -p ~/.private_keys
           echo "${{ vars.APPLE_API_PRIVATE_KEY }}" > ~/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8
           echo "APPLE_API_KEY_PATH=$HOME/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8" >> $GITHUB_ENV
+          echo "APPLE_API_KEY_PATH is $APPLE_API_KEY_PATH"
+          ls -l keys/apple || echo "keys/apple does not exist"
 
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -162,7 +164,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: keys/apple/AuthKey_8V37C4L378.p8
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
       - name: Build macOS Universal
         run: |
