@@ -123,6 +123,17 @@ jobs:
           echo "APPLE_API_KEY_PATH is $APPLE_API_KEY_PATH"
           ls -l keys/apple || echo "keys/apple does not exist"
 
+      - name: Debug Apple API key file
+        run: |
+          echo "File created at: $APPLE_API_KEY_PATH"
+          ls -l $APPLE_API_KEY_PATH
+          echo "=== First 2 lines of the key ==="
+          head -n 2 $APPLE_API_KEY_PATH
+          echo "=== Last line of the key ==="
+          tail -n 1 $APPLE_API_KEY_PATH
+          echo "=== Apple API key full content ==="
+          cat $APPLE_API_KEY_PATH
+
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
