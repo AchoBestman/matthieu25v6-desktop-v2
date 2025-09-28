@@ -1,4 +1,9 @@
 {
+  "plugins": {
+    "updater": {
+      "endpoints": []
+    }
+  },
   "bundle": {
     "macOS": {
       "signingIdentity": null,

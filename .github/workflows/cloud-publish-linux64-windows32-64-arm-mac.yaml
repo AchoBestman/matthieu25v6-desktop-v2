@@ -76,7 +76,7 @@ jobs:
     #       api-key: ${{ env.CN_API_KEY }}
 
   # Étape 3: build with bundle for Mac distribution
-  build-macos:
+  build-macos-out-apple-store:
     name: Build macOS (x86_64, ARM64, Universal)
     needs: draft
     runs-on: macos-latest
@@ -213,17 +213,6 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      # Step 2: Generate .pkg manually
-      - name: Bundle .pkg for x86_64 using the Generating .app
-        run: |
-          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
-          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
-
-          echo "Generating .pkg..."
-          xcrun productbuild --component "$APP_PATH" /Applications \
-                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
-                       "$PKG_PATH"
-
       - name: Bundle macOS ARM64 app and dmg
         run: |
           echo "Bundle for aarch64-apple-darwin..."
@@ -236,17 +225,6 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-        # Step 2: Generate .pkg manually
-      - name: Bundle .pkg for x86_64 using the Generating .app
-        run: |
-          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
-          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
-
-          echo "Generating .pkg..."
-          xcrun productbuild --component "$APP_PATH" /Applications \
-                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
-                       "$PKG_PATH"
-
       - name: Bundle macOS Universal app and dmg
         run: |
           echo "Bundle universal binary..."
@@ -258,17 +236,6 @@ jobs:
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
-
-        # Step 2: Generate .pkg manually
-      - name: Bundle .pkg for x86_64 using the Generating .app
-        run: |
-          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
-          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
-
-          echo "Generating .pkg..."
-          xcrun productbuild --component "$APP_PATH" /Applications \
-                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
-                       "$PKG_PATH"
 
       # Debug: list artifacts
       - name: List build artifacts
@@ -284,6 +251,164 @@ jobs:
       #   with:
       #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
       #     api-key: ${{ env.CN_API_KEY }}
+
+  build-macos-on-apple-store:
+    name: Build macOS (x86_64, ARM64, Universal)
+    needs: draft
+    runs-on: macos-latest
+    env:
+        APPLE_ID: ${{ vars.APPLE_ID }}
+        APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
+        APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+        APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+        APPLE_DISTRIBUTION_CERT_NAME: ${{ vars.APPLE_DISTRIBUTION_CERT_NAME }}
+        MAC_INSTALLER_CERT_NAME:  ${{ vars.MAC_INSTALLER_CERT_NAME }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # Import Apple Distribution Certificate - FIXED VERSION
+      - name: Import Apple Distribution Certificate
+        env:
+          APPLE_CERTIFICATE: ${{ vars.APPLE_DISTRIBUTION_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create certificate file by decode the encoding APPLE_CERTIFICATE
+          echo "$APPLE_CERTIFICATE" | base64 --decode > appstore_certificate.p12
+          
+          # Delete existing keychain if it exists
+          security delete-keychain build.keychain || true
+          
+          # Create and configure keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+          security set-keychain-settings -t 3600 -l build.keychain
+          
+          # Import certificate with proper flags
+          security import appstore_certificate.p12 \
+            -k build.keychain \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12
+          
+          # Set partition list for codesigning
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -s \
+            -k "$KEYCHAIN_PASSWORD" \
+            build.keychain
+          
+          # Verify certificate import
+          security find-identity -v -p codesigning build.keychain
+          
+          # Clean up certificate file
+          rm -f appstore_certificate.p12
+          
+          echo "Certificate import completed"
+
+      - name: Verify Certificate
+        run: |
+          echo "Verifying certificate..."
+          CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | head -1)
+          if [ -z "$CERT_INFO" ]; then
+            echo "No Apple Distribution certificate found!"
+            security find-identity -v -p codesigning build.keychain
+            exit 1
+          fi
+          CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+          echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+          echo "Certificate verified: $CERT_ID"
+
+      - name: Install stable Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+
+      - name: Add Rust targets
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add aarch64-apple-darwin
+          
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (no bundle) for prepare all distribution bundle on MacOS
+        run: |
+          for target in x86_64 aarch64 universal; do
+            pnpm tauri build --no-bundle --target $target-apple-darwin
+          done
+
+      # Bundle all targets with improved error handling
+      - name: Bundle macOS x86_64 app
+        run: |
+          echo "Bundle for x86_64-apple-darwin..."
+          pnpm tauri bundle --bundles app --target x86_64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+
+      - name: Bundle macOS ARM64 app
+        run: |
+          echo "Bundle for aarch64-apple-darwin..."
+          pnpm tauri bundle --bundles app --target aarch64-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+
+      - name: Bundle macOS Universal app
+        run: |
+          echo "Bundle universal binary..."
+          pnpm tauri bundle --bundles app --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+          APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+          APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+          APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
+
+      # --------------------------
+      # App Store Connect
+      # --------------------------
+      - name: Upload to App Store
+        run: |
+          APP_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.app"
+          PKG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.pkg"
+          PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/tauri.onlineappstore.conf.json"
+          codesign \
+          --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
+          --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
+          "$APP_PATH"
+
+          echo "Creating Apple Store package ${{env.APP_NAME}}.pkg..."
+          xcrun productbuild \
+            --sign "${{ env.MAC_INSTALLER_CERT_NAME }}" \
+            --component "$APP_PATH" "/Applications" \
+            "$PKG_PATH"
+        #run: xcrun altool --upload-app -f src-tauri/target/universal-apple-darwin/release/bundle/macos/Prophet\ Kacou.app --apiKey $APPLE_API_KEY --apiIssuer $APPLE_API_ISSUER
 
   # build-windows-x64:
   #   name: Build Windows x64
@@ -496,7 +621,8 @@ jobs:
 
   # publish:
   #   needs: 
-  #     - build-macos
+  #     - build-macos-out-apple-store
+  #     - build-macos-on-apple-store
   #     - build-windows-x64
   #     - build-windows-x86
   #     - build-windows-arm64
