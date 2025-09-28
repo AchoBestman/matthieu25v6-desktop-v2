@@ -133,6 +133,7 @@ jobs:
           tail -n 1 $APPLE_API_KEY_PATH
           echo "=== Apple API key full content ==="
           cat $APPLE_API_KEY_PATH
+          export APPLE_API_KEY_PATH="/Users/runner/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
 
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -163,7 +164,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH: $APPLE_API_KEY_PATH
+          APPLE_API_KEY_PATH: /Users/runner/.private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8
 
       - name: Build macOS ARM64
         run: |
