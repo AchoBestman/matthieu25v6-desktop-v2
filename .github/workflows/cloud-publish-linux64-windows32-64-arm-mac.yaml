@@ -361,11 +361,11 @@ jobs:
         run: |
           APP_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.app"
           PKG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.pkg"
-          PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
-          codesign \
-          --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
-          --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
-          "$APP_PATH"
+          # PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
+          # codesign \
+          # --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
+          # --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
+          # "$APP_PATH"
 
           echo "Creating Apple Store package ${{env.APP_NAME}}.pkg..."
           xcrun productbuild \
