@@ -71,7 +71,7 @@ jobs:
   
   #Step 2 : Create new release version on nebulacrab 
   draft:
-    name: Create new release version on nebulacrab cloud
+    name: Create new a release version on nebulacrab cloud
     needs: build-test
     runs-on: ubuntu-22.04
     steps:
