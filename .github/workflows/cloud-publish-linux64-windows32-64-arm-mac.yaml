@@ -629,13 +629,13 @@ jobs:
 
   # Step 5: publish release to CrabNebula 
   # publish-release:
-    name: publish release to CrabNebula
-    needs: upload-assets
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Publish release to CrabNebula
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
+  #   name: publish release to CrabNebula
+  #   needs: upload-assets
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Publish release to CrabNebula
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
