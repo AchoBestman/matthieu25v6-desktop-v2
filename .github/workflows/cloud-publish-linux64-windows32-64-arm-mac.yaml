@@ -402,8 +402,8 @@ jobs:
         run: |
           echo "Submitting ${{env.PKG_PATH}} to Apple Notary Tool..."
           xcrun notarytool submit "${{env.PKG_PATH}}" \
-            --key "${{ env.APPLE_API_KEY_PATH }}" \
-            --key-id "$APPLE_API_KEY_PATH" \
+            --key "$APPLE_API_KEY_PATH" \
+            --key-id "${{ env.APPLE_API_KEY }}" \
             --issuer "${{ env.APPLE_API_ISSUER }}" \
             --wait --timeout 600
 
