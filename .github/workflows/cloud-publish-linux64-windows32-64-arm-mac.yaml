@@ -67,24 +67,10 @@ jobs:
       - name: Build (no bundle)
         run: pnpm build
 
-  # Step 2 : create the new release with it version on nebulacrab cloud
-  draft:
-    name: Create new release version on nebulacrab cloud
-    needs: build-test
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v4
-    #   - name: create draft release
-    #     uses: crabnebula-dev/cloud-release@v0
-    #     with:
-    #       command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
-    #       api-key: ${{ env.CN_API_KEY }}
-
-
-  # Step 3: Start building image for all plateforms
+  # Step 2: Start building image for all plateforms
   build-macos-out-apple-store:
     name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
-    needs: draft
+    needs: build-test
     runs-on: macos-latest
     env:
         APPLE_ID: ${{ vars.APPLE_ID }}
@@ -253,7 +239,7 @@ jobs:
 
   build-macos-on-apple-store:
     name: Build Apple Store macOS (x86_64, ARM64, Universal)
-    needs: draft
+    needs: build-test
     runs-on: macos-latest
     env:
         APPLE_ID: ${{ vars.APPLE_ID }}
@@ -399,7 +385,7 @@ jobs:
 
   build-windows-x64:
     name: Build Windows x64
-    needs: draft
+    needs: build-test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -429,7 +415,7 @@ jobs:
 
   build-windows-x86:
     name: Build Windows x86
-    needs: draft
+    needs: build-test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -459,7 +445,7 @@ jobs:
 
   build-windows-arm64:
     name: Build Windows ARM64
-    needs: draft
+    needs: build-test
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -489,7 +475,7 @@ jobs:
 
   build-linux-x64:
     name: Build Linux x64
-    needs: draft
+    needs: build-test
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -534,7 +520,7 @@ jobs:
 
   build-linux-aarch64:
     name: Build Linux aarch64
-    needs: draft
+    needs: build-test
     runs-on: ubuntu-22.04-arm
     steps:
 
@@ -582,42 +568,50 @@ jobs:
         #   TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
         #   TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
+    # Step 2 : create the new release with it version on nebulacrab cloud
+  
+  # Step 3: Create new release version on nebulacrab cloud
+  draft:
+    name: Create new release version on nebulacrab cloud
+    needs: 
+      - build-macos-out-apple-store
+      - build-macos-on-apple-store
+      - build-windows-x64
+      - build-windows-x86
+      - build-windows-arm64
+      - build-linux-x64
+      - build-linux-aarch64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: create draft release
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
+          api-key: ${{ env.CN_API_KEY }}
+
   # Step 4: Upload assets to CrabNebula 
-  # upload-assets:
-  #   name: Upload assets to CrabNebula
-  #   runs-on: ubuntu-22.04
-  #   needs: 
-  #     - build-macos-out-apple-store
-  #     - build-macos-on-apple-store
-  #     - build-windows-x64
-  #     - build-windows-x86
-  #     - build-windows-arm64
-  #     - build-linux-x64
-  #     - build-linux-aarch64
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Upload assets to CrabNebula
-  #       uses: crabnebula-dev/cloud-release@v0
-  #       with:
-  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-  #         api-key: ${{ env.CN_API_KEY }}
+  upload-assets:
+    name: Upload assets to CrabNebula
+    runs-on: ubuntu-22.04
+    needs:  draft
+    steps:
+      - uses: actions/checkout@v4
+      - name: Upload assets to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
 
   # Step 5: publish release to CrabNebula 
-  # publish-release:
-  #   name: publish release to CrabNebula
-  #   needs: 
-  #     - build-macos-out-apple-store
-  #     - build-macos-on-apple-store
-  #     - build-windows-x64
-  #     - build-windows-x86
-  #     - build-windows-arm64
-  #     - build-linux-x64
-  #     - build-linux-aarch64
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Publish release to CrabNebula
-  #       uses: crabnebula-dev/cloud-release@v0
-  #       with:
-  #         command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-  #         api-key: ${{ env.CN_API_KEY }}
+  publish-release:
+    name: publish release to CrabNebula
+    needs: upload-assets
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish release to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
