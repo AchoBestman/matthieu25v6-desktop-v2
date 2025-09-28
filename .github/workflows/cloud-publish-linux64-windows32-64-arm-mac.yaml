@@ -181,7 +181,7 @@ jobs:
           
           # Test with xcrun notarytool to validate credentials
           echo "Testing credentials with notarytool..."
-          if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" --limit 1 2>&1; then
+          if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
             echo "✅ Apple API credentials are valid"
           else
             echo "❌ Apple API credentials test failed"
