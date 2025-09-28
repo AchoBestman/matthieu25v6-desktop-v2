@@ -26,8 +26,8 @@ env:
 
   APP_NAME: "Prophet Kacou"
   PKG_NAME: "ProphetKacou"
-  APP_PATH: "src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.app"
-  PKG_PATH: "src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKG_NAME.pkg"
+  APP_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.app"
+  PKG_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKG_NAME.pkg"
   APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
   APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
 
