@@ -22,6 +22,9 @@ env:
   GPG_PRIVATE_KEY: ${{ vars.LINUX_SIGN_PRIVATE_KEY }}
   LINUX_SIGN_KEY_ID: ${{ vars.LINUX_SIGN_KEY_ID }}
   LINUX_APPIMAGETOOL_SIGN_PASSPHRASE: ${{ vars.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  DEVELOPPER_ID_INSTALLER_CERT_NAME: ${{ vars.DEVELOPPER_ID_INSTALLER_CERT_NAME }}
+
+  APP_NAME: "Prophet Kacou"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -195,10 +198,10 @@ jobs:
         run: pnpm tauri build --no-bundle
 
       # Bundle all targets with improved error handling
-      - name: Bundle macOS x86_64 app and pkg
+      - name: Bundle macOS x86_64 app and dmg
         run: |
           echo "Bundle for x86_64-apple-darwin..."
-          pnpm tauri bundle --bundles app,pkg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          pnpm tauri bundle --bundles app,dmg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -207,10 +210,21 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Bundle macOS ARM64 app and pkg
+      # Step 2: Generate .pkg manually
+      - name: Bundle .pkg for x86_64 using the Generating .app
+        run: |
+          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
+          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
+
+          echo "Generating .pkg..."
+          xcrun productbuild --component "$APP_PATH" /Applications \
+                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
+                       "$PKG_PATH"
+
+      - name: Bundle macOS ARM64 app and dmg
         run: |
           echo "Bundle for aarch64-apple-darwin..."
-          pnpm tauri bundle --bundles app,pkg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          pnpm tauri bundle --bundles app,dmg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -219,10 +233,21 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Bundle macOS Universal app and pkg
+        # Step 2: Generate .pkg manually
+      - name: Bundle .pkg for x86_64 using the Generating .app
+        run: |
+          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
+          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
+
+          echo "Generating .pkg..."
+          xcrun productbuild --component "$APP_PATH" /Applications \
+                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
+                       "$PKG_PATH"
+
+      - name: Bundle macOS Universal app and dmg
         run: |
           echo "Bundle universal binary..."
-          pnpm tauri bundle --bundles app,pkg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          pnpm tauri bundle --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -231,6 +256,17 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
 
+        # Step 2: Generate .pkg manually
+      - name: Bundle .pkg for x86_64 using the Generating .app
+        run: |
+          APP_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.app"
+          PKG_PATH="src-tauri/target/x86_64-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
+
+          echo "Generating .pkg..."
+          xcrun productbuild --component "$APP_PATH" /Applications \
+                       --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
+                       "$PKG_PATH"
+                       
       # Debug: list artifacts
       - name: List build artifacts
         run: |
