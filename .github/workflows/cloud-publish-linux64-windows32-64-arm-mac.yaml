@@ -66,7 +66,7 @@ jobs:
           APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
         run: |
-          # Create certificate file
+          # Create certificate file by decode the encoding APPLE_CERTIFICATE
           echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
           
           # Delete existing keychain if it exists
@@ -116,28 +116,27 @@ jobs:
 
 
       # Set up Apple API key for notarization (Tauri v2 compatible)
-      - name: Set up Apple API key
+      - name: Set up Apple API key end Test if it work
         env:
             APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
         run: |
           # Create the directory structure
           echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
+          
+          #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
           API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
+
           # Test with xcrun notarytool to validate credentials
           echo "Testing credentials with notarytool..."
           if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
             echo "✅ Apple API credentials are valid"
           else
             echo "❌ Apple API credentials test failed"
-            echo "This could indicate:"
-            echo "1. Invalid API key format"
-            echo "2. Wrong Key ID"
-            echo "3. Wrong Issuer ID" 
-            echo "4. API key doesn't have notarization permissions"
+            echo "This could indicate: Invalid API key format or Wrong Key ID or Wrong Key Issuer or API key doesn't have notarization permissions"
             exit 1
           fi
 
-          # IMPORTANT: Set environment variable for next steps
+          # IMPORTANT: Set environment variable for next steps.  >> $GITHUB_ENV make variable be avalable in github action env
           echo "APPLE_API_KEY_PATH=$API_KEY_FILE" >> $GITHUB_ENV
 
       - name: Install stable Rust toolchain
@@ -164,8 +163,8 @@ jobs:
           echo "API key path: $APPLE_API_KEY_PATH"
           pnpm tauri build --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
@@ -176,8 +175,8 @@ jobs:
           echo "Building for aarch64-apple-darwin..."
           pnpm tauri build --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
@@ -188,8 +187,8 @@ jobs:
           echo "Building universal binary..."
           pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
