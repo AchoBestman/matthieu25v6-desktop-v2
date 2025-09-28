@@ -25,6 +25,11 @@ env:
   DEVELOPPER_ID_INSTALLER_CERT_NAME: ${{ vars.DEVELOPPER_ID_INSTALLER_CERT_NAME }}
 
   APP_NAME: "Prophet Kacou"
+  APP_PATH: "src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.app"
+  PKG_PATH: "src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.pkg"
+  APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+  APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -267,16 +272,14 @@ jobs:
         with:
           node-version: "20"
 
-      # Import Apple Distribution Certificate - FIXED VERSION
-      - name: Import Apple Distribution Certificate
+      # Import Apple Distribution Certificate and Mac Installer Certificate - FIXED VERSION
+      - name: Import Apple Distribution Certificate and Mac Installer Certificate
         env:
-          APPLE_CERTIFICATE: ${{ vars.APPLE_DISTRIBUTION_CERTIFICATE }}
+          APPLE_DISTRIBUTION_CERTIFICATE: ${{ vars.APPLE_DISTRIBUTION_CERTIFICATE }}
+          MAC_INSTALLER_CERT: ${{ vars.MAC_INSTALLER_CERTIFICATION }}
           APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
           KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
         run: |
-          # Create certificate file by decode the encoding APPLE_CERTIFICATE
-          echo "$APPLE_CERTIFICATE" | base64 --decode > appstore_certificate.p12
-          
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
           
@@ -285,8 +288,9 @@ jobs:
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-keychain-settings -t 3600 -l build.keychain
-          
-          # Import certificate with proper flags
+
+          # Import Apple Distribution
+          echo "$APPLE_DISTRIBUTION_CERTIFICATE" | base64 --decode > appstore_certificate.p12
           security import appstore_certificate.p12 \
             -k build.keychain \
             -P "$APPLE_CERTIFICATE_PASSWORD" \
@@ -294,19 +298,30 @@ jobs:
             -t cert \
             -f pkcs12
           
-          # Set partition list for codesigning
+          # Clean up certificate file
+          rm -f appstore_certificate.p12
+
+          # Import Mac Installer
+          echo "$MAC_INSTALLER_CERT" | base64 --decode > mac_installer.p12
+          security import mac_installer.p12 \
+            -k build.keychain \
+            -P "$APPLE_CERTIFICATE_PASSWORD" \
+            -A \
+            -t cert \
+            -f pkcs12
+
+          # Clean up certificate file
+          rm -f mac_installer.p12
+
+          # Set partition list for both certificates
           security set-key-partition-list \
             -S apple-tool:,apple: \
             -s \
             -k "$KEYCHAIN_PASSWORD" \
             build.keychain
-          
-          # Verify certificate import
+
+          # Verify both certificates
           security find-identity -v -p codesigning build.keychain
-          
-          # Clean up certificate file
-          rm -f appstore_certificate.p12
-          
           echo "Certificate import completed"
 
       - name: Verify Certificate
@@ -321,7 +336,7 @@ jobs:
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate verified: $CERT_ID"
-
+      
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -357,10 +372,8 @@ jobs:
       # --------------------------
       # App Store Connect
       # --------------------------
-      - name: Upload to App Store
+      - name: Generate the universal-apple-darwin .pkg for Apple Store
         run: |
-          APP_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.app"
-          PKG_PATH="src-tauri/target/universal-apple-darwin/release/bundle/macos/${{env.APP_NAME}}.pkg"
           # PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
           # codesign \
           # --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
@@ -370,8 +383,19 @@ jobs:
           echo "Creating Apple Store package ${{env.APP_NAME}}.pkg..."
           xcrun productbuild \
             --sign "${{ env.MAC_INSTALLER_CERT_NAME }}" \
-            --component "$APP_PATH" "/Applications" \
-            "$PKG_PATH"
+            --component "${{env.APP_PATH}}" "/Applications" \
+            "${{env.PKG_PATH}}"
+
+      - name: Upload to App Store
+        run: |
+          echo "Submitting ${{env.PKG_PATH}} to Apple Notary Tool..."
+          xcrun notarytool submit "${{env.PKG_PATH}}" \
+            --key "${{env.APPLE_API_KEY_PATH}}" \
+            --key-id "${{env.APPLE_API_KEY}}" \
+            --issuer "${{env.APPLE_API_ISSUER}}" \
+            --wait --timeout 600
+
+          echo "Submission completed. You can now use Transporter or App Store Connect."
 
   build-windows-x64:
     name: Build Windows x64
