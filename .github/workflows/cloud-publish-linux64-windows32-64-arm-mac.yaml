@@ -27,7 +27,39 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+#The listing of jobs to be executed
 jobs:
+  # Étape 1 : build without bundle (fast, for compilation validation)
+  build-test:
+    name: Test Build whole tauri + vite app (no bundle)
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Tauri CLI
+        run: pnpm add -g @tauri-apps/cli
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (no bundle)
+        run: pnpm tauri build --no-bundle
+
+  # Étape 2 : create the new release with it version on nebulacrab cloud
   draft:
     runs-on: ubuntu-22.04
     steps:
@@ -38,6 +70,7 @@ jobs:
     #       command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
     #       api-key: ${{ env.CN_API_KEY }}
 
+  # Étape 3: build with bundle for Mac distribution
   build-macos:
     name: Build macOS (x86_64, ARM64, Universal)
     needs: draft
@@ -156,12 +189,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Build all targets with improved error handling
-      - name: Build macOS x86_64
+      - name: Build (no bundle) for prepare distribution bundle on MacOS
+        run: pnpm tauri build --no-bundle
+
+      # Bundle all targets with improved error handling
+      - name: Bundle macOS x86_64 app and pkg
         run: |
-          echo "Building for x86_64-apple-darwin..."
-          echo "API key path: $APPLE_API_KEY_PATH"
-          pnpm tauri build --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          echo "Bundle for x86_64-apple-darwin..."
+          pnpm tauri bundle --bundles app,pkg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -170,10 +205,10 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Build macOS ARM64
+      - name: Bundle macOS ARM64 app and pkg
         run: |
-          echo "Building for aarch64-apple-darwin..."
-          pnpm tauri build --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          echo "Bundle for aarch64-apple-darwin..."
+          pnpm tauri bundle --bundles app,pkg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -182,10 +217,10 @@ jobs:
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
           APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
-      - name: Build macOS Universal
+      - name: Bundle macOS Universal app and pkg
         run: |
-          echo "Building universal binary..."
-          pnpm tauri build --bundles app --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+          echo "Bundle universal binary..."
+          pnpm tauri bundle --bundles app,pkg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
@@ -203,11 +238,11 @@ jobs:
           find src-tauri/target -name "*.pkg"
 
       # Upload all artifacts to CrabNebula
-      - name: Upload macOS builds to CrabNebula
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
-          api-key: ${{ env.CN_API_KEY }}
+      # - name: Upload macOS builds to CrabNebula
+      #   uses: crabnebula-dev/cloud-release@v0
+      #   with:
+      #     command: release upload ${{ env.CN_APPLICATION }} --framework tauri --mac-signing-identity ${{ env.CERT_ID }}
+      #     api-key: ${{ env.CN_API_KEY }}
 
   # build-windows-x64:
   #   name: Build Windows x64
