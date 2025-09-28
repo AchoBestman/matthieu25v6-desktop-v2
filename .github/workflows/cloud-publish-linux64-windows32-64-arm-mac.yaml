@@ -195,7 +195,9 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build (no bundle) for prepare distribution bundle on MacOS
-        run: pnpm tauri build --no-bundle
+        run: pnpm tauri build --no-bundle --target x86_64-apple-darwin
+        run: pnpm tauri build --no-bundle --target aarch64-apple-darwin
+        run: pnpm tauri build --no-bundle --target universal-apple-darwin
 
       # Bundle all targets with improved error handling
       - name: Bundle macOS x86_64 app and dmg
@@ -266,7 +268,7 @@ jobs:
           xcrun productbuild --component "$APP_PATH" /Applications \
                        --sign "${{env.DEVELOPPER_ID_INSTALLER_CERT_NAME}}" \
                        "$PKG_PATH"
-                       
+
       # Debug: list artifacts
       - name: List build artifacts
         run: |
