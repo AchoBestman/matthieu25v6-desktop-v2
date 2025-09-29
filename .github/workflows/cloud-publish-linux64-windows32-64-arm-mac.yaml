@@ -30,6 +30,11 @@ env:
   PKG_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKG_NAME.pkg"
   APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
   APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  APPLE_ID: ${{ vars.APPLE_ID }}
+  APPLE_BUNDLE_ID: ${{ vars.APPLE_BUNDLE_ID }}
+  APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+  APPLE_VERSION_STRING: ${{ vars.APPLE_VERSION_STRING }}
+  APP_VERSION: "1.0.5" # Manually update this for each release
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -67,9 +72,9 @@ jobs:
       - name: Build (no bundle)
         run: pnpm build
 
-   # Step 3: Create new release version on nebulacrab cloud
-  
-  #Step 2 : Create new release version on nebulacrab 
+    # Step 3: Create new release version on nebulacrab cloud
+
+  #Step 2 : Create new release version on nebulacrab
   draft:
     name: Create new a release version on nebulacrab cloud
     needs: build-test
@@ -88,10 +93,10 @@ jobs:
     needs: draft
     runs-on: macos-latest
     env:
-        APPLE_ID: ${{ vars.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-        APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-        APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+      APPLE_ID: ${{ vars.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
+      APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
+      APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
     steps:
       - uses: actions/checkout@v4
 
@@ -113,16 +118,16 @@ jobs:
         run: |
           # Create certificate file by decode the encoding APPLE_CERTIFICATE
           echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
-          
+
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
-          
+
           # Create and configure keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security set-keychain-settings -t 3600 -l build.keychain
-          
+
           # Import certificate with proper flags
           security import certificate.p12 \
             -k build.keychain \
@@ -130,20 +135,20 @@ jobs:
             -A \
             -t cert \
             -f pkcs12
-          
+
           # Set partition list for codesigning
           security set-key-partition-list \
             -S apple-tool:,apple: \
             -s \
             -k "$KEYCHAIN_PASSWORD" \
             build.keychain
-          
+
           # Verify certificate import
           security find-identity -v -p codesigning build.keychain
-          
+
           # Clean up certificate file
           rm -f certificate.p12
-          
+
           echo "Certificate import completed"
 
       - name: Verify Certificate
@@ -159,15 +164,14 @@ jobs:
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate verified: $CERT_ID"
 
-
       # Set up Apple API key for notarization (Tauri v2 compatible)
       - name: Set up Apple API key end Test if it work
         env:
-            APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
+          APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
         run: |
           # Create the directory structure
           echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
-          
+
           #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
           API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
 
@@ -197,7 +201,7 @@ jobs:
         run: |
           rustup target add x86_64-apple-darwin
           rustup target add aarch64-apple-darwin
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -242,7 +246,7 @@ jobs:
           APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
           APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
           APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-          APPLE_API_KEY_PATH:  ${{ env.APPLE_API_KEY_PATH }}
+          APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
       # Debug: list artifacts
       - name: List build artifacts
@@ -263,10 +267,10 @@ jobs:
     needs: draft
     runs-on: macos-latest
     env:
-        APPLE_ID: ${{ vars.APPLE_ID }}
-        APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-        APPLE_DISTRIBUTION_CERT_NAME: ${{ vars.APPLE_DISTRIBUTION_CERT_NAME }}
-        MAC_INSTALLER_CERT_NAME:  ${{ vars.MAC_INSTALLER_CERT_NAME }}
+      APPLE_ID: ${{ vars.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
+      APPLE_DISTRIBUTION_CERT_NAME: ${{ vars.APPLE_DISTRIBUTION_CERT_NAME }}
+      MAC_INSTALLER_CERT_NAME: ${{ vars.MAC_INSTALLER_CERT_NAME }}
     steps:
       - uses: actions/checkout@v4
 
@@ -289,7 +293,7 @@ jobs:
         run: |
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
-          
+
           # Create and configure keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
@@ -304,7 +308,7 @@ jobs:
             -A \
             -t cert \
             -f pkcs12
-          
+
           # Clean up certificate file
           rm -f appstore_certificate.p12
 
@@ -343,7 +347,7 @@ jobs:
           CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
           echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
           echo "Certificate verified: $CERT_ID"
-      
+
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
         with:
@@ -357,7 +361,7 @@ jobs:
         run: |
           rustup target add x86_64-apple-darwin
           rustup target add aarch64-apple-darwin
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -393,25 +397,40 @@ jobs:
             --component "${{env.APP_PATH}}" "/Applications" \
             "${{env.PKG_PATH}}"
 
-      - name: Upload to App Store
-        env: 
+      - name: Upload to App Store on TestFlight
+        env:
           APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
         run: |
           # Create the directory structure
           echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
-          
+
           #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
           API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
 
-          echo "Submitting ${{env.PKG_PATH}} to Apple Notary Tool..."
-          xcrun notarytool submit "${{env.PKG_PATH}}" \
-            --key "$API_KEY_FILE" \
-            --key-id "${{ env.APPLE_API_KEY }}" \
-            --issuer "${{ env.APPLE_API_ISSUER }}" \
-            --wait --timeout 600
+          # validate app with xcrun altool
+          xcrun altool --validate-app \
+            -f "${{env.PKG_PATH}}" \
+            -t osx \
+            --apiKey "${{ env.APPLE_API_KEY }}" \
+            --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
+            --output-format json
 
-          echo "Submission completed. You can now use Transporter or App Store Connect."
-  
+          # Upload with xcrun altool
+          echo "Submitting ${{env.PKG_PATH}} to TestFlight..."
+          xcrun altool --upload-package package \
+            -t osx \
+            --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
+            --apple-id "${{ env.APPLE_TEAM_ID }}" \
+            --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
+            --bundle-short-version-string "${{env.APP_VERSION}}" \
+            --bundle-version "${{ github.run_number }}" \
+            --apiKey "${{ env.APPLE_API_KEY }}" \
+            --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
+            --output-format json
+
+          echo "✅ Upload to App Store Connect completed successfully!"
+          echo "The build will appear in TestFlight within 10-15 minutes after processing."
+
   build-windows-x64:
     name: Build Windows x64
     needs: draft
@@ -545,7 +564,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
           sudo apt-get install -y pkg-config build-essential
-          
+
       - name: Add Rust target
         run: rustup target add x86_64-unknown-linux-gnu
       - name: Install dependencies
@@ -576,7 +595,6 @@ jobs:
     needs: draft
     runs-on: ubuntu-22.04-arm
     steps:
-
       - uses: actions/checkout@v4
       - name: Install pnpm
         uses: pnpm/action-setup@v3
@@ -586,7 +604,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install stable Rust toolchain
         uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -627,10 +645,10 @@ jobs:
           command: release upload ${{ env.CN_APPLICATION }} --framework tauri
           api-key: ${{ env.CN_API_KEY }}
 
-  # Step 5: publish release to CrabNebula 
+  # Step 5: publish release to CrabNebula
   publish-release:
     name: publish release to CrabNebula
-    needs: 
+    needs:
       - build-macos-out-apple-store
       - build-macos-on-apple-store
       - build-windows-x64
