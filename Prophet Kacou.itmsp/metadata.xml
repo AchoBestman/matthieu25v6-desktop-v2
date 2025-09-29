@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package version="software5.4" xmlns="http://apple.com/itunes/importer">
+    <software_assets apple_id="VOTRE_APP_ID">
+        <asset type="bundle">
+            <data_file>
+                <file_name>Prophet Kacou.pkg</file_name>
+                <size>TAILLE_EN_BYTES</size>
+                <checksum type="md5">MD5_CHECKSUM</checksum>
+            </data_file>
+        </asset>
+    </software_assets>
+</package>

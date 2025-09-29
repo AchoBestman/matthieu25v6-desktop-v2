@@ -32,7 +32,7 @@ env:
   APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
   APPLE_ID: ${{ vars.APPLE_ID }}
   APPLE_BUNDLE_ID: ${{ vars.APPLE_BUNDLE_ID }}
-  APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+  APP_APPLE_ID: ${{ vars.APP_APPLE_ID }}
   APPLE_VERSION_STRING: ${{ vars.APPLE_VERSION_STRING }}
 
 concurrency:
@@ -281,17 +281,19 @@ jobs:
       # Caches
       # --------------------------
       - name: Cache Rust crates
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
-            ~/.cargo/registry
-            ~/.cargo/git
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             ${{ runner.os }}-cargo-
 
       - name: Cache pnpm modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -299,7 +301,7 @@ jobs:
             ${{ runner.os }}-pnpm-
 
       - name: Cache Rust target dir (builds)
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: src-tauri/target
           key: ${{ runner.os }}-tauri-target-${{ hashFiles('src-tauri/Cargo.lock') }}
@@ -329,7 +331,7 @@ jobs:
         run: |
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
-
+          echo "github.run_number: ${{ github.run_number }}"
           # Create and configure keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
@@ -464,7 +466,7 @@ jobs:
           xcrun altool --upload-package "${{env.PKG_PATH}}" \
             -t osx \
             --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
-            --apple-id "${{ env.APPLE_TEAM_ID }}" \
+            --apple-id "${{ env.APP_APPLE_ID }}" \
             --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
             --bundle-short-version-string "$APP_VERSION" \
             --bundle-version "${{ github.run_number }}" \
