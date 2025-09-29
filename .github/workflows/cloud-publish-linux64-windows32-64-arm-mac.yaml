@@ -277,6 +277,39 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # --------------------------
+      # Caches
+      # --------------------------
+      - name: Cache Rust crates
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Cache Rust target dir (builds)
+        uses: actions/cache@v3
+        with:
+          path: src-tauri/target
+          key: ${{ runner.os }}-tauri-target-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-tauri-target-
+
+      # --------------------------
+      # Setup tools
+      # --------------------------
+
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -400,14 +433,17 @@ jobs:
             --component "${{env.APP_PATH}}" "/Applications" \
             "${{env.PKG_PATH}}"
 
-      - name: Upload to App Store on TestFlight
+      - name: Create Apple API key directory and save key
         env:
           APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
         run: |
-          # Create the directory structure
+          echo "Create the directory structure for Apple API key"
           mkdir -p ~/.appstoreconnect/private_keys
+          echo "Save Apple API key to file"
           echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8
 
+      - name: Verify if the .pkg is valid for Apple Store
+        run: |
           # validate app with xcrun altool
           xcrun altool --validate-app \
             -f "${{env.PKG_PATH}}" \
@@ -416,12 +452,16 @@ jobs:
             --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
             --output-format json
 
+          echo "✅ .pkg validation completed successfully!"
+
+      - name: Upload to App Store on TestFlight
+        run: |
           # Upload with xcrun altool
-          echo "Submitting ${{env.PKG_PATH}} to TestFlight..."
+          echo "Submitting ${{env.PKG_PATH}} to TestFlight with xcrun altool..."
           APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
           echo "APP_VERSION=$APP_VERSION"
 
-          xcrun altool --upload-package package \
+          xcrun altool --upload-package "${{env.PKG_PATH}}" \
             -t osx \
             --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
             --apple-id "${{ env.APPLE_TEAM_ID }}" \
