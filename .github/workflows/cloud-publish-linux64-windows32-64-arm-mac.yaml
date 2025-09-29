@@ -414,7 +414,7 @@ jobs:
           xcrun altool --validate-app \
             -f "${{env.PKG_PATH}}" \
             -t osx \
-            --apiKey "${{ env.APPLE_API_KEY }}" \
+            --apiKey "${{ env.API_KEY_FILE }}" \
             --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
             --output-format json
 
@@ -430,7 +430,7 @@ jobs:
             --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
             --bundle-short-version-string "$APP_VERSION" \
             --bundle-version "${{ github.run_number }}" \
-            --apiKey "${{ env.APPLE_API_KEY }}" \
+            --apiKey "${{ env.API_KEY_FILE }}" \
             --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
             --output-format json
 
