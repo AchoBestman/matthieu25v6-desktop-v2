@@ -91,14 +91,15 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-modules-
 
-          - name: Get app version
-            run: |
-              APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
-              echo "APP_VERSION=$APP_VERSION"
-          - name: Install pnpm
-            uses: pnpm/action-setup@v3
-            with:
-              version: 9
+    - name: Get app version
+      run: |
+        APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+        echo "APP_VERSION=$APP_VERSION"
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
 
     - uses: actions/setup-node@v4
       with:
