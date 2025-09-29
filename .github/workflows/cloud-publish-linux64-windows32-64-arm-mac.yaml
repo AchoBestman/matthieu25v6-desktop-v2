@@ -11,29 +11,42 @@ on:
         default: "prophet-kacou/prophet-kacou"
 
 env:
-  CN_APPLICATION: ${{ vars.CN_APPLICATION }}
-  CN_API_KEY: ${{ vars.CN_API_KEY }}
+  CN_APPLICATION: ${{ secrets.CN_APPLICATION }}
+  CN_API_KEY: ${{ secrets.CN_API_KEY }}
 
   RELEASE_NOTE: ./release-notes.txt
 
-  TAURI_SIGNING_PRIVATE_KEY: ${{ vars.TAURI_SIGNING_PRIVATE_KEY }}
-  TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ vars.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+  TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-  GPG_PRIVATE_KEY: ${{ vars.LINUX_SIGN_PRIVATE_KEY }}
-  LINUX_SIGN_KEY_ID: ${{ vars.LINUX_SIGN_KEY_ID }}
-  LINUX_APPIMAGETOOL_SIGN_PASSPHRASE: ${{ vars.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-  DEVELOPPER_ID_INSTALLER_CERT_NAME: ${{ vars.DEVELOPPER_ID_INSTALLER_CERT_NAME }}
+  GPG_PRIVATE_KEY: ${{ secrets.LINUX_SIGN_PRIVATE_KEY }}
+  LINUX_SIGN_KEY_ID: ${{ secrets.LINUX_SIGN_KEY_ID }}
+  LINUX_APPIMAGETOOL_SIGN_PASSPHRASE: ${{ secrets.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  DEVELOPPER_ID_INSTALLER_CERT_NAME: ${{ secrets.DEVELOPPER_ID_INSTALLER_CERT_NAME }}
 
-  APP_NAME: "Prophet Kacou"
+  APP_NAME: ${{ secrets.PKP_MACOS_APP_NAME }}
   PKG_NAME: "ProphetKacou"
   APP_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.app"
   PKG_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKG_NAME.pkg"
-  APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-  APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
-  APPLE_ID: ${{ vars.APPLE_ID }}
-  APPLE_BUNDLE_ID: ${{ vars.APPLE_BUNDLE_ID }}
-  APP_APPLE_ID: ${{ vars.APP_APPLE_ID }}
-  APPLE_VERSION_STRING: ${{ vars.APPLE_VERSION_STRING }}
+  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+  APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_BUNDLE_ID: ${{ secrets.APPLE_BUNDLE_ID }}
+  APP_APPLE_ID: ${{ secrets.APP_APPLE_ID }}
+  APPLE_VERSION_STRING: ${{ secrets.APPLE_VERSION_STRING }}
+  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+
+  APPLE_CERTIFICATE: ${{ secrets.APPLE_MAC_DEVELOPPER_ID }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+
+  APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
+  MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
+
+  APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
+  MAC_INSTALLER_CERTIFICATION: ${{ secrets.MAC_INSTALLER_CERTIFICATION }}
+  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -96,10 +109,10 @@ jobs:
   #   needs: draft
   #   runs-on: macos-latest
   #   env:
-  #     APPLE_ID: ${{ vars.APPLE_ID }}
-  #     APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-  #     APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-  #     APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #     APPLE_ID: ${{ env.APPLE_ID }}
+  #     APPLE_ID_PASSWORD: ${{ env.APPLE_ID_PASSWORD }}
+  #     APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #     APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
   #   steps:
   #     - uses: actions/checkout@v4
 
@@ -115,9 +128,9 @@ jobs:
   #     # Import Apple Developer Certificate - FIXED VERSION
   #     - name: Import Apple Developer Certificate
   #       env:
-  #         APPLE_CERTIFICATE: ${{ vars.APPLE_MAC_DEVELOPPER_ID }}
-  #         APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-  #         KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
+  #         APPLE_CERTIFICATE: ${{ env.APPLE_MAC_DEVELOPPER_ID }}
+  #         APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  #         KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
   #       run: |
   #         # Create certificate file by decode the encoding APPLE_CERTIFICATE
   #         echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
@@ -170,17 +183,17 @@ jobs:
   #     # Set up Apple API key for notarization (Tauri v2 compatible)
   #     - name: Set up Apple API key end Test if it work
   #       env:
-  #         APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
+  #         APPLE_API_PRIVATE_KEY_ENCODED: ${{ env.APPLE_API_PRIVATE_KEY }}
   #       run: |
   #         # Create the directory structure
-  #         echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ vars.APPLE_API_KEY }}.p8
+  #         echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ env.APPLE_API_KEY }}.p8
 
   #         #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
-  #         API_KEY_FILE="$(pwd)/AuthKey_${{ vars.APPLE_API_KEY }}.p8"
+  #         API_KEY_FILE="$(pwd)/AuthKey_${{ env.APPLE_API_KEY }}.p8"
 
   #         # Test with xcrun notarytool to validate credentials
   #         echo "Testing credentials with notarytool..."
-  #         if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ vars.APPLE_API_KEY }}" --issuer "${{ vars.APPLE_API_ISSUER }}" >&1; then
+  #         if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ env.APPLE_API_KEY }}" --issuer "${{ env.APPLE_API_ISSUER }}" >&1; then
   #           echo "✅ Apple API credentials are valid"
   #         else
   #           echo "❌ Apple API credentials test failed"
@@ -223,8 +236,8 @@ jobs:
   #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
   #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
   #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
   #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
   #     - name: Bundle macOS ARM64 app and dmg
@@ -235,8 +248,8 @@ jobs:
   #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
   #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
   #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
   #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
   #     - name: Bundle macOS Universal app and dmg
@@ -247,8 +260,8 @@ jobs:
   #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
   #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
   #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
-  #         APPLE_API_ISSUER: ${{ vars.APPLE_API_ISSUER }}
-  #         APPLE_API_KEY: ${{ vars.APPLE_API_KEY }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
   #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
 
   #     # Debug: list artifacts
@@ -270,10 +283,10 @@ jobs:
     needs: draft
     runs-on: macos-latest
     env:
-      APPLE_ID: ${{ vars.APPLE_ID }}
-      APPLE_ID_PASSWORD: ${{ vars.APPLE_ID_PASSWORD }}
-      APPLE_DISTRIBUTION_CERT_NAME: ${{ vars.APPLE_DISTRIBUTION_CERT_NAME }}
-      MAC_INSTALLER_CERT_NAME: ${{ vars.MAC_INSTALLER_CERT_NAME }}
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
+      MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
     steps:
       - uses: actions/checkout@v4
 
@@ -379,10 +392,10 @@ jobs:
       # Import Apple Distribution Certificate and Mac Installer Certificate - FIXED VERSION
       - name: Import Apple Distribution Certificate and Mac Installer Certificate
         env:
-          APPLE_DISTRIBUTION_CERTIFICATE: ${{ vars.APPLE_DISTRIBUTION_CERTIFICATE }}
-          MAC_INSTALLER_CERT: ${{ vars.MAC_INSTALLER_CERTIFICATION }}
-          APPLE_CERTIFICATE_PASSWORD: ${{ vars.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ vars.KEYCHAIN_PASSWORD }}
+          APPLE_DISTRIBUTION_CERTIFICATE: ${{ env.APPLE_DISTRIBUTION_CERTIFICATE }}
+          MAC_INSTALLER_CERT: ${{ env.MAC_INSTALLER_CERTIFICATION }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
         run: |
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
@@ -491,12 +504,12 @@ jobs:
 
       - name: Create Apple API key directory and save key
         env:
-          APPLE_API_PRIVATE_KEY_ENCODED: ${{ vars.APPLE_API_PRIVATE_KEY }}
+          APPLE_API_PRIVATE_KEY_ENCODED: ${{ env.APPLE_API_PRIVATE_KEY }} APPLE_API_KEY
         run: |
           echo "Create the directory structure for Apple API key"
           mkdir -p ~/.appstoreconnect/private_keys
           echo "Save Apple API key to file"
-          echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ vars.APPLE_API_KEY }}.p8
+          echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ env.APPLE_API_KEY }}.p8
 
       - name: Verify if the .pkg is valid for Apple Store
         run: |
@@ -510,26 +523,26 @@ jobs:
 
           echo "✅ .pkg validation completed successfully!"
 
-      - name: Upload to App Store on TestFlight
-        run: |
-          # Upload with xcrun altool
-          echo "Submitting ${{env.PKG_PATH}} to TestFlight with xcrun altool..."
-          APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
-          echo "APP_VERSION=$APP_VERSION"
+      # - name: Upload to App Store on TestFlight
+      #   run: |
+      #     # Upload with xcrun altool
+      #     echo "Submitting ${{env.PKG_PATH}} to TestFlight with xcrun altool..."
+      #     APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+      #     echo "APP_VERSION=$APP_VERSION"
 
-          xcrun altool --upload-package "${{env.PKG_PATH}}" \
-            -t osx \
-            --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
-            --apple-id "${{ env.APP_APPLE_ID }}" \
-            --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
-            --bundle-short-version-string "$APP_VERSION" \
-            --bundle-version "$APP_VERSION" \
-            --apiKey "${{ env.APPLE_API_KEY }}" \
-            --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
-            --output-format json
+      #     xcrun altool --upload-package "${{env.PKG_PATH}}" \
+      #       -t osx \
+      #       --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
+      #       --apple-id "${{ env.APP_APPLE_ID }}" \
+      #       --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
+      #       --bundle-short-version-string "$APP_VERSION" \
+      #       --bundle-version "$APP_VERSION" \
+      #       --apiKey "${{ env.APPLE_API_KEY }}" \
+      #       --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
+      #       --output-format json
 
-          echo "✅ Upload to App Store Connect completed successfully!"
-          echo "The build will appear in TestFlight within 10-15 minutes after processing."
+      #     echo "✅ Upload to App Store Connect completed successfully!"
+      #     echo "The build will appear in TestFlight within 10-15 minutes after processing."
 
   # build-windows-x64:
   #   name: Build Windows x64
