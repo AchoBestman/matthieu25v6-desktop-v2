@@ -132,17 +132,15 @@ jobs:
         command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
         api-key: ${{ env.CN_API_KEY }}
     # Step 3: Start building image for all plateforms
-
-
   build-macos-out-apple-store:
     name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
     runs-on: macos-latest
     # env:
-    #   APPLE_ID: ${{ env.APPLE_ID }}
-    #   APPLE_ID_PASSWORD: ${{ env.APPLE_ID_PASSWORD }}
-    #   APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
-    #   APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+    #   APPLE_ID: ${{ secrets.APPLE_ID }}
+    #   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+    #   APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+    #   APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
     steps:
     - uses: actions/checkout@v4
 
@@ -227,6 +225,7 @@ jobs:
         APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
         KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
       run: |
+        echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD"
         # Create certificate file by decode the encoding APPLE_CERTIFICATE
         echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
 
