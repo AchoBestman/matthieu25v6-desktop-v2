@@ -50,9 +50,8 @@ jobs:
 
       - name: Get app version
         run: |
-          echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
-          echo "APP_VERSION=${APP_VERSION}"
-
+          APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+          echo "APP_VERSION=$APP_VERSION"
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
@@ -387,10 +386,6 @@ jobs:
       # --------------------------
       # App Store Connect
       # --------------------------
-
-      - name: Get app version
-        run: echo "APP_VERSION=$(jq -r .version src-tauri/tauri.conf.json)" >> $GITHUB_ENV
-
       - name: Generate the universal-apple-darwin .pkg for Apple Store
         run: |
           # PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
@@ -425,12 +420,15 @@ jobs:
 
           # Upload with xcrun altool
           echo "Submitting ${{env.PKG_PATH}} to TestFlight..."
+          APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+          echo "APP_VERSION=$APP_VERSION"
+
           xcrun altool --upload-package package \
             -t osx \
             --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
             --apple-id "${{ env.APPLE_TEAM_ID }}" \
             --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
-            --bundle-short-version-string "${{env.APP_VERSION}}" \
+            --bundle-short-version-string "$APP_VERSION" \
             --bundle-version "${{ github.run_number }}" \
             --apiKey "${{ env.APPLE_API_KEY }}" \
             --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
