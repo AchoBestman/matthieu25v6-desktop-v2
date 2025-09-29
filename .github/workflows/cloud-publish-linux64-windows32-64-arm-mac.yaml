@@ -993,17 +993,12 @@ jobs:
     - name: Build Linux x86_64-unknown-linux-gnu
       run: pnpm tauri build --target x86_64-unknown-linux-gnu
       env:
-        SIGN: 1
-        SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-        APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-        APPIMAGETOOL_FORCE_SIGN: 1
-
-    # Tauri signing (obligatoire pour updater)
-    - name: Sign Tauri updater artifacts
-      run: pnpm tauri sign
-      env:
-        TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        # SIGN: 1
+        # SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+        # APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+        # APPIMAGETOOL_FORCE_SIGN: 1
+        TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
     - name: Upload assets to CrabNebula
       uses: crabnebula-dev/cloud-release@v0
@@ -1114,16 +1109,13 @@ jobs:
     - name: Build Linux aarch64-unknown-linux-gnu
       run: pnpm tauri build --target aarch64-unknown-linux-gnu
       env:
-        SIGN: 1
-        SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-        APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-        APPIMAGETOOL_FORCE_SIGN: 1
-      # Tauri signing (obligatoire pour updater)
-    - name: Sign Tauri updater artifacts
-      run: pnpm tauri sign
-      env:
-        TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        # SIGN: 1
+        # SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+        # APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+        # APPIMAGETOOL_FORCE_SIGN: 1
+
+        TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
     - name: Upload assets to CrabNebula
       uses: crabnebula-dev/cloud-release@v0
