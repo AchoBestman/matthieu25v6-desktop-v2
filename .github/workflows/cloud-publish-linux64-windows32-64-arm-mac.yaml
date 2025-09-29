@@ -136,11 +136,11 @@ jobs:
     name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
     runs-on: macos-latest
-    # env:
-    #   APPLE_ID: ${{ secrets.APPLE_ID }}
-    #   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-    #   APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
-    #   APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+    env:
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+      APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
     steps:
     - uses: actions/checkout@v4
 
@@ -221,9 +221,9 @@ jobs:
     # Import Apple Developer Certificate - FIXED VERSION
     - name: Import Apple Developer Certificate
       env:
-        APPLE_CERTIFICATE: ${{ env.APPLE_MAC_DEVELOPPER_ID }}
-        APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
-        KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+        APPLE_CERTIFICATE: ${{ secrets.APPLE_MAC_DEVELOPPER_ID }}
+        APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+        KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
       run: |
         echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD"
         # Create certificate file by decode the encoding APPLE_CERTIFICATE
@@ -376,11 +376,11 @@ jobs:
     name: Build Apple Store macOS (x86_64, ARM64, Universal)
     needs: draft
     runs-on: macos-latest
-    # env:
-    #   APPLE_ID: ${{ secrets.APPLE_ID }}
-    #   APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-    #   APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
-    #   MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
+    env:
+      APPLE_ID: ${{ secrets.APPLE_ID }}
+      APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+      APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
+      MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
     steps:
     - uses: actions/checkout@v4
 
