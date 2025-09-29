@@ -278,9 +278,11 @@ jobs:
       - uses: actions/checkout@v4
 
       # --------------------------
-      # Caches
+      # Caches optimisés
       # --------------------------
-      - name: Cache Rust crates
+
+      # 1. Cache Rust toolchain et crates
+      - name: Cache Rust toolchain
         uses: actions/cache@v4
         with:
           path: |
@@ -288,11 +290,15 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+            ~/.rustup/toolchains/
+            ~/.rustup/update-hashes/
+            ~/.rustup/settings.toml
+          key: ${{ runner.os }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
-            ${{ runner.os }}-cargo-
+            ${{ runner.os }}-rust-toolchain-
 
-      - name: Cache pnpm modules
+      # 2. Cache pnpm store
+      - name: Cache pnpm store
         uses: actions/cache@v4
         with:
           path: ~/.pnpm-store
@@ -300,13 +306,62 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
 
-      - name: Cache Rust target dir (builds)
+      # 3. Cache node_modules
+      - name: Cache node_modules
         uses: actions/cache@v4
         with:
-          path: src-tauri/target
-          key: ${{ runner.os }}-tauri-target-${{ hashFiles('src-tauri/Cargo.lock') }}
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-tauri-target-
+            ${{ runner.os }}-node-modules-
+
+      # 4. Cache Rust build artifacts (par architecture)
+      - name: Cache Rust build artifacts (x86_64)
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/x86_64-apple-darwin
+          key: ${{ runner.os }}-tauri-x86-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-tauri-x86-
+
+      - name: Cache Rust build artifacts (aarch64)
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/aarch64-apple-darwin
+          key: ${{ runner.os }}-tauri-arm-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-tauri-arm-
+
+      - name: Cache Rust build artifacts (universal)
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/universal-apple-darwin
+          key: ${{ runner.os }}-tauri-universal-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-tauri-universal-
+
+      # 5. Cache les binaires compilés (dependencies build)
+      - name: Cache Tauri dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target/debug/deps
+            src-tauri/target/release/deps
+          key: ${{ runner.os }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-tauri-deps-
+
+      # 6. Cache frontend build (si applicable)
+      - name: Cache frontend build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .next
+            dist
+            build
+          key: ${{ runner.os }}-frontend-${{ hashFiles('src/**/*', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-frontend-
 
       # --------------------------
       # Setup tools
@@ -331,7 +386,6 @@ jobs:
         run: |
           # Delete existing keychain if it exists
           security delete-keychain build.keychain || true
-          echo "github.run_number: ${{ github.run_number }}"
           # Create and configure keychain
           security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
           security default-keychain -s build.keychain
@@ -469,7 +523,7 @@ jobs:
             --apple-id "${{ env.APP_APPLE_ID }}" \
             --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
             --bundle-short-version-string "$APP_VERSION" \
-            --bundle-version "${{ github.run_number }}" \
+            --bundle-version "$APP_VERSION" \
             --apiKey "${{ env.APPLE_API_KEY }}" \
             --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
             --output-format json
