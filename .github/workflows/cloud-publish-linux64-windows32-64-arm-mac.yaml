@@ -1200,6 +1200,14 @@ jobs:
           gpgconf --kill gpg-agent 2>/dev/null || true
           gpgconf --launch gpg-agent
 
+          # Test the passphrase (without showing it)
+          echo "Testing GPG passphrase..."
+          echo "test" | gpg --batch --yes \
+            --pinentry-mode loopback \
+            --passphrase "${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}" \
+            --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
+            --sign --armor > /dev/null 2>&1 && echo "✓ Passphrase is correct" || echo "✗ Passphrase test failed"
+
       - name: Build Linux aarch64-unknown-linux-gnu
         run: pnpm tauri build --target aarch64-unknown-linux-gnu
         env:
@@ -1230,7 +1238,7 @@ jobs:
               # Use --passphrase directly instead of stdin
               gpg --batch --yes \
                 --pinentry-mode loopback \
-                --passphrase "${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}" \
+                --passphrase "Bestm@n1995" \
                 --detach-sign --armor \
                 --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
                 "$appimage"
