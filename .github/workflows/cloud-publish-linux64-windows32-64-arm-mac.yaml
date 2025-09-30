@@ -1,6 +1,8 @@
 name: Prophet Kacou Release Process
 on:
-  push:
+  pull_request:
+    types:
+      - closed
     branches:
       - deploy
   workflow_dispatch:
@@ -56,6 +58,7 @@ jobs:
   # Step 1 : build without bundle (fast, for compilation validation)
   build-test:
     name: Test Build vite app to prevent error (no bundle)
+    if: github.event.pull_request.merged == true
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

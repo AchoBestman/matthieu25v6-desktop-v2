@@ -1,5 +1,10 @@
 import * as React from "react";
-import { Link, Outlet, createRootRoute } from "@tanstack/react-router";
+import {
+  Link,
+  Outlet,
+  createRootRoute,
+  useMatches,
+} from "@tanstack/react-router";
 import { AppSidebar } from "@/components/commons/app-sidebar";
 import { SidebarInset, SidebarTrigger } from "@/components/ui/sidebar";
 import {
@@ -15,7 +20,7 @@ import { tr } from "@/translation";
 import { useLangue } from "@/context/langue-context";
 import { SearchCodeIcon } from "lucide-react";
 import { SearchDrawer } from "@/components/commons/search-drawer";
-import 'react-confirm-alert/src/react-confirm-alert.css';
+import "react-confirm-alert/src/react-confirm-alert.css";
 import DonwloadHistoryDropdown from "@/components/commons/download-history";
 import AppUpdaterDropdown from "@/components/commons/app-updater";
 
@@ -26,13 +31,21 @@ export const Route = createRootRoute({
 function RootComponent() {
   const { lng } = useLangue();
   const [topMenus, setTopMenus] = React.useState(menus);
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  const matches = useMatches();
+  const isLandingPage = matches.some((match) => match.pathname === "/landing");
 
   React.useEffect(() => {
     setTopMenus(menus);
   }, [lng]);
 
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  // Si c'est la landing page, on affiche juste l'Outlet sans layout
+  if (isLandingPage) {
+    return <Outlet />;
+  }
 
+  // Sinon, on affiche le layout complet
   return (
     <React.Fragment>
       <AppSidebar />
@@ -56,7 +69,7 @@ function RootComponent() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex items-center">
-            <AppUpdaterDropdown/>
+            <AppUpdaterDropdown />
             <DonwloadHistoryDropdown />
             <SearchCodeIcon
               onClick={() => setIsSearchOpen(true)}

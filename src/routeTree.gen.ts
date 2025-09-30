@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VideosRouteImport } from './routes/videos'
 import { Route as SermonsRouteImport } from './routes/sermons'
 import { Route as PhotosRouteImport } from './routes/photos'
+import { Route as LandingRouteImport } from './routes/landing'
 import { Route as HymnsRouteImport } from './routes/hymns'
 import { Route as BiographiesRouteImport } from './routes/biographies'
 import { Route as AssembleesRouteImport } from './routes/assemblees'
@@ -30,6 +31,11 @@ const SermonsRoute = SermonsRouteImport.update({
 const PhotosRoute = PhotosRouteImport.update({
   id: '/photos',
   path: '/photos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandingRoute = LandingRouteImport.update({
+  id: '/landing',
+  path: '/landing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HymnsRoute = HymnsRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/assemblees': typeof AssembleesRoute
   '/biographies': typeof BiographiesRoute
   '/hymns': typeof HymnsRoute
+  '/landing': typeof LandingRoute
   '/photos': typeof PhotosRoute
   '/sermons': typeof SermonsRoute
   '/videos': typeof VideosRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/assemblees': typeof AssembleesRoute
   '/biographies': typeof BiographiesRoute
   '/hymns': typeof HymnsRoute
+  '/landing': typeof LandingRoute
   '/photos': typeof PhotosRoute
   '/sermons': typeof SermonsRoute
   '/videos': typeof VideosRoute
@@ -77,6 +85,7 @@ export interface FileRoutesById {
   '/assemblees': typeof AssembleesRoute
   '/biographies': typeof BiographiesRoute
   '/hymns': typeof HymnsRoute
+  '/landing': typeof LandingRoute
   '/photos': typeof PhotosRoute
   '/sermons': typeof SermonsRoute
   '/videos': typeof VideosRoute
@@ -88,6 +97,7 @@ export interface FileRouteTypes {
     | '/assemblees'
     | '/biographies'
     | '/hymns'
+    | '/landing'
     | '/photos'
     | '/sermons'
     | '/videos'
@@ -97,6 +107,7 @@ export interface FileRouteTypes {
     | '/assemblees'
     | '/biographies'
     | '/hymns'
+    | '/landing'
     | '/photos'
     | '/sermons'
     | '/videos'
@@ -106,6 +117,7 @@ export interface FileRouteTypes {
     | '/assemblees'
     | '/biographies'
     | '/hymns'
+    | '/landing'
     | '/photos'
     | '/sermons'
     | '/videos'
@@ -116,6 +128,7 @@ export interface RootRouteChildren {
   AssembleesRoute: typeof AssembleesRoute
   BiographiesRoute: typeof BiographiesRoute
   HymnsRoute: typeof HymnsRoute
+  LandingRoute: typeof LandingRoute
   PhotosRoute: typeof PhotosRoute
   SermonsRoute: typeof SermonsRoute
   VideosRoute: typeof VideosRoute
@@ -142,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/photos'
       fullPath: '/photos'
       preLoaderRoute: typeof PhotosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/landing': {
+      id: '/landing'
+      path: '/landing'
+      fullPath: '/landing'
+      preLoaderRoute: typeof LandingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hymns': {
@@ -180,6 +200,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssembleesRoute: AssembleesRoute,
   BiographiesRoute: BiographiesRoute,
   HymnsRoute: HymnsRoute,
+  LandingRoute: LandingRoute,
   PhotosRoute: PhotosRoute,
   SermonsRoute: SermonsRoute,
   VideosRoute: VideosRoute,

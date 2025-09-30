@@ -2,6 +2,7 @@ import { TranslationKeySchema } from "@/translation";
 import {
   AudioLinesIcon,
   Book,
+  Home,
   ImageIcon,
   LucideProps,
   PieChart,
@@ -18,6 +19,12 @@ export const menus: {
   >;
   isActive: boolean;
 }[] = [
+  {
+    title: "home.title",
+    url: "/landing",
+    icon: Home,
+    isActive: false,
+  },
   {
     title: "home.biography",
     url: "/biographies",
