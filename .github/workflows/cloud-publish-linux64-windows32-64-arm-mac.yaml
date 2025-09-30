@@ -1047,7 +1047,7 @@ jobs:
               # Use --passphrase directly instead of stdin
               gpg --batch --yes \
                 --pinentry-mode loopback \
-                --passphrase "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" \
+                --passphrase "${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}" \
                 --detach-sign --armor \
                 --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
                 "$appimage"
@@ -1230,7 +1230,7 @@ jobs:
               # Use --passphrase directly instead of stdin
               gpg --batch --yes \
                 --pinentry-mode loopback \
-                --passphrase "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" \
+                --passphrase "${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}" \
                 --detach-sign --armor \
                 --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
                 "$appimage"
