@@ -1204,7 +1204,7 @@ jobs:
           echo "Testing GPG passphrase..."
           echo "test" | gpg --batch --yes \
             --pinentry-mode loopback \
-            --passphrase "${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}" \
+            --passphrase "Bestm@n1995" \
             --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
             --sign --armor > /dev/null 2>&1 && echo "✓ Passphrase is correct" || echo "✗ Passphrase test failed"
 
