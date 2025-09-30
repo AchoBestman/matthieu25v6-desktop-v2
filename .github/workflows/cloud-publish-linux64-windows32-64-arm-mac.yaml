@@ -1019,8 +1019,8 @@ jobs:
           chmod 600 ~/.gnupg/gpg-agent.conf
           chmod 600 ~/.gnupg/gpg.conf
           # Restart gpg-agent to apply changes
-          gpgconf --kill gpg-agent || true
-          gpg-agent --daemon --allow-loopback-pinentry
+          gpgconf --kill gpg-agent 2>/dev/null || true
+          gpgconf --launch gpg-agent
 
       - name: Build Linux x86_64-unknown-linux-gnu
         run: pnpm tauri build --target x86_64-unknown-linux-gnu
@@ -1197,8 +1197,8 @@ jobs:
           chmod 600 ~/.gnupg/gpg-agent.conf
           chmod 600 ~/.gnupg/gpg.conf
           # Restart gpg-agent to apply changes
-          gpgconf --kill gpg-agent || true
-          gpg-agent --daemon --allow-loopback-pinentry
+          gpgconf --kill gpg-agent 2>/dev/null || true
+          gpgconf --launch gpg-agent
 
       - name: Build Linux aarch64-unknown-linux-gnu
         run: pnpm tauri build --target aarch64-unknown-linux-gnu
