@@ -1011,11 +1011,16 @@ jobs:
         run: |
           echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
           # Configure GPG for non-interactive use
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          chmod 600 ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/gpg.conf
           # Restart gpg-agent to apply changes
-          gpgconf --kill gpg-agent
-          gpgconf --launch gpg-agent
+          gpgconf --kill gpg-agent || true
+          gpg-agent --daemon --allow-loopback-pinentry
 
       - name: Build Linux x86_64-unknown-linux-gnu
         run: pnpm tauri build --target x86_64-unknown-linux-gnu
@@ -1039,10 +1044,10 @@ jobs:
           for appimage in "$APPIMAGE_DIR"/*.AppImage; do
             if [ -f "$appimage" ]; then
               echo "Signing: $appimage"
-              echo "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" | \
-                gpg --batch --yes \
+              # Use --passphrase directly instead of stdin
+              gpg --batch --yes \
                 --pinentry-mode loopback \
-                --passphrase-fd 0 \
+                --passphrase "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" \
                 --detach-sign --armor \
                 --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
                 "$appimage"
@@ -1184,11 +1189,16 @@ jobs:
         run: |
           echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
           # Configure GPG for non-interactive use
-          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          mkdir -p ~/.gnupg
+          chmod 700 ~/.gnupg
+          echo "allow-loopback-pinentry" > ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" > ~/.gnupg/gpg.conf
+          echo "use-agent" >> ~/.gnupg/gpg.conf
+          chmod 600 ~/.gnupg/gpg-agent.conf
+          chmod 600 ~/.gnupg/gpg.conf
           # Restart gpg-agent to apply changes
-          gpgconf --kill gpg-agent
-          gpgconf --launch gpg-agent
+          gpgconf --kill gpg-agent || true
+          gpg-agent --daemon --allow-loopback-pinentry
 
       - name: Build Linux aarch64-unknown-linux-gnu
         run: pnpm tauri build --target aarch64-unknown-linux-gnu
@@ -1217,10 +1227,10 @@ jobs:
           for appimage in "$APPIMAGE_DIR"/*.AppImage; do
             if [ -f "$appimage" ]; then
               echo "Signing: $appimage"
-              echo "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" | \
-                gpg --batch --yes \
+              # Use --passphrase directly instead of stdin
+              gpg --batch --yes \
                 --pinentry-mode loopback \
-                --passphrase-fd 0 \
+                --passphrase "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" \
                 --detach-sign --armor \
                 --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
                 "$appimage"
