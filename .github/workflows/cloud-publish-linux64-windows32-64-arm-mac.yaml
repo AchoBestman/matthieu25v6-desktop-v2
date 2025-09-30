@@ -978,8 +978,22 @@ jobs:
     - name: Install Linux dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-        sudo apt-get install -y pkg-config build-essential
+        sudo apt-get install -y \
+          webkit2gtk-4.1-dev \
+          libgtk-3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          pkg-config \
+          build-essential \
+          xdg-utils \
+          libcanberra-dev \
+          libcanberra-gtk3-0 \
+          libfuse2 \
+          gvfs \
+          gvfs-daemons \
+          gvfs-common \
+          mesa-utils \
+          mesa-vulkan-drivers
 
     - name: Add Rust target
       run: rustup target add x86_64-unknown-linux-gnu
@@ -993,10 +1007,10 @@ jobs:
     - name: Build Linux x86_64-unknown-linux-gnu
       run: pnpm tauri build --target x86_64-unknown-linux-gnu
       env:
-        # SIGN: 1
-        # SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-        # APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-        # APPIMAGETOOL_FORCE_SIGN: 1
+        SIGN: 1
+        SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+        APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+        APPIMAGETOOL_FORCE_SIGN: 1
         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
@@ -1092,9 +1106,22 @@ jobs:
     - name: Install Linux dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y webkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-        sudo apt-get install -y pkg-config build-essential
-        sudo apt-get install -y xdg-utils
+        sudo apt-get install -y \
+          webkit2gtk-4.1-dev \
+          libgtk-3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          pkg-config \
+          build-essential \
+          xdg-utils \
+          libcanberra-dev \
+          libcanberra-gtk3-0 \
+          libfuse2 \
+          gvfs \
+          gvfs-daemons \
+          gvfs-common \
+          mesa-utils \
+          mesa-vulkan-drivers
 
     - name: Add Rust target
       run: rustup target add aarch64-unknown-linux-gnu
@@ -1109,10 +1136,10 @@ jobs:
     - name: Build Linux aarch64-unknown-linux-gnu
       run: pnpm tauri build --target aarch64-unknown-linux-gnu
       env:
-        # SIGN: 1
-        # SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-        # APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-        # APPIMAGETOOL_FORCE_SIGN: 1
+        SIGN: 1
+        SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+        APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+        APPIMAGETOOL_FORCE_SIGN: 1
 
         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
