@@ -1016,10 +1016,41 @@ jobs:
         env:
           SIGN: 1
           SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-          APPIMAGETOOL_FORCE_SIGN: 1
+
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Sign AppImage (post-build)
+        run: |
+          APPIMAGE_DIR="src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage"
+
+          if [ ! -d "$APPIMAGE_DIR" ]; then
+            echo "⚠ AppImage directory not found"
+            exit 1
+          fi
+
+          # Find and sign all AppImage files
+          found=false
+          for appimage in "$APPIMAGE_DIR"/*.AppImage; do
+            if [ -f "$appimage" ]; then
+              echo "Signing: $appimage"
+              echo "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" | \
+                gpg --batch --yes --passphrase-fd 0 \
+                --detach-sign --armor \
+                --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
+                "$appimage"
+              echo "✓ Created: ${appimage}.asc"
+              found=true
+            fi
+          done
+
+          if [ "$found" = false ]; then
+            echo "⚠ No AppImage files found to sign"
+            exit 1
+          fi
+
+          echo "All AppImages signed successfully:"
+          ls -lh "$APPIMAGE_DIR"/*.AppImage*
 
       - name: Upload assets to CrabNebula
         uses: crabnebula-dev/cloud-release@v0
@@ -1149,13 +1180,47 @@ jobs:
       - name: Build Linux aarch64-unknown-linux-gnu
         run: pnpm tauri build --target aarch64-unknown-linux-gnu
         env:
+          # These sign DEB and RPM packages only
           SIGN: 1
           SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-          APPIMAGETOOL_FORCE_SIGN: 1
 
+          # Tauri updater signing
           TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # DO NOT set APPIMAGETOOL_SIGN_PASSPHRASE or APPIMAGETOOL_FORCE_SIGN
+          # These cause linuxdeploy to fail
+
+      - name: Sign AppImage (post-build)
+        run: |
+          APPIMAGE_DIR="src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/appimage"
+
+          if [ ! -d "$APPIMAGE_DIR" ]; then
+            echo "⚠ AppImage directory not found"
+            exit 1
+          fi
+
+          # Find and sign all AppImage files
+          found=false
+          for appimage in "$APPIMAGE_DIR"/*.AppImage; do
+            if [ -f "$appimage" ]; then
+              echo "Signing: $appimage"
+              echo "${{ env.APPIMAGETOOL_SIGN_PASSPHRASE }}" | \
+                gpg --batch --yes --passphrase-fd 0 \
+                --detach-sign --armor \
+                --default-key "${{ env.LINUX_SIGN_KEY_ID }}" \
+                "$appimage"
+              echo "✓ Created: ${appimage}.asc"
+              found=true
+            fi
+          done
+
+          if [ "$found" = false ]; then
+            echo "⚠ No AppImage files found to sign"
+            exit 1
+          fi
+
+          echo "All AppImages signed successfully:"
+          ls -lh "$APPIMAGE_DIR"/*.AppImage*
 
       - name: Upload assets to CrabNebula
         uses: crabnebula-dev/cloud-release@v0
