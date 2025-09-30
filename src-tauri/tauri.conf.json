@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Prophet Kacou v1.0.3",
+        "title": "Prophet Kacou v1.0.5",
         "width": 1024,
         "height": 576,
         "resizable": true,

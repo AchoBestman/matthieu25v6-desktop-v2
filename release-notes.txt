@@ -1,0 +1,1 @@
+refactor: clean up GPG configuration and signing steps in workflow
