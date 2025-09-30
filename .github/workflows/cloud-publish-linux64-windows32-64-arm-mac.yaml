@@ -993,7 +993,12 @@ jobs:
           gvfs-daemons \
           gvfs-common \
           mesa-utils \
-          mesa-vulkan-drivers
+          mesa-vulkan-drivers \
+          patchelf \
+          desktop-file-utils \
+          gettext \
+          libgstreamer1.0-dev \
+          libgstreamer-plugins-base1.0-dev
 
     - name: Add Rust target
       run: rustup target add x86_64-unknown-linux-gnu
@@ -1121,7 +1126,12 @@ jobs:
           gvfs-daemons \
           gvfs-common \
           mesa-utils \
-          mesa-vulkan-drivers
+          mesa-vulkan-drivers \
+          patchelf \
+          desktop-file-utils \
+          gettext \
+          libgstreamer1.0-dev \
+          libgstreamer-plugins-base1.0-dev
 
     - name: Add Rust target
       run: rustup target add aarch64-unknown-linux-gnu
