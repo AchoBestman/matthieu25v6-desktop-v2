@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matteus 25:6",
+    "title": "Profet Kacou",
+    "home": "Hjem",
+    "confidentiality_clause": "Personvernpolicy",
+    "choose_langue": "Klikk på språket ditt (Flagg)",
+    "first_image_title": "Mirakler og helbredelser",
+    "second_image_title": "AV PROFET KACOU PHILIPPE",
+    "third_image_title": "BEKREFTER BUDSKAPET HANS",
+    "image_message": "Mitt ord og preken bestod ikke av overbevisende visdomsord, men i demonstrasjon av Ånden og kraft.",
+    "share_message": "For å sende denne appen til alle du elsker",
+    "share_button_title": "Klikk her",
+    "update_button_message": "Oppdater",
     "sermon": "Forkynnelse",
     "menu": "Meny",
     "lng": "Språk",

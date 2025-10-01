@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matthew 25:6",
+   "title": "Prophet Kacou",
+    "home": "Home",
+    "confidentiality_clause": "Privacy Policy",
+    "choose_langue": "Click on your language (Flag)",
+    "first_image_title": "Miracles and healings",
+    "second_image_title": "OF PROPHET KACOU PHILIPPE",
+    "third_image_title": "CONFIRMING HIS MESSAGE",
+    "image_message": "My word and preaching did not consist of persuasive words of wisdom, but in demonstration of the Spirit and of power.",
+    "share_message": "To send this App to everyone you love",
+    "share_button_title": "Click here",
+    "update_button_message": "Update",
     "sermon": "Sermons",
     "menu": "Menu",
     "lng": "Languages",

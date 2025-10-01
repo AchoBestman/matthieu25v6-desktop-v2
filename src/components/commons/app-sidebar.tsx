@@ -26,7 +26,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   // IRL you should use the url/router.
   const activeItem = {
     name: tr("home.title"),
-    email: "matthieu25v6.org",
+    email: "philippekacou.org",
     avatar: "/images/logo-pkacou3.jpeg",
   };
 

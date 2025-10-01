@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Mattheüs 25:6",
+    "title": "Profeet Kacou",
+    "home": "Startpagina",
+    "confidentiality_clause": "Privacybeleid",
+    "choose_langue": "Klik op uw taal (Vlag)",
+    "first_image_title": "Wonderen en genezingen",
+    "second_image_title": "VAN PROFEET KACOU PHILIPPE",
+    "third_image_title": "BEVESTIGT ZIJN BOODSCHAP",
+    "image_message": "Mijn woord en prediking bestonden niet uit overtuigende woorden van wijsheid, maar uit demonstratie van de Geest en kracht.",
+    "share_message": "Om deze app naar iedereen te sturen die u liefhebt",
+    "share_button_title": "Klik hier",
+    "update_button_message": "Bijwerken",
     "sermon": "Preken",
     "menu": "Menu",
     "lng": "Talen",

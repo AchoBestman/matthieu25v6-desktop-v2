@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matthäus 25:6",
+    "title": "Prophet Kacou",
+    "home": "Startseite",
+    "confidentiality_clause": "Datenschutzrichtlinie",
+    "choose_langue": "Klicken Sie auf Ihre Sprache (Flagge)",
+    "first_image_title": "Wunder und Heilungen",
+    "second_image_title": "DES PROPHETEN KACOU PHILIPPE",
+    "third_image_title": "BESTÄTIGUNG SEINER BOTSCHAFT",
+    "image_message": "Mein Wort und meine Predigt bestanden nicht aus überzeugenden Weisheitsworten, sondern aus der Demonstration des Geistes und der Kraft.",
+    "share_message": "Um diese App an alle zu senden, die Sie lieben",
+    "share_button_title": "Hier klicken",
+    "update_button_message": "Aktualisieren",
     "sermon": "Predigten",
     "menu": "Menü",
     "lng": "Sprachen",

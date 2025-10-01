@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matei 25:6",
+    "title": "Proorocul Kacou",
+    "home": "Acasă",
+    "confidentiality_clause": "Politica de confidențialitate",
+    "choose_langue": "Faceți clic pe limba dvs. (Steag)",
+    "first_image_title": "Minuni și vindecări",
+    "second_image_title": "ALE PROFETULUI KACOU PHILIPPE",
+    "third_image_title": "CONFIRMÂND MESAJUL SĂU",
+    "image_message": "Cuvântul și predica mea nu au constat în cuvinte convingătoare de înțelepciune, ci în demonstrarea Duhului și a puterii.",
+    "share_message": "Pentru a trimite această aplicație tuturor celor pe care îi iubiți",
+    "share_button_title": "Faceți clic aici",
+    "update_button_message": "Actualizare",
     "sermon": "Predici",
     "menu": "Meniu",
     "lng": "Limbi",

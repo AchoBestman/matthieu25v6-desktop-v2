@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matius 25:6",
+    "title": "Nabi Kacou",
+    "home": "Beranda",
+    "confidentiality_clause": "Kebijakan Privasi",
+    "choose_langue": "Klik pada bahasa Anda (Bendera)",
+    "first_image_title": "Mukjizat dan penyembuhan",
+    "second_image_title": "DARI NABI KACOU PHILIPPE",
+    "third_image_title": "MENEGASKAN PESANNYA",
+    "image_message": "Firman dan khotbahku bukanlah kata-kata hikmat yang persuasif, melainkan demonstrasi Roh dan kuasa.",
+    "share_message": "Untuk mengirimkan Aplikasi ini kepada semua orang yang Anda cintai",
+    "share_button_title": "Klik di sini",
+    "update_button_message": "Perbarui",
     "sermon": "Khotbah",
     "menu": "Menu",
     "lng": "Bahasa",

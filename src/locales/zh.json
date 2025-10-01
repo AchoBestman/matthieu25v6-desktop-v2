@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "马太福音 25:6",
+    "title": "先知卡库",
+    "home": "首页",
+    "confidentiality_clause": "隐私政策",
+    "choose_langue": "点击您的语言（旗帜）",
+    "first_image_title": "奇迹与治愈",
+    "second_image_title": "卡库先知菲利普",
+    "third_image_title": "确认他的讯息",
+    "image_message": "我的话语和讲道不是说服智慧的言语，而是灵和能力的显现。",
+    "share_message": "将此应用发送给你所爱的人",
+    "share_button_title": "点击这里",
+    "update_button_message": "更新",
     "sermon": "讲道",
     "menu": "菜单",
     "lng": "语言",

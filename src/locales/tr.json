@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "Matta 25:6",
+    "title": "Peygamber Kacou",
+    "home": "Ana Sayfa",
+    "confidentiality_clause": "Gizlilik Politikası",
+    "choose_langue": "Diliniz üzerine tıklayın (Bayrak)",
+    "first_image_title": "Mucizeler ve iyileşmeler",
+    "second_image_title": "PEYGAMBER KACOU PHILIPPE",
+    "third_image_title": "MESAJINI DOĞRULUYOR",
+    "image_message": "Sözlerim ve vaazım ikna edici bilgelik sözlerinden oluşmamış, Ruh ve güç gösterisinde olmuştur.",
+    "share_message": "Bu uygulamayı sevdiğiniz herkese göndermek için",
+    "share_button_title": "Buraya tıklayın",
+    "update_button_message": "Güncelle",
     "sermon": "Vaazlar",
     "menu": "Menü",
     "lng": "Diller",

@@ -20,7 +20,7 @@ export const menus: {
   isActive: boolean;
 }[] = [
   {
-    title: "home.title",
+    title: "home.home",
     url: "/landing",
     icon: Home,
     isActive: false,

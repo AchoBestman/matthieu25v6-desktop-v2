@@ -1,6 +1,16 @@
 {
   "home": {
-    "title": "マタイ 25:6",
+    "title": "預言者カクー",
+    "home": "ホーム",
+    "confidentiality_clause": "プライバシーポリシー",
+    "choose_langue": "言語をクリックしてください（旗）",
+    "first_image_title": "奇跡と癒し",
+    "second_image_title": "カクー・フィリップ預言者の",
+    "third_image_title": "そのメッセージの確認",
+    "image_message": "私の言葉と説教は、説得力のある知恵の言葉ではなく、霊と力の現れでした。",
+    "share_message": "このアプリを愛する人全員に送るために",
+    "share_button_title": "ここをクリック",
+    "update_button_message": "更新",
     "sermon": "説教",
     "menu": "メニュー",
     "lng": "言語",
