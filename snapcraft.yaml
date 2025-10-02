@@ -55,11 +55,9 @@ package-repositories:
 
 parts:
   build-app:
-    plugin: dump
-    source:
-      type: git
-      url: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
-      branch: develop
+    plugin: git
+    source: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
+    branch: develop
     build-snaps:
     - node/20/stable
     - rustup/latest/stable
