@@ -15,8 +15,8 @@ architectures:
 - build-on: arm64
 
 layout:
-  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
-    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0
 
 apps:
   prophet-kacou:
@@ -59,14 +59,14 @@ parts:
     source: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
     source-type: git
     source-branch: develop
-
+    
     build-snaps:
     - node/20/stable
     - rustup/latest/stable
 
     build-packages:
     - git
-    - webkit2gtk-4.1-dev
+    - libwebkit2gtk-4.0-dev
     - libgtk-3-dev
     - libayatana-appindicator3-dev
     - librsvg2-dev
@@ -93,9 +93,9 @@ parts:
     - libxdo-dev
     - libssl-dev
     - dpkg
-
+    
     stage-packages:
-    - libwebkit2gtk-4.1-0
+    - libwebkit2gtk-4.0-37
     - libgtk-3-0
     - libayatana-appindicator3-1
 
