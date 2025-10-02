@@ -1,0 +1,108 @@
+name: prophet-kacou
+base: core22
+version: '1.0.1'
+summary: This app contains all the message of Prophet Kacou Philippe # 79 char long summary
+description: |
+  The Book of Prophet Kacou, having the same value as the Books of the Bible.
+
+  On April 24, 1993, Kacou Philippe, a young man working on a construction site, received a vision: the visitation of an angel of God who commissioned him with a Message destined for the Salvation of the whole earth, in fulfillment of the cry of Matthew 25:6—the midnight cry in the Bible—after the evening time with the prophet William Marrion Branham, according to Mark 13:35. The Message reveals many great mysteries of humanity, such as the origin of the Black race. This application contains the entire Message that Jesus Christ gave to His Servant Kacou Philippe for humanity, as well as the account of his conversion and the three great visions of his call and commission just as he received them. The Message has already been translated into more than 80 languages and is addressed to all the inhabitants of the earth. Share it with everyone you love.
+
+grade: stable
+confinement: strict
+
+architectures:
+- build-on: amd64
+- build-on: arm64
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+
+apps:
+  prophet-kacou:
+    command: usr/bin/prophet-kacou
+    desktop: usr/share/applications/prophet-kacou.desktop
+    extensions: [ gnome ]
+    #plugs:
+    #  - network
+    # Add whatever plugs you need here, see https://snapcraft.io/docs/snapcraft-interfaces for more info.
+    # The gnome extension already includes [ desktop, desktop-legacy, gsettings, opengl, wayland, x11, mount-observe, calendar-service ]
+    #  - single-instance-plug # add this if you're using the single-instance plugin
+    #slots:
+    # Add the slots you need to expose to other snaps
+    #  - single-instance-plug # add this if you're using the single-instance plugin
+
+    # Add these lines only if you're using the single-instance plugin
+    # Check https://v2.tauri.app/plugin/single-instance/ for details
+    #slots:
+    #  single-instance:
+    #    interface: dbus
+    #    bus: session
+    #    name: org.net_mydomain_MyApp.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
+    #
+    #plugs:
+    #  single-instance-plug:
+    #    interface: dbus
+    #    bus: session
+    #    name: org.net_mydomain_MyApp.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
+
+package-repositories:
+- type: apt
+  components: [ main ]
+  suites: [ noble ]
+  key-id: 78E1918602959B9C59103100F1831DDAFC42E99D
+  url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu
+
+parts:
+  build-app:
+    plugin: dump
+    source:
+      type: git
+      url: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
+      branch: develop
+    build-snaps:
+    - node/20/stable
+    - rustup/latest/stable
+
+    build-packages:
+    - webkit2gtk-4.1-dev
+    - libgtk-3-dev
+    - libayatana-appindicator3-dev
+    - librsvg2-dev
+    - pkg-config
+    - build-essential
+    - xdg-utils
+    - libcanberra-dev
+    - libcanberra-gtk3-0
+    - libfuse2
+    - gvfs
+    - gvfs-daemons
+    - gvfs-common
+    - mesa-utils
+    - mesa-vulkan-drivers
+    - patchelf
+    - desktop-file-utils
+    - gettext
+    - libunwind-dev
+    - libgstreamer1.0-dev
+    - libgstreamer-plugins-base1.0-dev
+    - curl
+    - wget
+    - file
+    - libxdo-dev
+    - libssl-dev
+    - libayatana-appindicator3-dev
+    - librsvg2-dev
+    - dpkg
+    stage-packages:
+    - libwebkit2gtk-4.1-0
+    - libgtk-3-0
+    - libayatana-appindicator3-1
+
+    override-build: |
+      set -eu
+      npm install
+      npm run tauri build -- --bundles deb --target $CRAFT_ARCH_TRIPLET_GNU
+      dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
+      sed -i -e "s|Icon=prophet-kacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophet-kacou.png|g" 
+        $SNAPCRAFT_PART_INSTALL/usr/share/applications/prophet-kacou.desktop

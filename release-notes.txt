@@ -1,0 +1,10 @@
+feat: Enhance UI components with new styles and search functionality
+
+- Added search functionality to LangueDropdown with automatic focus on input.
+- Updated styles in various components to use new color scheme (pkp-sand, pkp-ocean).
+- Improved accessibility by preventing dropdown closure when interacting with search input.
+- Refactored SelectWithSearch to reset search term on close and focus input when opened.
+- Enhanced dialog components with consistent styling and improved user experience.
+- Updated list and card components for photos and videos to align with new design.
+- Refined sermon and biography routes for better layout and styling consistency.
+- Adjusted index.css for new color variables and audio player styles.

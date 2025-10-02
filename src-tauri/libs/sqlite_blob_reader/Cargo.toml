@@ -1,0 +1,8 @@
+[package]
+name = "sqlite_blob_reader"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rusqlite = "0.31"
+base64 = "0.22"

@@ -1,0 +1,97 @@
+{
+  "internationalization": {
+    "locales": [
+      "en"
+    ],
+    "requiredLocales": [],
+    "strictMode": "inclusive",
+    "defaultLocale": "en"
+  },
+  "middleware": {
+    "headerName": "x-intlayer-locale",
+    "cookieName": "INTLAYER_LOCALE",
+    "prefixDefault": false,
+    "basePath": "",
+    "serverSetCookie": "always",
+    "noPrefix": false
+  },
+  "content": {
+    "fileExtensions": [
+      ".content.ts",
+      ".content.js",
+      ".content.cjs",
+      ".content.cjx",
+      ".content.mjs",
+      ".content.mjx",
+      ".content.json",
+      ".content.tsx",
+      ".content.jsx"
+    ],
+    "baseDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2",
+    "excludedPath": [
+      "node_modules"
+    ],
+    "watch": true,
+    "contentDir": [
+      "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\src"
+    ],
+    "dictionariesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\dictionary",
+    "moduleAugmentationDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\types",
+    "dictionaryOutput": [
+      "intlayer"
+    ],
+    "unmergedDictionariesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\unmerged_dictionary",
+    "dynamicDictionariesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\dynamic_dictionary",
+    "i18nextResourcesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\i18next_resources",
+    "reactIntlMessagesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\intl_messages",
+    "typesDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\types",
+    "mainDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\main",
+    "configDir": "C:\\Users\\Lenovo\\Desktop\\Others\\matthieu25v6\\matthieu25v6-desktop-v2\\.intlayer\\config",
+    "watchedFilesPattern": [
+      "/**/*.content.ts",
+      "/**/*.content.js",
+      "/**/*.content.cjs",
+      "/**/*.content.cjx",
+      "/**/*.content.mjs",
+      "/**/*.content.mjx",
+      "/**/*.content.json",
+      "/**/*.content.tsx",
+      "/**/*.content.jsx"
+    ],
+    "watchedFilesPatternWithPath": [
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.ts",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.js",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.cjs",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.cjx",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.mjs",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.mjx",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.json",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.tsx",
+      "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/src/**/*.content.jsx"
+    ],
+    "outputFilesPatternWithPath": "C:/Users/Lenovo/Desktop/Others/matthieu25v6/matthieu25v6-desktop-v2/.intlayer/dictionary/**/*.json"
+  },
+  "editor": {
+    "applicationURL": "",
+    "editorURL": "http://localhost:8000",
+    "cmsURL": "https://intlayer.org",
+    "backendURL": "https://back.intlayer.org",
+    "port": 8000,
+    "enabled": true,
+    "dictionaryPriorityStrategy": "local_first",
+    "hotReload": false
+  },
+  "log": {
+    "mode": "default",
+    "prefix": "\u001b[90m[intlayer] \u001b[0m"
+  },
+  "ai": {},
+  "build": {
+    "optimize": false,
+    "activateDynamicImport": false,
+    "traversePattern": [
+      "**/*.{js,ts,mjs,cjs,jsx,tsx,mjx,cjx,vue,svelte,svte}",
+      "!**/node_modules/**"
+    ]
+  }
+}

@@ -1,11 +1,24 @@
 [package]
-name = "matthieu25v6-desktop-v2"
-version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
-edition = "2021"
+name = "ProphetKacou"
+version = "1.0.5"
+description = "This app contains all the message of Prophet Kacou Philippe"
+authors = ["aikpeachille55@gmail.com"]
+license = ""
+repository = "https://gitlab.com/matthieu25v61/matthieu25v6-desktop-v2.git"
+edition = "2024"
+rust-version = "1.87.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[profile.dev]
+incremental = true # Compile your binary in smaller steps.
+
+[profile.release]
+codegen-units = 1 # Allows LLVM to perform better optimization.
+lto = true # Enables link-time-optimizations.
+opt-level = "s" # Prioritizes small binary size. Use `3` if you prefer speed.
+panic = "abort" # Higher performance by disabling panic handlers.
+strip = true # Ensures debug symbols are removed.
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
@@ -22,4 +35,22 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
+tauri-plugin-fs = "2"
+tauri-plugin-sql = { version = "2", features = ["sqlite"] }
+sqlite_blob_reader = { path = "./libs/sqlite_blob_reader" }
 
+reqwest = { version = "0.12.23", features = ["json", "stream"] }
+tokio = { version = "1.47.1", features = ["full"] }
+futures-util = "0.3.31"
+tokio-util = "0.7.16"
+uuid = { version = "1.4", features = ["v4"] }
+tauri-plugin-updater = "2"
+tauri-plugin-dialog = "2.4.0"
+tauri-plugin-process = "2.3.0"
+tauri-plugin-shell = "2"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
+
+[target.x86_64-pc-windows-msvc]
+linker = "lld-link"

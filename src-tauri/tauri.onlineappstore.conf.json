@@ -1,0 +1,16 @@
+{
+  "plugins": {
+    "updater": {
+      "endpoints": []
+    }
+  },
+  "bundle": {
+    "macOS": {
+      "signingIdentity": null,
+      "entitlements": "./Entitlements-appstore.plist",
+      "files": {
+        "embedded.provisionprofile": "./profiles/Prophet_Kacou_Mac_App_Store_Connect.provisionprofile"
+      }
+    }
+  }
+}

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "matthieu25v6-desktop-v2",
-  "version": "0.1.0",
-  "identifier": "com.matthieu25v6.app",
+  "productName": "Prophet Kacou",
+  "version": "1.0.5",
+  "identifier": "com.prophetkacou.org",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,24 +12,95 @@
   "app": {
     "windows": [
       {
-        "title": "matthieu25v6-desktop-v2",
-        "width": 800,
-        "height": 600
+        "title": "Prophet Kacou",
+        "width": 1024,
+        "height": 576,
+        "resizable": true,
+        "fullscreen": false
       }
     ],
     "security": {
       "csp": null
+    },
+    "withGlobalTauri": true
+  },
+  "plugins": {
+    "updater": {
+      "dangerousInsecureTransportProtocol": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIzMjFBN0MxQjg5NTFFNTQKUldSVUhwVzR3YWNoSXd1SWNLRG9UV1JjT3BZbUJBRE94c1ZYYVEraEhkYTZSWTZxVmk3L09RYjMK",
+      "active": true,
+      "endpoints": [
+        "https://cdn.crabnebula.app/update/prophet-kacou/prophet-kacou/{{target}}-{{arch}}/{{current_version}}",
+        "https://matthieu25v6-api-v2.test/api/desktop/release/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": true,
+      "windows": {
+        "installMode": "passive"
+      }
     }
   },
   "bundle": {
+    "copyright": "Copyright © 2025 All rights reserved.",
+    "createUpdaterArtifacts": true,
+    "publisher": "Matth25v6 App",
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "icon": ["icons/icon.icns", "icons/icon.ico", "icons/icon.png"],
+    "resources": [
+      "resources/fr/matth25v6_fr.db",
+      "resources/en/matth25v6_en.db",
+      "resources/es/matth25v6_es.db",
+      "resources/pt/matth25v6_pt.db"
+    ],
+    "externalBin": [],
+    "category": "Music",
+    "shortDescription": "This app contains all the message of Prophet Kacou Philippe",
+    "longDescription": "",
+    "windows": {
+      "allowDowngrades": true,
+      "certificateThumbprint": null,
+      "digestAlgorithm": "SHA256",
+      "timestampUrl": null,
+      "nsis": null,
+      "signCommand": null,
+      "tsp": false,
+      "webviewInstallMode": {
+        "silent": true,
+        "type": "embedBootstrapper"
+      },
+      "wix": null
+    },
+    "linux": {
+      "appimage": {
+        "bundleMediaFramework": true,
+        "files": {}
+      },
+      "deb": {
+        "files": {}
+      },
+      "rpm": {
+        "epoch": 0,
+        "files": {},
+        "release": "1"
+      }
+    },
+    "macOS": {
+      "dmg": {
+        "appPosition": {
+          "x": 180,
+          "y": 170
+        },
+        "applicationFolderPosition": {
+          "x": 480,
+          "y": 170
+        },
+        "windowSize": {
+          "height": 576,
+          "width": 1024
+        }
+      },
+      "hardenedRuntime": true,
+      "minimumSystemVersion": "10.13"
+    }
   }
 }

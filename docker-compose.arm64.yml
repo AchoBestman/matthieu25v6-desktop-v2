@@ -1,0 +1,31 @@
+services:
+    # ARM64 build (for your M4 Pro and ARM servers)
+  prophet-kacou-arm64:
+    build:
+      context: .
+      dockerfile: Dockerfile.arm64  # Your original ARM64 Dockerfile
+      platforms:
+        - linux/arm64
+    container_name: prophet-kacou-arm64
+    environment:
+      - CI=true
+      - APPIMAGE_EXTRACT_AND_RUN=1
+    volumes:
+      - ./artifacts-arm64:/artifacts
+      - node_modules_cache_arm64:/app/node_modules
+      - cargo_cache_arm64:/home/tauri/.cargo
+    working_dir: /app
+    user: tauri
+    command: >
+      sh -c "
+        echo 'ARM64 build completed! Copying artifacts...' &&
+        mkdir -p /artifacts &&
+        cp -r /app/src-tauri/target/release/bundle/* /artifacts/ 2>/dev/null &&
+        cp /app/src-tauri/target/release/ProphetKacou /artifacts/ 2>/dev/null &&
+        echo 'ARM64 artifacts:' &&
+        ls -la /artifacts/
+      "
+
+volumes:
+  node_modules_cache_arm64:
+  cargo_cache_arm64:

@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+.env
+helper.txt
+Old versions/
+Prophet Kacou.pkg
+Prophet Kacou-local.pkg
+Prophet_Kacou_Developper_Id.plist
+Prophet_Kacou_Mac_App_Store_Connect.plist
+artifacts
+screenshots
+artifacts-arm64
+artifacts-x86_64
+windows-versions/
+keys/

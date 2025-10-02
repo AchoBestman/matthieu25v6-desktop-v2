@@ -1,0 +1,11 @@
+{
+  "bundle": {
+    "macOS": {
+      "signingIdentity": "Developer ID Application: Philippe Kacou (7KXD5D4D52)",
+      "entitlements": "./Entitlements-local.plist",
+      "files": {
+        "embedded.provisionprofile": "./profiles/Prophet_Kacou_Developper_Id.provisionprofile"
+      }
+    }
+  }
+}

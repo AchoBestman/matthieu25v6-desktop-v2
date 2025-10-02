@@ -1,0 +1,1191 @@
+name: Prophet Kacou Release Process
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - deploy
+  workflow_dispatch:
+    inputs:
+      application:
+        description: "The fully qualified slug of your app on CrabNebula Cloud"
+        required: true
+        default: "prophet-kacou/prophet-kacou"
+
+env:
+  CN_APPLICATION: ${{ secrets.CN_APPLICATION }}
+  CN_API_KEY: ${{ secrets.CN_API_KEY }}
+
+  RELEASE_NOTE: ./release-notes.txt
+
+  TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+  TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+  GPG_PRIVATE_KEY: ${{ secrets.LINUX_SIGN_PRIVATE_KEY }}
+  LINUX_SIGN_KEY_ID: ${{ secrets.LINUX_SIGN_KEY_ID }}
+  LINUX_APPIMAGETOOL_SIGN_PASSPHRASE: ${{ secrets.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+
+  DEVELOPPER_ID_INSTALLER_CERT_NAME: ${{ secrets.DEVELOPPER_ID_INSTALLER_CERT_NAME }}
+  APP_NAME: ${{ secrets.PKP_MACOS_APP_NAME }}
+  PKG_NAME: "ProphetKacou"
+  APP_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$APP_NAME.app"
+  PKG_PATH: "$(pwd)/src-tauri/target/universal-apple-darwin/release/bundle/macos/$PKG_NAME.pkg"
+  APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+  APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_BUNDLE_ID: ${{ secrets.APPLE_BUNDLE_ID }}
+  APP_APPLE_ID: ${{ secrets.APP_APPLE_ID }}
+  APPLE_VERSION_STRING: ${{ secrets.APPLE_VERSION_STRING }}
+  APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+
+  APPLE_CERTIFICATE: ${{ secrets.APPLE_MAC_DEVELOPPER_ID }}
+  KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  APPLE_API_PRIVATE_KEY: ${{ secrets.APPLE_API_PRIVATE_KEY }}
+
+  APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
+  MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
+
+  APPLE_DISTRIBUTION_CERTIFICATE: ${{ secrets.APPLE_DISTRIBUTION_CERTIFICATE }}
+  MAC_INSTALLER_CERTIFICATION: ${{ secrets.MAC_INSTALLER_CERTIFICATION }}
+  APPLE_EXPORT_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+#The listing of jobs to be executed
+jobs:
+  # Step 1 : build without bundle (fast, for compilation validation)
+  build-test:
+    name: Test Build vite app to prevent error (no bundle)
+    if: github.event.pull_request.merged == true
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.rustup/toolchains/
+            ~/.rustup/update-hashes/
+            ~/.rustup/settings.toml
+          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Get app version
+        run: |
+          APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+          echo "APP_VERSION=$APP_VERSION"
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install Tauri CLI
+        run: pnpm add -g @tauri-apps/cli
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (no bundle)
+        run: pnpm build
+
+  #Step 2 : Create new release version on nebulacrab
+  draft:
+    name: Create new a release version on nebulacrab cloud
+    needs: build-test
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: create draft release
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
+          api-key: ${{ env.CN_API_KEY }}
+
+  # Step 3: Start building image for all plateforms
+  # build-macos-out-apple-store:
+  #   name: Build Out Apple Store macOS (x86_64, ARM64, Universal)
+  #   needs: draft
+  #   runs-on: macos-latest
+  #   env:
+  #     APPLE_ID: ${{ secrets.APPLE_ID }}
+  #     APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+  #     APPLE_API_ISSUER: ${{ secrets.APPLE_API_ISSUER }}
+  #     APPLE_API_KEY: ${{ secrets.APPLE_API_KEY }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     - name: Cache Rust toolchain
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           ~/.rustup/toolchains/
+  #           ~/.rustup/update-hashes/
+  #           ~/.rustup/settings.toml
+  #         key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+  #     - name: Cache pnpm store
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.pnpm-store
+  #         key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           pnpm-
+
+  #     - name: Cache node_modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-modules-
+
+  #     - name: Cache Rust build artifacts (x86_64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/x86_64-apple-darwin
+  #         key: ${{ runner.os }}-${{ runner.arch }}-offline-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-offline-
+
+  #     - name: Cache Rust build artifacts (aarch64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/aarch64-apple-darwin
+  #         key: ${{ runner.os }}-${{ runner.arch }}-offline-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-offline-
+
+  #     - name: Cache Rust build artifacts (universal)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/universal-apple-darwin
+  #         key: ${{ runner.os }}-${{ runner.arch }}-offline-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-offline-
+
+  #     - name: Cache Tauri dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           src-tauri/target/debug/deps
+  #           src-tauri/target/release/deps
+  #         key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+
+  #     # Import Apple Developer Certificate - FIXED VERSION
+  #     - name: Import Apple Developer Certificate
+  #       env:
+  #         APPLE_CERTIFICATE: ${{ secrets.APPLE_MAC_DEVELOPPER_ID }}
+  #         APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  #         KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  #       run: |
+  #         echo "KEYCHAIN_PASSWORD=$KEYCHAIN_PASSWORD"
+  #         # Create certificate file by decode the encoding APPLE_CERTIFICATE
+  #         echo "$APPLE_CERTIFICATE" | base64 --decode > certificate.p12
+
+  #         # Delete existing keychain if it exists
+  #         security delete-keychain build.keychain || true
+
+  #         # Create and configure keychain
+  #         security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security default-keychain -s build.keychain
+  #         security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security set-keychain-settings -t 3600 -l build.keychain
+
+  #         # Import certificate with proper flags
+  #         security import certificate.p12 \
+  #           -k build.keychain \
+  #           -P "$APPLE_CERTIFICATE_PASSWORD" \
+  #           -A \
+  #           -t cert \
+  #           -f pkcs12
+
+  #         # Set partition list for codesigning
+  #         security set-key-partition-list \
+  #           -S apple-tool:,apple: \
+  #           -s \
+  #           -k "$KEYCHAIN_PASSWORD" \
+  #           build.keychain
+
+  #         # Verify certificate import
+  #         security find-identity -v -p codesigning build.keychain
+
+  #         # Clean up certificate file
+  #         rm -f certificate.p12
+
+  #         echo "Certificate import completed"
+
+  #     - name: Verify Certificate
+  #       run: |
+  #         echo "Verifying certificate..."
+  #         CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Developer ID Application" | head -1)
+  #         if [ -z "$CERT_INFO" ]; then
+  #           echo "No Developer ID Application certificate found!"
+  #           security find-identity -v -p codesigning build.keychain
+  #           exit 1
+  #         fi
+  #         CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+  #         echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+  #         echo "Certificate verified: $CERT_ID"
+
+  #     # Set up Apple API key for notarization (Tauri v2 compatible)
+  #     - name: Set up Apple API key end Test if it work
+  #       env:
+  #         APPLE_API_PRIVATE_KEY_ENCODED: ${{ env.APPLE_API_PRIVATE_KEY }}
+  #       run: |
+  #         # Create the directory structure
+  #         echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > AuthKey_${{ env.APPLE_API_KEY }}.p8
+
+  #         #$(pwd) → exécute la commande pwd (print working directory), qui retourne le chemin absolu du répertoire courant
+  #         API_KEY_FILE="$(pwd)/AuthKey_${{ env.APPLE_API_KEY }}.p8"
+
+  #         # Test with xcrun notarytool to validate credentials
+  #         echo "Testing credentials with notarytool..."
+  #         if xcrun notarytool history --key "$API_KEY_FILE" --key-id "${{ env.APPLE_API_KEY }}" --issuer "${{ env.APPLE_API_ISSUER }}" >&1; then
+  #           echo "✅ Apple API credentials are valid"
+  #         else
+  #           echo "❌ Apple API credentials test failed"
+  #           echo "This could indicate: Invalid API key format or Wrong Key ID or Wrong Key Issuer or API key doesn't have notarization permissions"
+  #           exit 1
+  #         fi
+
+  #         # IMPORTANT: Set environment variable for next steps.  >> $GITHUB_ENV make variable be avalable in github action env
+  #         echo "APPLE_API_KEY_PATH=$API_KEY_FILE" >> $GITHUB_ENV
+
+  #     - name: Install stable Rust toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+
+  #     - name: Add Rust targets
+  #       run: |
+  #         rustup target add x86_64-apple-darwin
+  #         rustup target add aarch64-apple-darwin
+
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Build (no bundle) for prepare all distribution bundle on MacOS
+  #       run: |
+  #         for target in x86_64 aarch64 universal; do
+  #           pnpm tauri build --no-bundle --target $target-apple-darwin
+  #         done
+
+  #     # Bundle all targets with improved error handling
+  #     - name: Bundle macOS x86_64 app and dmg
+  #       run: |
+  #         echo "Bundle for x86_64-apple-darwin..."
+  #         pnpm tauri bundle --bundles app,dmg --target x86_64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+
+  #     - name: Bundle macOS ARM64 app and dmg
+  #       run: |
+  #         echo "Bundle for aarch64-apple-darwin..."
+  #         pnpm tauri bundle --bundles app,dmg --target aarch64-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+
+  #     - name: Bundle macOS Universal app and dmg
+  #       run: |
+  #         echo "Bundle universal binary..."
+  #         pnpm tauri bundle --bundles app,dmg --target universal-apple-darwin --config src-tauri/tauri.offlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+  #         APPLE_API_ISSUER: ${{ env.APPLE_API_ISSUER }}
+  #         APPLE_API_KEY: ${{ env.APPLE_API_KEY }}
+  #         APPLE_API_KEY_PATH: ${{ env.APPLE_API_KEY_PATH }}
+
+  #     # Debug: list artifacts
+  #     - name: List build artifacts
+  #       run: |
+  #         echo "=== Build Artifacts ==="
+  #         find src-tauri/target -name "*.app" -type d
+  #         find src-tauri/target -name "*.dmg"
+  #         find src-tauri/target -name "*.pkg"
+
+  #     - name: Upload assets to CrabNebula
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
+
+  # build-macos-on-apple-store:
+  #   name: Build Apple Store macOS (x86_64, ARM64, Universal)
+  #   needs: draft
+  #   runs-on: macos-latest
+  #   env:
+  #     APPLE_ID: ${{ secrets.APPLE_ID }}
+  #     APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+  #     APPLE_DISTRIBUTION_CERT_NAME: ${{ secrets.APPLE_DISTRIBUTION_CERT_NAME }}
+  #     MAC_INSTALLER_CERT_NAME: ${{ secrets.MAC_INSTALLER_CERT_NAME }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     # --------------------------
+  #     # Caches optimisés
+  #     # --------------------------
+
+  #     # 1. Cache Rust toolchain et crates
+  #     - name: Cache Rust toolchain
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           ~/.rustup/toolchains/
+  #           ~/.rustup/update-hashes/
+  #           ~/.rustup/settings.toml
+  #         key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+  #     # 2. Cache pnpm store
+  #     - name: Cache pnpm store
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.pnpm-store
+  #         key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           pnpm-
+
+  #     # 3. Cache node_modules
+  #     - name: Cache node_modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-modules-
+
+  #     # 4. Cache Rust build artifacts (par architecture)
+  #     - name: Cache Rust build artifacts (x86_64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/x86_64-apple-darwin
+  #         key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-
+
+  #     - name: Cache Rust build artifacts (aarch64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/aarch64-apple-darwin
+  #         key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-
+
+  #     - name: Cache Rust build artifacts (universal)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/universal-apple-darwin
+  #         key: ${{ runner.os }}-tauri-universal-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-tauri-universal-
+
+  #     # 5. Cache les binaires compilés (dependencies build)
+  #     - name: Cache Tauri dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           src-tauri/target/debug/deps
+  #           src-tauri/target/release/deps
+  #         key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+  #     # 6. Cache frontend build (si applicable)
+  #     - name: Cache frontend build
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           .next
+  #           dist
+  #           build
+  #         key: ${{ runner.os }}-frontend-${{ hashFiles('src/**/*', 'pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-frontend-
+
+  #     # --------------------------
+  #     # Setup tools
+  #     # --------------------------
+
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+
+  #     # Import Apple Distribution Certificate and Mac Installer Certificate - FIXED VERSION
+  #     - name: Import Apple Distribution Certificate and Mac Installer Certificate
+  #       env:
+  #         APPLE_DISTRIBUTION_CERTIFICATE: ${{ env.APPLE_DISTRIBUTION_CERTIFICATE }}
+  #         MAC_INSTALLER_CERT: ${{ env.MAC_INSTALLER_CERTIFICATION }}
+  #         APPLE_CERTIFICATE_PASSWORD: ${{ env.APPLE_EXPORT_CERTIFICATE_PASSWORD }}
+  #         KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+  #       run: |
+  #         # Delete existing keychain if it exists
+  #         security delete-keychain build.keychain || true
+  #         # Create and configure keychain
+  #         security create-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security default-keychain -s build.keychain
+  #         security unlock-keychain -p "$KEYCHAIN_PASSWORD" build.keychain
+  #         security set-keychain-settings -t 3600 -l build.keychain
+
+  #         # Import Apple Distribution
+  #         echo "$APPLE_DISTRIBUTION_CERTIFICATE" | base64 --decode > appstore_certificate.p12
+  #         security import appstore_certificate.p12 \
+  #           -k build.keychain \
+  #           -P "$APPLE_CERTIFICATE_PASSWORD" \
+  #           -A \
+  #           -t cert \
+  #           -f pkcs12
+
+  #         # Clean up certificate file
+  #         rm -f appstore_certificate.p12
+
+  #         # Import Mac Installer
+  #         echo "$MAC_INSTALLER_CERT" | base64 --decode > mac_installer.p12
+  #         security import mac_installer.p12 \
+  #           -k build.keychain \
+  #           -P "$APPLE_CERTIFICATE_PASSWORD" \
+  #           -A \
+  #           -t cert \
+  #           -f pkcs12
+
+  #         # Clean up certificate file
+  #         rm -f mac_installer.p12
+
+  #         # Set partition list for both certificates
+  #         security set-key-partition-list \
+  #           -S apple-tool:,apple: \
+  #           -s \
+  #           -k "$KEYCHAIN_PASSWORD" \
+  #           build.keychain
+
+  #         # Verify both certificates
+  #         security find-identity -v -p codesigning build.keychain
+  #         echo "Certificate import completed"
+
+  #     - name: Verify Certificate
+  #       run: |
+  #         echo "Verifying certificate..."
+  #         CERT_INFO=$(security find-identity -v -p codesigning build.keychain | grep "Apple Distribution" | head -1)
+  #         if [ -z "$CERT_INFO" ]; then
+  #           echo "No Apple Distribution certificate found!"
+  #           security find-identity -v -p codesigning build.keychain
+  #           exit 1
+  #         fi
+  #         CERT_ID=$(echo "$CERT_INFO" | awk -F'"' '{print $2}')
+  #         echo "CERT_ID=$CERT_ID" >> $GITHUB_ENV
+  #         echo "Certificate verified: $CERT_ID"
+
+  #     - name: Install stable Rust toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+
+  #     - name: Add Rust targets
+  #       run: |
+  #         rustup target add x86_64-apple-darwin
+  #         rustup target add aarch64-apple-darwin
+
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Build (no bundle) for prepare all distribution bundle on MacOS
+  #       run: |
+  #         for target in x86_64 aarch64 universal; do
+  #           pnpm tauri build --no-bundle --target $target-apple-darwin
+  #         done
+
+  #     - name: Bundle macOS Universal app
+  #       run: |
+  #         echo "Bundle universal binary..."
+  #         pnpm tauri bundle --bundles app --target universal-apple-darwin --config src-tauri/tauri.onlineappstore.conf.json --verbose
+  #       env:
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+  #         APPLE_SIGNING_IDENTITY: ${{ env.CERT_ID }}
+
+  #     # --------------------------
+  #     # App Store Connect
+  #     # --------------------------
+  #     - name: Generate the universal-apple-darwin .pkg for Apple Store
+  #       run: |
+  #         # PATH_TO_ONLINE_ENTITLEMENTS_FILE="src-tauri/Entitlements-appstore.plist"
+  #         # codesign \
+  #         # --sign "${{env.APPLE_DISTRIBUTION_CERT_NAME}}" \
+  #         # --entitlements "$PATH_TO_ONLINE_ENTITLEMENTS_FILE" \
+  #         # "$APP_PATH"
+
+  #         echo "Creating Apple Store package ${{env.APP_NAME}}.pkg..."
+  #         xcrun productbuild \
+  #           --sign "${{ env.MAC_INSTALLER_CERT_NAME }}" \
+  #           --component "${{env.APP_PATH}}" "/Applications" \
+  #           "${{env.PKG_PATH}}"
+
+  #     - name: Create Apple API key directory and save key
+  #       env:
+  #         APPLE_API_PRIVATE_KEY_ENCODED: ${{ env.APPLE_API_PRIVATE_KEY }}
+  #       run: |
+  #         echo "Create the directory structure for Apple API key"
+  #         mkdir -p ~/.appstoreconnect/private_keys
+  #         echo "Save Apple API key to file"
+  #         echo "$APPLE_API_PRIVATE_KEY_ENCODED" | base64 --decode > ~/.appstoreconnect/private_keys/AuthKey_${{ env.APPLE_API_KEY }}.p8
+
+  #     - name: Verify if the .pkg is valid for Apple Store
+  #       run: |
+  #         # validate app with xcrun altool
+  #         xcrun altool --validate-app \
+  #           -f "${{env.PKG_PATH}}" \
+  #           -t osx \
+  #           --apiKey "${{ env.APPLE_API_KEY }}" \
+  #           --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
+  #           --output-format json
+
+  #         echo "✅ .pkg validation completed successfully!"
+
+  #     - name: Upload to App Store on TestFlight
+  #       run: |
+  #         # Upload with xcrun altool
+  #         echo "Submitting ${{env.PKG_PATH}} to TestFlight with xcrun altool..."
+  #         APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+  #         echo "APP_VERSION=$APP_VERSION"
+
+  #         xcrun altool --upload-package "${{env.PKG_PATH}}" \
+  #           -t osx \
+  #           --asc-public-id "${{ env.APPLE_API_ISSUER }}" \
+  #           --apple-id "${{ env.APP_APPLE_ID }}" \
+  #           --bundle-id ${{ env.APPLE_BUNDLE_ID }} \
+  #           --bundle-short-version-string "$APP_VERSION" \
+  #           --bundle-version "$APP_VERSION" \
+  #           --apiKey "${{ env.APPLE_API_KEY }}" \
+  #           --apiIssuer "${{ env.APPLE_API_ISSUER }}" \
+  #           --output-format json
+
+  #         echo "✅ Upload to App Store Connect completed successfully!"
+  #         echo "The build will appear in TestFlight within 10-15 minutes after processing."
+
+  build-windows-x64:
+    name: Build Windows x64
+    needs: draft
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.rustup/toolchains/
+            ~/.rustup/update-hashes/
+            ~/.rustup/settings.toml
+          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Cache Rust build artifacts
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/x86_64-pc-windows-msvc
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Cache Tauri dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target/debug/deps
+            src-tauri/target/release/deps
+          key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Add Rust target
+        run: rustup target add x86_64-pc-windows-msvc
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Windows x86_64-pc-windows-msvc
+        run: pnpm tauri build --target x86_64-pc-windows-msvc
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload assets to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
+
+  build-windows-x86:
+    name: Build Windows x86
+    needs: draft
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.rustup/toolchains/
+            ~/.rustup/update-hashes/
+            ~/.rustup/settings.toml
+          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Cache Rust build artifacts
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/i686-pc-windows-msvc
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Cache Tauri dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target/debug/deps
+            src-tauri/target/release/deps
+          key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Add Rust target
+        run: rustup target add i686-pc-windows-msvc
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Windows i686-pc-windows-msvc
+        run: pnpm tauri build --target i686-pc-windows-msvc
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload assets to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
+
+  build-windows-arm64:
+    name: Build Windows ARM64
+    needs: draft
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache Rust toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ~/.rustup/toolchains/
+            ~/.rustup/update-hashes/
+            ~/.rustup/settings.toml
+          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.pnpm-store
+          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            pnpm-
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-node-modules-
+
+      - name: Cache Rust build artifacts
+        uses: actions/cache@v4
+        with:
+          path: src-tauri/target/aarch64-pc-windows-msvc
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Cache Tauri dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            src-tauri/target/debug/deps
+            src-tauri/target/release/deps
+          key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install stable toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+          cache: true
+      - name: Install Tauri CLI
+        run: npm install -g @tauri-apps/cli
+      - name: Add Rust target
+        run: rustup target add aarch64-pc-windows-msvc
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build Windows aarch64-pc-windows-msvc
+        run: pnpm tauri build --target aarch64-pc-windows-msvc
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+      - name: Upload assets to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
+
+  # build-linux-x64:
+  #   name: Build Linux x64
+  #   needs: draft
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     # Caches pour Linux x64
+  #     - name: Cache Rust toolchain
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           ~/.rustup/toolchains/
+  #           ~/.rustup/update-hashes/
+  #           ~/.rustup/settings.toml
+  #         key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+  #     - name: Cache pnpm store
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.pnpm-store
+  #         key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           pnpm-
+
+  #     - name: Cache node_modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-modules-
+
+  #     - name: Cache Rust build artifacts (x64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/x86_64-unknown-linux-gnu
+  #         key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-
+
+  #     - name: Cache Tauri dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           src-tauri/target/debug/deps
+  #           src-tauri/target/release/deps
+  #         key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+  #     - name: Cache APT packages
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: /var/cache/apt/archives
+  #         key: ${{ runner.os }}-${{ runner.arch }}-apt-${{ hashFiles('.github/workflows/**') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-apt-
+
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #     - name: Install stable toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Install Linux dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y \
+  #           webkit2gtk-4.1-dev \
+  #           libgtk-3-dev \
+  #           libayatana-appindicator3-dev \
+  #           librsvg2-dev \
+  #           pkg-config \
+  #           build-essential \
+  #           xdg-utils \
+  #           libcanberra-dev \
+  #           libcanberra-gtk3-0 \
+  #           libfuse2 \
+  #           gvfs \
+  #           gvfs-daemons \
+  #           gvfs-common \
+  #           mesa-utils \
+  #           mesa-vulkan-drivers \
+  #           patchelf \
+  #           desktop-file-utils \
+  #           gettext \
+  #           libunwind-dev \
+  #           libgstreamer1.0-dev \
+  #           libgstreamer-plugins-base1.0-dev
+
+  #     - name: Add Rust target
+  #       run: rustup target add x86_64-unknown-linux-gnu
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Import GPG key
+  #       run: |
+  #         echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
+
+  #     - name: Build Linux x86_64-unknown-linux-gnu
+  #       run: pnpm tauri build --target x86_64-unknown-linux-gnu
+  #       env:
+  #         #Linux app siging env
+  #         SIGN: 1
+  #         SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+  #         APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  #         APPIMAGETOOL_FORCE_SIGN: 1
+  #         #Tauri updater app siging env
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+  #     - name: Upload assets to CrabNebula
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
+
+  # build-linux-aarch64:
+  #   name: Build Linux aarch64
+  #   needs: draft
+  #   runs-on: ubuntu-22.04-arm
+  #   steps:
+  #     - uses: actions/checkout@v4
+
+  #     # Caches pour Linux aarch64
+  #     - name: Cache Rust toolchain
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           ~/.cargo/bin/
+  #           ~/.cargo/registry/index/
+  #           ~/.cargo/registry/cache/
+  #           ~/.cargo/git/db/
+  #           ~/.rustup/toolchains/
+  #           ~/.rustup/update-hashes/
+  #           ~/.rustup/settings.toml
+  #         key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+
+  #     - name: Cache pnpm store
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: ~/.pnpm-store
+  #         key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           pnpm-
+
+  #     - name: Cache node_modules
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: node_modules
+  #         key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-modules-
+
+  #     - name: Cache Rust build artifacts (aarch64)
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: src-tauri/target/aarch64-unknown-linux-gnu
+  #         key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-
+
+  #     - name: Cache Tauri dependencies
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           src-tauri/target/debug/deps
+  #           src-tauri/target/release/deps
+  #         key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+
+  #     - name: Cache APT packages
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: /var/cache/apt/archives
+  #         key: ${{ runner.os }}-${{ runner.arch }}-apt-${{ hashFiles('.github/workflows/**') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-${{ runner.arch }}-apt-
+
+  #     - name: Install pnpm
+  #       uses: pnpm/action-setup@v3
+  #       with:
+  #         version: 9
+
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "20"
+  #         cache: "pnpm"
+
+  #     - name: Install stable Rust toolchain
+  #       uses: actions-rust-lang/setup-rust-toolchain@v1
+  #       with:
+  #         toolchain: stable
+  #         cache: true
+
+  #     - name: Install Tauri CLI
+  #       run: npm install -g @tauri-apps/cli
+  #     - name: Install Linux dependencies
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install -y \
+  #           webkit2gtk-4.1-dev \
+  #           libgtk-3-dev \
+  #           libayatana-appindicator3-dev \
+  #           librsvg2-dev \
+  #           pkg-config \
+  #           build-essential \
+  #           xdg-utils \
+  #           libcanberra-dev \
+  #           libcanberra-gtk3-0 \
+  #           libfuse2 \
+  #           gvfs \
+  #           gvfs-daemons \
+  #           gvfs-common \
+  #           mesa-utils \
+  #           mesa-vulkan-drivers \
+  #           patchelf \
+  #           desktop-file-utils \
+  #           gettext \
+  #           libunwind-dev \
+  #           libgstreamer1.0-dev \
+  #           libgstreamer-plugins-base1.0-dev
+
+  #     - name: Add Rust target
+  #       run: rustup target add aarch64-unknown-linux-gnu
+
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     - name: Import GPG key
+  #       run: |
+  #         echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
+
+  #     - name: Build Linux aarch64-unknown-linux-gnu
+  #       run: pnpm tauri build --target aarch64-unknown-linux-gnu
+  #       env:
+  #         # These sign DEB, AppImage and RPM packages
+  #         SIGN: 1
+  #         SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+  #         APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+  #         APPIMAGETOOL_FORCE_SIGN: 1
+
+  #         #Tauri updater signing
+  #         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+  #         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+
+  #     - name: Upload assets to CrabNebula
+  #       uses: crabnebula-dev/cloud-release@v0
+  #       with:
+  #         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+  #         api-key: ${{ env.CN_API_KEY }}
+
+  #Step 5: publish release to CrabNebula
+  publish-release:
+    name: publish release to CrabNebula
+    needs:
+      #- build-macos-out-apple-store
+      #- build-macos-on-apple-store
+      - build-windows-x64
+      - build-windows-x86
+      - build-windows-arm64
+      #- build-linux-x64
+      #- build-linux-aarch64
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish release to CrabNebula
+        uses: crabnebula-dev/cloud-release@v0
+        with:
+          command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+          api-key: ${{ env.CN_API_KEY }}
