@@ -49,7 +49,6 @@ fn fetch_blob(db_path: String, name: String) -> Result<Vec<u8>, String> {
     get_file_blob(&db_path, &name)
 }
 
-
 fn run_migration_if_needed(app: &tauri::App) -> tauri::Result<()> {
     let current_version = app.package_info().version.to_string();
     let app_dir = app
@@ -66,13 +65,12 @@ fn run_migration_if_needed(app: &tauri::App) -> tauri::Result<()> {
         println!("app run for the first time");
         should_run = true;
     } else {
-        
         let saved_version = fs::read_to_string(&version_file).unwrap_or_default();
         if saved_version.trim() != current_version {
             // mise à jour détectée
             println!("app is updated because version change");
             should_run = true;
-        }else{
+        } else {
             println!("app start not for first time nor update time");
         }
     }
@@ -106,11 +104,9 @@ fn run_migration_if_needed(app: &tauri::App) -> tauri::Result<()> {
         fs::write(&version_file, &current_version).unwrap();
     }
 
-        
     println!("should run {}", should_run);
     Ok(())
 }
-
 
 fn set_app_size_on_run_time(app: &tauri::App) -> tauri::Result<()> {
     let primary_monitor = app.app_handle().primary_monitor()?.unwrap();
@@ -145,6 +141,7 @@ fn set_app_size_on_run_time(app: &tauri::App) -> tauri::Result<()> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_fs::init())

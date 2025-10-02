@@ -12,7 +12,7 @@ import { dbExist, deleteDb, downloadWithProgress } from "@/lib/database";
 import { Download, RefreshCcw, Trash } from "lucide-react";
 import { API_URL } from "@/lib/env";
 import { downloadDrogressType } from "@/lib/utils";
-import { setTr, tr } from "@/translation";
+import { tr } from "@/translation";
 import DownloadProgressModal from "@/components/dialog/download-progress-modal";
 import DisplayAlert from "@/components/dialog/display-alert";
 import { Langue } from "@/schemas/langue";
@@ -20,7 +20,7 @@ import { useLangue } from "@/context/langue-context";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { useSermon } from "@/context/sermon-context";
 
-type LangueDataType = {
+export type LangueDataType = {
   id: number;
   name: string;
   lang: string;
@@ -31,7 +31,7 @@ type LangueDataType = {
 };
 
 const LangueDropdown = () => {
-  const { setLng, setLangName, lng } = useLangue();
+  const { setDefaultLangue, lng } = useLangue();
   const { setVerseNumber, setNumber } = useSermon();
   const [isOpen, setIsOpen] = useState(false);
   const [langues, setLangues] = useState<Array<LangueDataType>>([]);
@@ -124,11 +124,9 @@ const LangueDropdown = () => {
   };
 
   const changeUrl = (langue: LangueDataType) => {
-    setLng(langue.lang);
-    setLangName(langue.name);
-    setTr(langue.translation);
-    setNumber("1")
-    setVerseNumber("")
+    setDefaultLangue(langue);
+    setNumber("1");
+    setVerseNumber("");
   };
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -290,7 +288,6 @@ const LangueDropdown = () => {
                 );
               })}
           </ul>
-          
         </DropdownMenuContent>
       </DropdownMenu>
     </>

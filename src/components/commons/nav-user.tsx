@@ -25,6 +25,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { open as OpenTauri } from "@tauri-apps/plugin-shell";
 
 export function NavUser({
   user,
@@ -37,6 +38,15 @@ export function NavUser({
 }>) {
   const { isMobile } = useSidebar();
 
+  const openLink = async (url: string) => {
+    try {
+      await OpenTauri(url);
+    } catch (error) {
+      console.error("Erreur lors de l'ouverture du lien:", error);
+      // Fallback : ouvrir dans le navigateur classique
+      window.open(url, "_blank");
+    }
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -72,14 +82,12 @@ export function NavUser({
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
                   <span className="truncate text-xs">
-                    <a
-                      className="text-primary"
-                      href={`https://${user.email}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      onClick={() => openLink(`https://${user.email}`)}
+                      className="text-primary cursor-pointer"
                     >
                       {user.email}
-                    </a>
+                    </button>
                   </span>
                 </div>
               </div>
@@ -88,7 +96,12 @@ export function NavUser({
             <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Mail />
-                <a href="mailto:mat25v6.msg@gmail.com">mat25v6.msg@gmail.com</a>
+                <button
+                  className="cursor-pointer"
+                  onClick={() => openLink("mailto:mat25v6.msg@gmail.com")}
+                >
+                  mat25v6.msg@gmail.com
+                </button>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -109,14 +122,12 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <Navigation />
-              <a
-                href={`https://${user.email}`}
-                className="text-primary"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => openLink(`https://${user.email}`)}
+                className="text-primary cursor-pointer"
               >
                 {user.email}
-              </a>
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

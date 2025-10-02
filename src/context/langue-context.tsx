@@ -1,11 +1,14 @@
 "use client";
 
+import { LangueDataType } from "@/components/commons/langue-dropdown";
+import { setTr } from "@/translation";
 import {
   createContext,
   useContext,
   useMemo,
   useState,
   ReactNode,
+  useEffect,
 } from "react";
 
 type LangueContextType = {
@@ -13,6 +16,7 @@ type LangueContextType = {
   langName: string;
   setLng: (lng: string) => void;
   setLangName: (langName: string) => void;
+  setDefaultLangue: (langue: LangueDataType) => void;
 };
 
 const LangueContext = createContext<LangueContextType | null>(null);
@@ -32,6 +36,30 @@ export function LangueProvider({
 }>) {
   const [lng, setLng] = useState("en-en");
   const [langName, setLangName] = useState("English");
+  const defauttLangue = localStorage.getItem("defauttLangue");
+
+  useEffect(() => {
+    if (defauttLangue) {
+      const langue = JSON.parse(defauttLangue);
+      setTr(langue.tr);
+      setLangName(langue.name);
+      setLng(langue.lang);
+    }
+  }, []);
+
+  const setDefaultLangue = (langue: LangueDataType) => {
+    setLng(langue.lang);
+    setLangName(langue.name);
+    setTr(langue.translation);
+    localStorage.setItem(
+      "defauttLangue",
+      JSON.stringify({
+        name: langue.name,
+        lang: langue.lang,
+        tr: langue.translation,
+      })
+    );
+  };
 
   const value = useMemo(
     () => ({
@@ -39,6 +67,7 @@ export function LangueProvider({
       langName,
       setLng,
       setLangName,
+      setDefaultLangue,
     }),
     [lng, langName]
   );

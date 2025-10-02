@@ -343,10 +343,10 @@ function RouteComponent() {
 
           <div
             id="invoice"
-            className={`invoice min-h-[100vh] flex-1 md:min-h-min`}
+            className={`invoice min-h-[100vh] flex-1 md:min-h-min pb-15`}
           >
             <div className="flex">
-              {sermonImage?.blobUrl && sermon?.number !==9 && (
+              {sermonImage?.blobUrl && sermon?.number !== 9 && (
                 <img
                   alt=""
                   className="float-left pr-4 mt-2"
@@ -419,7 +419,7 @@ function RouteComponent() {
             ))}
             <div className="mt-4">{sermon?.similar_sermon}</div>
             <div className="flex">
-              {sermonImage?.blobUrl && sermon?.number ===9 && (
+              {sermonImage?.blobUrl && sermon?.number === 9 && (
                 <img
                   alt=""
                   className="float-left pr-4 mt-2"

@@ -72,7 +72,7 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0
       '@tauri-apps/plugin-shell':
-        specifier: ^2.3.1
+        specifier: ~2
         version: 2.3.1
       '@tauri-apps/plugin-sql':
         specifier: ~2.2.1

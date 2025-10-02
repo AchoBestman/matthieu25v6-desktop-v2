@@ -1,1 +1,2 @@
-refactor: clean up GPG configuration and signing steps in workflow
+refactor: remove unused logo images and update package dependencies
+feat: implementation of landing page with custom langue selection, activated language setup.
