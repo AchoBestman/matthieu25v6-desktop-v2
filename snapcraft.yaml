@@ -55,14 +55,17 @@ package-repositories:
 
 parts:
   build-app:
-    plugin: git
+    plugin: nil
     source: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
-    branch: develop
+    source-type: git
+    source-branch: develop
+
     build-snaps:
     - node/20/stable
     - rustup/latest/stable
 
     build-packages:
+    - git
     - webkit2gtk-4.1-dev
     - libgtk-3-dev
     - libayatana-appindicator3-dev
@@ -89,9 +92,8 @@ parts:
     - file
     - libxdo-dev
     - libssl-dev
-    - libayatana-appindicator3-dev
-    - librsvg2-dev
     - dpkg
+
     stage-packages:
     - libwebkit2gtk-4.1-0
     - libgtk-3-0
@@ -102,5 +104,5 @@ parts:
       npm install
       npm run tauri build -- --bundles deb --target $CRAFT_ARCH_TRIPLET_GNU
       dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
-      sed -i -e "s|Icon=prophet-kacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophet-kacou.png|g" 
+      sed -i -e "s|Icon=prophet-kacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophet-kacou.png|g" \
         $SNAPCRAFT_PART_INSTALL/usr/share/applications/prophet-kacou.desktop
