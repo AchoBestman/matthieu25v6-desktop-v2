@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ChevronsUpDown,
-  Home,
-  Mail,
-  Navigation,
-  Phone,
-  PhoneCall,
-} from "lucide-react";
+import { ChevronsUpDown, Mail, Navigation } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
