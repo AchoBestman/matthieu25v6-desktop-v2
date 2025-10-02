@@ -43,10 +43,10 @@ export function SearchDrawer({
   });
 
   const stripHtml = (html: string) => {
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  return div.textContent || div.innerText || "";
-};
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
+  };
 
   const highlightText = (text: string, keyword: string) => {
     const cleanText = stripHtml(text);
@@ -70,10 +70,10 @@ export function SearchDrawer({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/50">
-      <div className="mt-20 ml-85 w-full max-w-4xl rounded-l-2xl bg-white shadow-lg dark:bg-gray-900 p-4">
+      <div className="mt-20 ml-85 w-full max-w-4xl rounded-l-2xl shadow-lg bg-pkp-sand dark:bg-gray-800 p-4">
         {/* Header */}
         <div className="flex items-center border-b pb-2">
-          <Search className="mr-2 h-5 w-5 text-gray-400" />
+          <Search className="mr-2 h-5 w-5 text-gray-400 border-pkp-ocean" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}

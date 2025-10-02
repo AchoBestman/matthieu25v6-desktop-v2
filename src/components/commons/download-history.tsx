@@ -13,9 +13,7 @@ import {
   PlayCircle,
   Trash,
 } from "lucide-react";
-import {
-  DownloadHistoryItem,
-} from "@/lib/download-history";
+import { DownloadHistoryItem } from "@/lib/download-history";
 import { useAudioPlayer } from "@/context/audio-player-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 import { tr } from "@/translation";
@@ -32,28 +30,33 @@ const DonwloadHistoryDropdown = () => {
   const { setAudio } = useAudioPlayer();
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 300);
-  const  { lng } = useLangue();
+  const { lng } = useLangue();
 
   useEffect(() => {
-  if (searchDebounce) {
-    const filtered = history.filter(item =>
-      item.fileOriginalName.toLowerCase().includes(searchDebounce.toLowerCase())
-    );
-    setDownloads(filtered);
-  } else {
-    setDownloads(history);
-  }
-}, [searchDebounce, history]);
-
+    if (searchDebounce) {
+      const filtered = history.filter((item) =>
+        item.fileOriginalName
+          .toLowerCase()
+          .includes(searchDebounce.toLowerCase())
+      );
+      setDownloads(filtered);
+    } else {
+      setDownloads(history);
+    }
+  }, [searchDebounce, history]);
 
   const putAudioInPlayer = async (item: DownloadHistoryItem) => {
     // specially audioTitle and must have the same value. i can't pass item.fileName because it is slug with _
 
-    if(item.fileName.endsWith('pdf') || item.fileName.endsWith('.m4a') || item.fileName.endsWith('.wav') || item.fileName.endsWith('.flac') ){
+    if (
+      item.fileName.endsWith("pdf") ||
+      item.fileName.endsWith(".m4a") ||
+      item.fileName.endsWith(".wav") ||
+      item.fileName.endsWith(".flac")
+    ) {
       const filePath = await createPaths(lng, "Others", item.fileName, "pdf");
       await openFile(filePath);
-      
-    }else{
+    } else {
       setAudio(
         item.url,
         item.fileOriginalName, // i pass here for display in the player
@@ -66,8 +69,8 @@ const DonwloadHistoryDropdown = () => {
   };
 
   const stopDownloaded = async (modelId: number) => {
-    await cancelDownload(modelId)// clear before from the client and next clear locally
-    clearHistory(modelId)
+    await cancelDownload(modelId); // clear before from the client and next clear locally
+    clearHistory(modelId);
   };
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -89,8 +92,7 @@ const DonwloadHistoryDropdown = () => {
           <span className="h-8 w-8 ml-1.5 cursor-pointer">
             <CloudDownload className="object-cover p-0.5 cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
           </span>
-          {downloads.filter((item) => item.progress < 100).length >
-            0 && (
+          {downloads.filter((item) => item.progress < 100).length > 0 && (
             <span className="-ml-4 -mt-6 h-5 w-5 text-white bg-red-500 rounded-full">
               {downloads.filter((item) => item.progress < 100).length}
             </span>
@@ -100,12 +102,12 @@ const DonwloadHistoryDropdown = () => {
 
       <DropdownMenuContent
         align="end"
-        className="w-full min-w-sm mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+        className="w-full min-w-sm mb-4 rounded-2xl border border-gray-200 p-3 shadow-lg dark:border-gray-800 bg-pkp-sand dark:bg-gray-800"
       >
         <Input
           type="search"
           placeholder={tr("button.search")}
-          className="mb-2"
+          className="mb-2 border-pkp-ocean"
           onChange={searchAudioDownloaded}
         />
         <ul className="max-h-[500px] overflow-auto border-t pt-4 pb-8 border-gray-200 dark:border-gray-800 flex flex-col gap-1">
@@ -163,8 +165,11 @@ const DonwloadHistoryDropdown = () => {
                             className="cursor-pointer"
                             onClick={() => putAudioInPlayer(item)}
                           >
-                            {item.fileName.endsWith('pdf') ? <File className="w-5 text-green-500 dark:text-white"></File> : <PlayCircle className="w-5 text-blue-500 dark:text-white"></PlayCircle>}
-                            
+                            {item.fileName.endsWith("pdf") ? (
+                              <File className="w-5 text-green-500 dark:text-white"></File>
+                            ) : (
+                              <PlayCircle className="w-5 text-pkp-indigo dark:text-white"></PlayCircle>
+                            )}
                           </button>
                           <button
                             className="cursor-pointer mx-1"

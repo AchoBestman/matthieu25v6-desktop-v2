@@ -47,7 +47,7 @@ const SermonHeader = ({
   const { lng } = useLangue();
   return (
     <>
-      <div className="text-amber-800 dark:text-white text-xl pb-2 italic bold">
+      <div className="text-dark dark:text-white text-xl pb-2 italic bold">
         <div className="whitespace-nowrap">
           {`${sermon?.chapter} : ${sermon.title}`}
         </div>
@@ -64,7 +64,7 @@ const SermonHeader = ({
           )}
           <Printer
             onClick={() => handleDownload(sermon, lng)}
-            className="cursor-pointer mx-2 text-amber-800 dark:text-white"
+            className="cursor-pointer mx-2 text-pkp-ocean dark:text-white"
           ></Printer>
         </div>
         <Input
@@ -72,7 +72,7 @@ const SermonHeader = ({
           placeholder={tr("button.search")}
           defaultValue={search}
           onChange={handleLocalSearch}
-          className="border-amber-800 dark:border-white border-2 w-full outline-none"
+          className="border-pkp-ocean dark:border-white border-2 w-full outline-none"
         />
       </div>
     </>

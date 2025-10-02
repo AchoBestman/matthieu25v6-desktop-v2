@@ -28,19 +28,19 @@ const DisplayAlert = ({
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent className="border-amber-800 dark:border-white border-2">
+        <AlertDialogContent className="bg-pkp-sand dark:bg-gray-800 border-pkp-ocean dark:border-white border-2">
           <AlertDialogHeader>
             <AlertDialogTitle className="italic">{title}</AlertDialogTitle>
             <AlertDialogDescription>{message}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             {cancel && (
-              <AlertDialogCancel className="cursor-pointer outline-none border-amber-800 dark:border-white border-2 italic">
+              <AlertDialogCancel className="cursor-pointer outline-none border-pkp-ocean dark:border-white border-2 italic">
                 {tr("button.close")}
               </AlertDialogCancel>
             )}
             {next && (
-              <AlertDialogAction className="border-amber-800 dark:border-white border-2">
+              <AlertDialogAction className="border-pkp-ocean dark:border-white border-2">
                 Continue
               </AlertDialogAction>
             )}

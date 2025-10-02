@@ -33,22 +33,22 @@ if (!rootElement.innerHTML) {
       <LangueProvider>
         <QueryClientProvider client={queryClient}>
           <DownloadHistoryProvider>
-          <AudioPlayerProvider>
-            <SongPlayer darkColor="white" lightColor="white" />
-            <ThemeProvider>
-              <SermonProvider>
-                <SidebarProvider
-                  style={
-                    {
-                      "--sidebar-width": "350px",
-                    } as React.CSSProperties
-                  }
-                >
-                  <RouterProvider router={router} />
-                </SidebarProvider>
-              </SermonProvider>
-            </ThemeProvider>
-          </AudioPlayerProvider>
+            <AudioPlayerProvider>
+              <SongPlayer darkColor="white" lightColor="#a0a83b" />
+              <ThemeProvider>
+                <SermonProvider>
+                  <SidebarProvider
+                    style={
+                      {
+                        "--sidebar-width": "350px",
+                      } as React.CSSProperties
+                    }
+                  >
+                    <RouterProvider router={router} />
+                  </SidebarProvider>
+                </SermonProvider>
+              </ThemeProvider>
+            </AudioPlayerProvider>
           </DownloadHistoryProvider>
         </QueryClientProvider>
       </LangueProvider>

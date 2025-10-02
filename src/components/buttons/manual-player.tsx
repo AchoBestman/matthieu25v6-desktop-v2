@@ -29,8 +29,8 @@ const SongPlayerManualButton = ({
     type === "Sermons"
       ? `${(data as Sermon).chapter} : ${data.title}`
       : data.title;
-  const albumId = type === "Hymns" ? (data as SingList)?.album_id : undefined
-  const modelId = data.id
+  const albumId = type === "Hymns" ? (data as SingList)?.album_id : undefined;
+  const modelId = data.id;
 
   const putsongInPlayer = async () => {
     let canPlay = true;
@@ -41,13 +41,7 @@ const SongPlayerManualButton = ({
       });
     }
     if (canPlay && data.audio) {
-      setAudio(
-        data.audio,
-        title,
-        modelId,
-        albumId,
-        true
-      );
+      setAudio(data.audio, title, modelId, albumId, true);
     }
   };
 
@@ -57,7 +51,7 @@ const SongPlayerManualButton = ({
         {(data.audio !== audioUrl ||
           (!playedAudioUrl && data.audio === audioUrl && data.audio)) && (
           <PlayCircle
-            className={`cursor-pointer h-6 w-6 text-amber-800 dark:text-white`}
+            className={`cursor-pointer h-6 w-6 text-pkp-ocean dark:text-white`}
             onClick={() => putsongInPlayer()}
           ></PlayCircle>
         )}
@@ -90,7 +84,7 @@ const SongPlayerManualButton = ({
               className={`cursor-pointer ml-2 ${
                 fileIsDownload
                   ? "text-orange-500"
-                  : "text-amber-800 dark:text-white"
+                  : "text-pkp-ocean dark:text-white"
               }`}
             ></Download>
           </DownloadButton>

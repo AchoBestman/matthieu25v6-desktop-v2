@@ -105,7 +105,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
+            {/* <DropdownMenuGroup>
               <DropdownMenuItem>
                 <Home />
                 <span>{"BP 374 Sikensi (Côte d'Ivoire)"}</span>
@@ -119,7 +119,7 @@ export function NavUser({
                 {"(+225) 0757585000"}
               </DropdownMenuItem>
             </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator /> */}
             <DropdownMenuItem>
               <Navigation />
               <button

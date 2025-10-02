@@ -46,7 +46,7 @@ const SermonSidebar = () => {
   const [searchParams, setSearchParams] = useState<SermonSearchParams>({
     per_page: 500,
     order: "ASC",
-    search: ""
+    search: "",
   });
 
   const [selectedSermon, setSelectedSermon] = useState<SelectSermonType>({
@@ -104,15 +104,22 @@ const SermonSidebar = () => {
   }, [selectedVerseDebounce.verse_number]);
 
   useEffect(() => {
-    if (number) setSelectedSermon((prev) => ({ ...prev, number: number.toString() }));
+    if (number)
+      setSelectedSermon((prev) => ({ ...prev, number: number.toString() }));
   }, [number]);
 
-   useEffect(() => {
-    setSelectedSermon((prev) => ({ ...prev, verse_number: verseNumber.toString() }));
+  useEffect(() => {
+    setSelectedSermon((prev) => ({
+      ...prev,
+      verse_number: verseNumber.toString(),
+    }));
   }, [verseNumber]);
 
   return (
-    <Sidebar collapsible="none" className="hidden flex-1 md:flex bg-muted">
+    <Sidebar
+      collapsible="none"
+      className="hidden flex-1 md:flex bg-pkp-sand dark:bg-gray-800"
+    >
       <DisplayAlert
         open={open}
         onOpenChange={onOpenChange}
@@ -164,7 +171,9 @@ const SermonSidebar = () => {
                     parseInt(e.target.value) > sermons?.pagination?.meta?.total
                   ) {
                     setMessage(
-                      `Kacou ${e.target.value} ${tr("home.search_not_found_pred_message")}`
+                      `Kacou ${e.target.value} ${tr(
+                        "home.search_not_found_pred_message"
+                      )}`
                     );
                     setOpen(true);
                   }

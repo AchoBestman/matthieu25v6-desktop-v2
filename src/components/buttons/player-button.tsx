@@ -15,9 +15,9 @@ const SongPlayer = ({
   darkColor?: string;
 }) => {
   const color: { [key: string]: string } = {
-    light: lightColor ?? "#e9d8a6",
-    dark: lightColor ?? "white",
-    system: darkColor ?? "#e9d8a6",
+    light: lightColor ?? "#a0a83b",
+    dark: lightColor ?? "#a0a83b",
+    system: darkColor ?? "#a0a83b",
   };
   const { lng } = useLangue();
   const {
@@ -36,7 +36,11 @@ const SongPlayer = ({
   if (!audioUrl) return null;
 
   const handleRemovePlayer = () => {
-    handleConfirmAlert(tr("alert.stop_playing"), false, handleRemovePlayerConfirm);
+    handleConfirmAlert(
+      tr("alert.stop_playing"),
+      false,
+      handleRemovePlayerConfirm
+    );
   };
 
   const handleRemovePlayerConfirm = () => {
@@ -55,7 +59,7 @@ const SongPlayer = ({
         right: 0,
         zIndex: "10",
         width: "72.3%",
-        border: "2px solid #7b3d1a",
+        border: "2px solid #a0a83b",
       }}
     >
       {playedAudioUrl && (
@@ -131,9 +135,9 @@ const SongPlayer = ({
             <div
               key="title"
               style={{
-                fontWeight: "lighter",
+                fontWeight: "bold",
                 fontStyle: "italic",
-                color: "#7b3d1a",
+                color: "dark",
                 fontSize: "13px",
                 display: "flex",
                 justifyContent: "space-between",
@@ -147,7 +151,7 @@ const SongPlayer = ({
               </span>
               <XCircle
                 onClick={handleRemovePlayer}
-                className="h-9 w-9 text-red-700 cursor-pointer"
+                className="h-9 w-9 text-pkp-ocean cursor-pointer"
               ></XCircle>
             </div>,
           ]}

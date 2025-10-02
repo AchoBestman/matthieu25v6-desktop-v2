@@ -23,7 +23,7 @@ export function ShowPhotoModal({
   return (
     <div>
       <AlertDialog onOpenChange={onOpenChange} open={open}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-pkp-sand dark:bg-gray-800">
           <AlertDialogHeader>
             <AlertDialogTitle>{title}</AlertDialogTitle>
           </AlertDialogHeader>

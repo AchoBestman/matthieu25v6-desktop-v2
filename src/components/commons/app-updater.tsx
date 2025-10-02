@@ -49,7 +49,7 @@ const AppUpdaterDropdown = () => {
 
       <DropdownMenuContent
         align="end"
-        className="w-sm min-w-sm mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+        className="w-sm min-w-sm mb-4 rounded-2xl border border-gray-200 p-3 shadow-lg dark:border-gray-800 bg-pkp-sand dark:bg-gray-800"
       >
         <ul className="max-h-[500px] overflow-auto border-t pt-4 pb-8 border-gray-200 dark:border-gray-800 flex flex-col gap-1">
           {update?.version && (

@@ -111,7 +111,7 @@ export default function RouteComponent() {
   return (
     <div className="min-h-screen max-h-screen relative w-full overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="h-[5vh] bg-amber-800 text-white py-2 px-6 flex items-center justify-between shadow-lg">
+      <div className="h-[5vh] bg-pkp-indigo text-white py-2 px-6 flex items-center justify-between shadow-lg">
         <h1 className="text-xl font-semibold">
           {tr("home.title")} v{tauriConfig.version}
         </h1>
@@ -120,13 +120,13 @@ export default function RouteComponent() {
             onClick={() =>
               openLink("https://www.iubenda.com/privacy-policy/84576984")
             }
-            className="cursor-pointer text-orange-400s hover:text-orange-300 underlines text-sm md:text-base px-2"
+            className="cursor-pointer text-orange-400s hover:text-pkp-sand underlines text-sm md:text-base px-2"
           >
             {tr("home.confidentiality_clause")}
           </button>
           <Link
             to="/sermons"
-            className="flex items-center gap-2 px-4 py-1 text-white rounded-lg border-1 hover:bg-amber-700 transition-colors shadow-md"
+            className="flex items-center gap-2 px-4 py-1 text-white hover:text-black rounded-lg border-1 hover:bg-pkp-sand transition-colors shadow-md"
           >
             <BookAudio size={20} />
             {tr("home.sermon")}
@@ -138,7 +138,7 @@ export default function RouteComponent() {
       <div className="h-[87vh] flex flex-col">
         {/* Language Selection */}
         <div className="bg-white py-3 px-4">
-          <p className="text-center text-blue-900 font-semibold text-base mb-3">
+          <p className="text-center text-pkp-ocean font-semibold text-base mb-3">
             {tr("home.choose_langue")}
           </p>
           <div className="flex justify-center gap-2 flex-wrap">
@@ -149,7 +149,7 @@ export default function RouteComponent() {
                   navigate({ to: "/sermons" });
                 }}
                 key={item.id}
-                className="flex flex-col items-center justify-center p-2 border border-amber-800 rounded shadow hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer "
+                className="flex flex-col items-center justify-center p-2 border border-pkp-indigo rounded shadow hover:shadow-lg transform hover:scale-105 transition-all duration-200 cursor-pointer "
                 title={item.name}
                 style={{ maxWidth: "100px", maxHeight: "70px" }}
               >
@@ -186,7 +186,7 @@ export default function RouteComponent() {
           {/* Bible Verse Quote */}
           <div className="mt-auto mb-20 mx-4 w-full flex justify-center">
             <div className="bg-white/95 p-2 max-w-4xl">
-              <p className="text-blue-900 text-2xl leading-relaxed italic text-center font-medium">
+              <p className="text-pkp-indigo text-2xl leading-relaxed italic text-center font-medium">
                 {`"${tr("home.image_message")}"`}
               </p>
               <p className="text-right text-blue-800 font-bold mt-2 text-md ">
@@ -208,7 +208,7 @@ export default function RouteComponent() {
                       "https://web.crabnebula.cloud/prophet-kacou/prophet-kacou/releases"
                     )
                   }
-                  className="px-4 py-2 bg-white hover:bg-green-600 text-indigo-900 hover:text-white font-semibold rounded shadow-lg transition-colors text-sm cursor-pointer border border-white"
+                  className="px-4 py-2 bg-white hover:bg-pkp-ocean text-pkp-indigo hover:text-white font-semibold rounded shadow-lg transition-colors text-sm cursor-pointer border border-white"
                 >
                   {tr("home.share_button_title")}
                 </button>
@@ -222,7 +222,7 @@ export default function RouteComponent() {
       </div>
 
       {/* Footer  */}
-      <footer className="bg-indigo-900 text-white py-2 text-center h-[8vh] flex flex-col justify-center">
+      <footer className="bg-pkp-indigo text-white py-2 text-center h-[8vh] flex flex-col justify-center">
         <p className="mb-1 text-sm">mat25v6.msg@gmail.com</p>
         <button
           onClick={() =>

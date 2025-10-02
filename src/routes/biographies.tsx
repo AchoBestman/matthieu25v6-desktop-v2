@@ -28,7 +28,6 @@ function RouteComponent() {
 
   return (
     <div className="mt-10">
-      
       {isLoading && tr("home.waiting")}
       {isError && tr("home.search_not_found_pred_message")}
       <PageLoader
@@ -55,11 +54,13 @@ function RouteComponent() {
               __html: `${biography?.description}`
                 .replace(
                   /<(h1|h2)>/g,
-                  `<strong style="color:${theme === "dark" ? "orange" : "#7b3d1a"} !important; font-size: 22px;"><$1>`
+                  `<strong style="color:${
+                    theme === "dark" ? "orange" : "#2d77a8"
+                  } !important; font-size: 22px;"><$1>`
                 )
                 .replace(/<\/(h1|h2)>/g, "</strong></$1>"),
             }}
-            className="text-justify w-11.5/12 mt-4 sm:mt-0 sm:w-full"
+            className="text-justify w-11.5/12 mt-4 sm:mt-0 sm:w-full "
           ></div>
         </div>
       </PageLoader>

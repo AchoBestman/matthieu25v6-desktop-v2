@@ -73,7 +73,7 @@ export function AssembliesDataTable<TData, TValue>({
           placeholder={tr("table.filter_by_name")}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="max-w-sm border-2 border-amber-800 dark:border-white"
+          className="max-w-sm border-2 border-pkp-ocean dark:border-white"
         />
       </div>
       <DataTablePagination table={table} />

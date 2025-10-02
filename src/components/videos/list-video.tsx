@@ -39,14 +39,14 @@ export default function ListVideo() {
   return (
     <>
       <div
-        className={`sticky top-16 w-full -mt-12 h-15 px-2 py-2 bg-muted z-1`}
+        className={`sticky top-16 w-full -mt-12 h-15 px-2 py-2 bg-pkp-sand dark:bg-gray-800 z-1 `}
       >
         <Input
           type="text"
           placeholder={tr("button.search") + "..."}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="border-primary dark:border-white border-2 outline-none"
+          className="border-pkp-ocean dark:border-white border-2 outline-none"
         />
       </div>
       <PageLoader
@@ -57,7 +57,7 @@ export default function ListVideo() {
         }
         isLoading={!videos?.data || isLoading || isError}
       >
-        <div className="bg-muted/100 pl-4 pr-1 pt-12">
+        <div className="dark:bg-muted/100 pl-4 pr-1 pt-12">
           {videos && videos.pagination?.meta?.total > 10 && (
             <div className="py-4 pt-5">
               <PaginationData

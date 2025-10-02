@@ -62,7 +62,7 @@ export default function PhotoCard({
       {description && (
         <Button
           onClick={onOpenChange}
-          className="text-white border-2 dark:border-white"
+          className="bg-pkp-ocean dark:bg-black text-white border-2 dark:border-white"
         >
           {tr("button.see_more")}
         </Button>

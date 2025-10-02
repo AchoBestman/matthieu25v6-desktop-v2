@@ -24,7 +24,7 @@ const LeaderModal = ({
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>
-        <AlertDialogContent className="border-2 border-amber-800 dark:border-white">
+        <AlertDialogContent className="bg-pkp-sand dark:bg-gray-800 border-2 border-pkp-ocean dark:border-white">
           <AlertDialogHeader>
             <AlertDialogTitle>{tr("table.username_info")}</AlertDialogTitle>
             <AlertDialogDescription>
@@ -36,7 +36,7 @@ const LeaderModal = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             {cancel && (
-              <AlertDialogCancel className="border-amber-800 dark:border-white border-2">
+              <AlertDialogCancel className="border-pkp-ocean dark:border-white border-2">
                 {tr("button.close")}
               </AlertDialogCancel>
             )}

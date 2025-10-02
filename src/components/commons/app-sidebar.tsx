@@ -43,7 +43,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="overflow-hidden *:data-[sidebar=sidebar]:flex-row"
+      className="overflow-hidden *:data-[sidebar=sidebar]:flex-row "
       {...props}
     >
       {/* This is the first sidebar */}
@@ -51,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* This will make the sidebar appear as icons.*/}
       <Sidebar
         collapsible="none"
-        className={`border-r w-[calc(var(--sidebar-width-icon)+1px)]! bg-muted`}
+        className={`border-r w-[calc(var(--sidebar-width-icon)+1px)]! bg-pkp-sand dark:bg-gray-800`}
       >
         <SidebarHeader>
           <SidebarMenu>

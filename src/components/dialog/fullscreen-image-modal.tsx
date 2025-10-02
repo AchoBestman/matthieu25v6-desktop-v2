@@ -101,7 +101,7 @@ export function FullscreenImageModal({
           maxWidth: "100vw",
           maxHeight: "100vh",
         }}
-        className="p-0 bg-black border-none max-w-none w-screen h-screen rounded-none"
+        className="p-0 bg-pkp-sand dark:bg-gray-800 border-none max-w-none w-screen h-screen rounded-none"
       >
         <AlertDialogHeader className="sr-only">
           <AlertDialogTitle>Image en plein écran</AlertDialogTitle>

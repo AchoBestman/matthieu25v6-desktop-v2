@@ -325,9 +325,9 @@ function RouteComponent() {
             : tr("home.waiting")
         }
       >
-        <div>
+        <div className="bg-pkp-sand dark:bg-gray-800">
           <div
-            className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-muted z-1`}
+            className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-pkp-sand dark:bg-gray-800 z-1`}
           >
             {sermon && (
               <SermonHeader
@@ -345,11 +345,11 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min pb-15`}
           >
-            <div className="flex">
+            <div className="flex justify-center items-center">
               {sermonImage?.blobUrl && sermon?.number !== 9 && (
                 <img
                   alt=""
-                  className="float-left pr-4 mt-2"
+                  className="float-left pr-4 mt-2 mb-4"
                   src={sermonImage?.blobUrl}
                 />
               )}
@@ -418,7 +418,7 @@ function RouteComponent() {
               </div>
             ))}
             <div className="mt-4">{sermon?.similar_sermon}</div>
-            <div className="flex">
+            <div className="flex justify-center items-center">
               {sermonImage?.blobUrl && sermon?.number === 9 && (
                 <img
                   alt=""

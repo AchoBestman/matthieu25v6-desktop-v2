@@ -36,6 +36,7 @@ const LangueDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [langues, setLangues] = useState<Array<LangueDataType>>([]);
   const [searchLangues, setSearchLangues] = useState<Array<LangueDataType>>([]);
+  const [searchValue, setSearchValue] = useState(""); // Ajout d'un état pour la valeur de recherche
   const [openProgress, setOpenProgress] = useState<boolean>(false);
   const [progress, setProgress] = useState<downloadDrogressType>({
     percent: 0,
@@ -44,6 +45,8 @@ const LangueDropdown = () => {
   });
   const [open, setOpen] = useState<boolean>(false);
   const abortRef = useRef(false);
+  const searchInputRef = useRef<HTMLInputElement>(null); // Ref pour l'input
+
   const onOpenChange = () => {
     setOpen(!open);
   };
@@ -136,6 +139,7 @@ const LangueDropdown = () => {
 
   function closeDropdown() {
     setIsOpen(false);
+    setSearchValue(""); // Réinitialiser la recherche
   }
 
   function activeLang() {
@@ -146,6 +150,7 @@ const LangueDropdown = () => {
 
   const searchLangue = (e: ChangeEvent<HTMLInputElement>) => {
     const search = e.target.value;
+    setSearchValue(search); // Mettre à jour la valeur de recherche
     const lngs = searchLangues.filter((value: LangueDataType) =>
       value.name.toLowerCase().includes(search.toLowerCase())
     );
@@ -159,6 +164,15 @@ const LangueDropdown = () => {
   useEffect(() => {
     if (progress.percent === 100) availabeLangues();
   }, [progress]);
+
+  // Focus automatique sur l'input quand le dropdown s'ouvre
+  useEffect(() => {
+    if (isOpen && searchInputRef.current) {
+      setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 0);
+    }
+  }, [isOpen]);
 
   return (
     <>
@@ -219,13 +233,22 @@ const LangueDropdown = () => {
 
         <DropdownMenuContent
           align="end"
-          className="w-[300px] mb-4 rounded-2xl border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-800 dark:bg-gray-900"
+          className="w-[300px] mb-4 rounded-2xl border border-gray-200 p-3 shadow-lg dark:border-gray-800 bg-pkp-sand dark:bg-gray-800"
+          onInteractOutside={(e) => {
+            // Empêcher la fermeture si on clique dans l'input
+            if (searchInputRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
         >
           <Input
+            ref={searchInputRef}
             type="search"
             placeholder={tr("button.search")}
-            className="mb-2"
+            className="mb-2 border border-pkp-ocean"
+            value={searchValue}
             onChange={searchLangue}
+            onKeyDown={(e) => e.stopPropagation()} // Empêcher la propagation des touches
           />
           <ul className="max-h-[500px] overflow-auto border-t pt-4 pb-8 border-gray-200 dark:border-gray-800 flex flex-col gap-1">
             {langues?.length > 0 &&
@@ -265,7 +288,7 @@ const LangueDropdown = () => {
                               className="cursor-pointer"
                               onClick={() => downloadDb(item.lang)}
                             >
-                              <RefreshCcw className="w-5 text-primary dark:text-white mx-2"></RefreshCcw>
+                              <RefreshCcw className="w-5 text-pkp-ocean dark:text-white mx-2"></RefreshCcw>
                             </button>
                             <button
                               className="cursor-pointer"
@@ -279,7 +302,7 @@ const LangueDropdown = () => {
                             className="cursor-pointer"
                             onClick={() => downloadDb(item.lang)}
                           >
-                            <Download className="w-5 text-primary dark:text-white"></Download>
+                            <Download className="w-5 text-pkp-ocean dark:text-white"></Download>
                           </button>
                         )}
                       </button>

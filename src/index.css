@@ -5,12 +5,33 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Audio player - couleur quand le lecteur ne joue pas */
+.audio-player-wrapper .rhap_main-controls-button,
+.audio-player-wrapper .rhap_additional-controls .rhap_volume-button button {
+  color: oklch(0.503 0.085 237.5) !important; /* pkp-lime par défaut */
+}
+
+.audio-player-wrapper .rhap_progress-indicator,
+.audio-player-wrapper .rhap_progress-filled,
+.audio-player-wrapper .rhap_volume-indicator,
+.audio-player-wrapper .rhap_volume-bar {
+  background-color: oklch(0.503 0.085 237.5) !important;
+}
+
+/* Audio player - couleur quand le lecteur joue */
 .audio-player-wrapper.playing .rhap_main-controls-button,
 .audio-player-wrapper.playing
   .rhap_additional-controls
   .rhap_volume-button
   button {
-  color: oklch(47.3% 0.137 46.201) !important; /* change icon color */
+  color: oklch(0.503 0.085 237.5) !important; /* pkp-ocean quand en lecture */
+}
+
+.audio-player-wrapper.playing .rhap_progress-indicator,
+.audio-player-wrapper.playing .rhap_progress-filled,
+.audio-player-wrapper.playing .rhap_volume-indicator,
+.audio-player-wrapper.playing .rhap_volume-bar {
+  background-color: oklch(0.503 0.085 237.5) !important;
 }
 
 @media print {
@@ -81,6 +102,12 @@ body {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Couleurs personnalisées PKP */
+  --color-pkp-sand: var(--pkp-sand);
+  --color-pkp-indigo: var(--pkp-indigo);
+  --color-pkp-lime: var(--pkp-lime);
+  --color-pkp-ocean: var(--pkp-ocean);
 }
 
 :root {
@@ -116,6 +143,12 @@ body {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Vos couleurs personnalisées PKP en oklch */
+  --pkp-sand: oklch(0.859 0.053 77.5); /* #e5cda4 */
+  --pkp-indigo: oklch(0.438 0.134 264.4); /* #3f51b5 */
+  --pkp-lime: oklch(0.656 0.104 97.8); /* #a0a83b */
+  --pkp-ocean: oklch(0.503 0.085 237.5); /* #2d77a8 */
 }
 
 .dark {
@@ -150,6 +183,12 @@ body {
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Vos couleurs personnalisées PKP restent identiques en mode dark */
+  --pkp-sand: oklch(0.859 0.053 77.5);
+  --pkp-indigo: oklch(0.438 0.134 264.4);
+  --pkp-lime: oklch(0.656 0.104 97.8);
+  --pkp-ocean: oklch(0.503 0.085 237.5);
 }
 
 @layer base {

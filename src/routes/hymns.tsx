@@ -35,9 +35,9 @@ function RouteComponent() {
   } = useSongs(lng, selectedAlbumId, undefined, searchTermDebounce);
 
   return (
-    <div>
+    <div className="">
       <div
-        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-muted z-1`}
+        className={`sticky top-16 w-full -mt-4 h-20 px-2 py-2 bg-pkp-sand dark:bg-gray-800 z-1`}
       >
         <div className="flex items-center justify-end my-5">
           {albumsData?.data && albumsData.data.length > 0 && (

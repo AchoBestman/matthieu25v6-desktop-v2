@@ -45,12 +45,12 @@ function RootComponent() {
     return <Outlet />;
   }
 
-  // Sinon, on affiche le layout complet
+  // Sinon, on affiche le layout complet bg-pkp-sand dark:bg-gray-800
   return (
     <React.Fragment>
       <AppSidebar />
-      <SidebarInset className="bg-muted">
-        <header className="bg-amber-800 sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4 z-1">
+      <SidebarInset className="bg-pkp-sand dark:bg-gray-800">
+        <header className="bg-pkp-indigo sticky top-0 flex justify-between shrink-0 items-center gap-2 border-b p-4 z-1">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
@@ -58,7 +58,7 @@ function RootComponent() {
                   <Link
                     key={menu.url}
                     to={menu.url}
-                    className="[&.active]:font-bold gap-2 p-2 text-white"
+                    className="[&.active]:font-bold gap-2 p-2 text-white hover:text-pkp-sand"
                   >
                     <BreadcrumbLink href={menu.url}>
                       {tr(menu.title)}
