@@ -345,13 +345,9 @@ function RouteComponent() {
             id="invoice"
             className={`invoice min-h-[100vh] flex-1 md:min-h-min pb-15`}
           >
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center my-4 w-full">
               {sermonImage?.blobUrl && sermon?.number !== 9 && (
-                <img
-                  alt=""
-                  className="float-left pr-4 mt-2 mb-4"
-                  src={sermonImage?.blobUrl}
-                />
+                <img alt="" className="w-full" src={sermonImage?.blobUrl} />
               )}
             </div>
             {sermon?.verses?.map((verset: Verses, key: number) => (
@@ -418,13 +414,9 @@ function RouteComponent() {
               </div>
             ))}
             <div className="mt-4">{sermon?.similar_sermon}</div>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center w-full my-4">
               {sermonImage?.blobUrl && sermon?.number === 9 && (
-                <img
-                  alt=""
-                  className="float-left pr-4 mt-2"
-                  src={sermonImage?.blobUrl}
-                />
+                <img alt="" className="w-full" src={sermonImage?.blobUrl} />
               )}
             </div>
           </div>
