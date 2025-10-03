@@ -1,6 +1,6 @@
 name: prophetkacou
 base: core22
-version: '1.0.1'
+version: "1.0.1"
 summary: This app contains all the message of Prophet Kacou Philippe # 79 char long summary
 description: |
   The Book of Prophet Kacou, having the same value as the Books of the Bible.
@@ -11,18 +11,18 @@ grade: stable
 confinement: strict
 
 architectures:
-- build-on: amd64
-- build-on: arm64
+  - build-on: amd64
+  - build-on: arm64
 
 layout:
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0:
     bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0
 
 apps:
-  prophet-kacou:
-    command: usr/bin/prophet-kacou
-    desktop: usr/share/applications/prophet-kacou.desktop
-    extensions: [ gnome ]
+  prophetkacou:
+    command: usr/bin/prophetkacou
+    desktop: usr/share/applications/prophetkacou.desktop
+    extensions: [gnome]
     #plugs:
     #  - network
     # Add whatever plugs you need here, see https://snapcraft.io/docs/snapcraft-interfaces for more info.
@@ -47,11 +47,11 @@ apps:
     #    name: org.net_mydomain_MyApp.SingleInstance # Remember to change net_mydomain_MyApp to your app ID with "_" instead of "." and "-"
 
 package-repositories:
-- type: apt
-  components: [ main ]
-  suites: [ noble ]
-  key-id: 78E1918602959B9C59103100F1831DDAFC42E99D
-  url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu
+  - type: apt
+    components: [main]
+    suites: [noble]
+    key-id: 78E1918602959B9C59103100F1831DDAFC42E99D
+    url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu
 
 parts:
   build-app:
@@ -61,58 +61,64 @@ parts:
     source-branch: develop
 
     build-snaps:
-    - node/20/stable
-    - rustup/latest/stable
+      - node/20/stable
+      - rustup/latest/stable
 
     build-packages:
-    - git
-    - libwebkit2gtk-4.0-dev
-    - libgtk-3-dev
-    - libayatana-appindicator3-dev
-    - librsvg2-dev
-    - pkg-config
-    - build-essential
-    - xdg-utils
-    - libcanberra-dev
-    - libcanberra-gtk3-0
-    - libfuse2
-    - gvfs
-    - gvfs-daemons
-    - gvfs-common
-    - mesa-utils
-    - mesa-vulkan-drivers
-    - patchelf
-    - desktop-file-utils
-    - gettext
-    - libunwind-dev
-    - libgstreamer1.0-dev
-    - libgstreamer-plugins-base1.0-dev
-    - curl
-    - wget
-    - file
-    - libxdo-dev
-    - libssl-dev
-    - dpkg
+      - git
+      - libwebkit2gtk-4.0-dev
+      - libgtk-3-dev
+      - libayatana-appindicator3-dev
+      - librsvg2-dev
+      - pkg-config
+      - build-essential
+      - xdg-utils
+      - libcanberra-dev
+      - libcanberra-gtk3-0
+      - libfuse2
+      - gvfs
+      - gvfs-daemons
+      - gvfs-common
+      - mesa-utils
+      - mesa-vulkan-drivers
+      - patchelf
+      - desktop-file-utils
+      - gettext
+      - libunwind-dev
+      - libgstreamer1.0-dev
+      - libgstreamer-plugins-base1.0-dev
+      - curl
+      - wget
+      - file
+      - libxdo-dev
+      - libssl-dev
+      - dpkg
 
     stage-packages:
-    - libwebkit2gtk-4.0-37
-    - libgtk-3-0
-    - libayatana-appindicator3-1
+      - libwebkit2gtk-4.0-37
+      - libgtk-3-0
+      - libayatana-appindicator3-1
 
     override-build: |
       set -eu
       # Initialize rustup and install stable toolchain
       rustup default stable
 
-      # Install npm dependencies
-      npm install
+      # Install pnpm globally
+      npm install -g pnpm
 
-      # Build the Tauri application
-      npm run tauri build -- --bundles deb --target $CRAFT_ARCH_TRIPLET_GNU
+      # Downgrade NPM packages to match Cargo.toml versions (2.3.x)
+      pnpm add @tauri-apps/plugin-opener@~2.3.0 @tauri-apps/plugin-sql@~2.3.0
+
+      # Install remaining dependencies
+      pnpm install --shamefully-hoist
+
+      # Build the Tauri application using pnpm
+      pnpm tauri build -- --bundles deb --target $CRAFT_ARCH_TRIPLET_GNU
 
       # Extract the .deb package
       dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
 
       # Fix the icon path in the desktop file
-      sed -i -e "s|Icon=prophet-kacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophet-kacou.png|g" \
-        $SNAPCRAFT_PART_INSTALL/usr/share/applications/prophet-kacou.desktop
+      sed -i -e "s|Icon=prophetkacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophetkacou.png|g" \
+        $SNAPCRAFT_PART_INSTALL/usr/share/applications/prophetkacou.desktop
