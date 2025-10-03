@@ -1250,6 +1250,7 @@ jobs:
 
       - name: Publish Snap to Store
         run: |
+          echo "build snapcraft"
           cd snap-build
           snapcraft upload --release=stable *.snap
 
