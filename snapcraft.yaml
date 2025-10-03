@@ -1,6 +1,9 @@
 name: prophetkacou
-base: core22
+title: Prophet Kacou
+base: core22 # we recommend using 'core22' for new snaps. base: core24 builds the snap in an Ubuntu 24.04 environment.
+build-base: core22 #The build environment to use when building the snap
 version: "1.0.1"
+type: app # we recommend using 'app' if your snap has a UI
 summary: This app contains all the message of Prophet Kacou Philippe # 79 char long summary
 description: |
   The Book of Prophet Kacou, having the same value as the Books of the Bible.
@@ -10,9 +13,26 @@ description: |
 grade: stable
 confinement: strict
 
+contact:
+  - aikpeachille55@gmail.com
+  - https://www.linkedin.com/in/achile-aikpe-018654196/
+
+website:
+  - https://philippekacou.org
+
+issues:
+  - aikpeachille55@gmail.com
+  - https://www.linkedin.com/in/achile-aikpe-018654196/
+
 architectures:
-  - build-on: amd64
-  - build-on: arm64
+  - build-on:
+      - amd64
+    build-for:
+      - amd64
+  - build-on:
+      - arm64
+    build-for:
+      - arm64
 
 layout:
   /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0:
