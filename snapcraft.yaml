@@ -59,7 +59,7 @@ parts:
     source: https://github.com/AchoBestman/matthieu25v6-desktop-v2.git
     source-type: git
     source-branch: develop
-    
+
     build-snaps:
     - node/20/stable
     - rustup/latest/stable
@@ -93,7 +93,7 @@ parts:
     - libxdo-dev
     - libssl-dev
     - dpkg
-    
+
     stage-packages:
     - libwebkit2gtk-4.0-37
     - libgtk-3-0
@@ -101,8 +101,18 @@ parts:
 
     override-build: |
       set -eu
+      # Initialize rustup and install stable toolchain
+      rustup default stable
+
+      # Install npm dependencies
       npm install
+
+      # Build the Tauri application
       npm run tauri build -- --bundles deb --target $CRAFT_ARCH_TRIPLET_GNU
+
+      # Extract the .deb package
       dpkg -x src-tauri/target/release/bundle/deb/*.deb $SNAPCRAFT_PART_INSTALL/
+
+      # Fix the icon path in the desktop file
       sed -i -e "s|Icon=prophet-kacou|Icon=/usr/share/icons/hicolor/32x32/apps/prophet-kacou.png|g" \
         $SNAPCRAFT_PART_INSTALL/usr/share/applications/prophet-kacou.desktop
