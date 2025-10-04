@@ -1,13 +1,10 @@
 name: Prophet Kacou Release Process
 on:
-  # pull_request:
-  #   types:
-  #   - closed
-  #   branches:
-  #   - deploy
-  push:
+  pull_request:
+    types:
+    - closed
     branches:
-    - develop
+    - deploy
   workflow_dispatch:
     inputs:
       application:
