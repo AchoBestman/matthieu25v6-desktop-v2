@@ -2,9 +2,9 @@ name: Prophet Kacou Release Process
 on:
   pull_request:
     types:
-      - closed
+    - closed
     branches:
-      - deploy
+    - deploy
   workflow_dispatch:
     inputs:
       application:
@@ -62,66 +62,66 @@ jobs:
     if: github.event.pull_request.merged == true
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ~/.rustup/toolchains/
-            ~/.rustup/update-hashes/
-            ~/.rustup/settings.toml
-          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+    - name: Cache Rust toolchain
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ~/.rustup/toolchains/
+          ~/.rustup/update-hashes/
+          ~/.rustup/settings.toml
+        key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-
+    - name: Cache pnpm store
+      uses: actions/cache@v4
+      with:
+        path: ~/.pnpm-store
+        key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
 
-      - name: Get app version
-        run: |
-          APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
-          echo "APP_VERSION=$APP_VERSION"
+    - name: Get app version
+      run: |
+        APP_VERSION=$(jq -r '.version' "$(pwd)/src-tauri/tauri.conf.json")
+        echo "APP_VERSION=$APP_VERSION"
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
 
-      - name: Install Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
+    - name: Install Rust
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
 
-      - name: Install Tauri CLI
-        run: pnpm add -g @tauri-apps/cli
+    - name: Install Tauri CLI
+      run: pnpm add -g @tauri-apps/cli
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Build (no bundle)
-        run: pnpm build
+    - name: Build (no bundle)
+      run: pnpm build
 
   #Step 2 : Create new release version on nebulacrab
   draft:
@@ -129,12 +129,12 @@ jobs:
     needs: build-test
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
-      - name: create draft release
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
-          api-key: ${{ env.CN_API_KEY }}
+    - uses: actions/checkout@v4
+    - name: create draft release
+      uses: crabnebula-dev/cloud-release@v0
+      with:
+        command: release draft ${{ env.CN_APPLICATION }} --framework tauri --notes-file ${{ env.RELEASE_NOTE }}
+        api-key: ${{ env.CN_API_KEY }}
 
   # Step 3: Start building image for all plateforms
   # build-macos-out-apple-store:
@@ -1038,251 +1038,239 @@ jobs:
     needs: draft
     runs-on: ubuntu-22.04-arm
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-      # Caches pour Linux aarch64
-      - name: Cache Rust toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            ~/.rustup/toolchains/
-            ~/.rustup/update-hashes/
-            ~/.rustup/settings.toml
-          key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
+    # Caches pour Linux aarch64
+    - name: Cache Rust toolchain
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          ~/.rustup/toolchains/
+          ~/.rustup/update-hashes/
+          ~/.rustup/settings.toml
+        key: ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-rust-toolchain-
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            pnpm-
+    - name: Cache pnpm store
+      uses: actions/cache@v4
+      with:
+        path: ~/.pnpm-store
+        key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-node-modules-
 
-      - name: Cache Rust build artifacts (aarch64)
-        uses: actions/cache@v4
-        with:
-          path: src-tauri/target/aarch64-unknown-linux-gnu
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-
+    - name: Cache Rust build artifacts (aarch64)
+      uses: actions/cache@v4
+      with:
+        path: src-tauri/target/aarch64-unknown-linux-gnu
+        key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('src-tauri/Cargo.lock', 'src-tauri/src/**/*.rs') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-
 
-      - name: Cache Tauri dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            src-tauri/target/debug/deps
-            src-tauri/target/release/deps
-          key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
+    - name: Cache Tauri dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          src-tauri/target/debug/deps
+          src-tauri/target/release/deps
+        key: ${{ runner.os }}-${{ runner.arch }}-tauri-deps-${{ hashFiles('src-tauri/Cargo.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-tauri-deps-
 
-      - name: Cache APT packages
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt/archives
-          key: ${{ runner.os }}-${{ runner.arch }}-apt-${{ hashFiles('.github/workflows/**') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ runner.arch }}-apt-
+    - name: Cache APT packages
+      uses: actions/cache@v4
+      with:
+        path: /var/cache/apt/archives
+        key: ${{ runner.os }}-${{ runner.arch }}-apt-${{ hashFiles('.github/workflows/**') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-apt-
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
+    - name: Install pnpm
+      uses: pnpm/action-setup@v3
+      with:
+        version: 9
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "pnpm"
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "20"
+        cache: "pnpm"
 
-      - name: Install stable Rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          toolchain: stable
-          cache: true
+    - name: Install stable Rust toolchain
+      uses: actions-rust-lang/setup-rust-toolchain@v1
+      with:
+        toolchain: stable
+        cache: true
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
+    - name: Install Tauri CLI
+      run: npm install -g @tauri-apps/cli
 
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            webkit2gtk-4.1-dev \
-            libgtk-3-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            pkg-config \
-            build-essential \
-            xdg-utils \
-            libcanberra-dev \
-            libcanberra-gtk3-0 \
-            libfuse2 \
-            gvfs \
-            gvfs-daemons \
-            gvfs-common \
-            mesa-utils \
-            mesa-vulkan-drivers \
-            patchelf \
-            desktop-file-utils \
-            gettext \
-            libunwind-dev \
-            libgstreamer1.0-dev \
-            libgstreamer-plugins-base1.0-dev
+    - name: Install Linux dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          webkit2gtk-4.1-dev \
+          libgtk-3-dev \
+          libayatana-appindicator3-dev \
+          librsvg2-dev \
+          pkg-config \
+          build-essential \
+          xdg-utils \
+          libcanberra-dev \
+          libcanberra-gtk3-0 \
+          libfuse2 \
+          gvfs \
+          gvfs-daemons \
+          gvfs-common \
+          mesa-utils \
+          mesa-vulkan-drivers \
+          patchelf \
+          desktop-file-utils \
+          gettext \
+          libunwind-dev \
+          libgstreamer1.0-dev \
+          libgstreamer-plugins-base1.0-dev
 
-      - name: Add Rust target
-        run: rustup target add aarch64-unknown-linux-gnu
+    - name: Add Rust target
+      run: rustup target add aarch64-unknown-linux-gnu
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
 
-      - name: Import GPG key
-        run: |
-          echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
+    - name: Import GPG key
+      run: |
+        echo "${{ env.GPG_PRIVATE_KEY }}" | base64 --decode | gpg --batch --import
 
-      - name: Build Linux aarch64-unknown-linux-gnu
-        run: pnpm tauri build --target aarch64-unknown-linux-gnu
-        env:
-          # These sign DEB, AppImage and RPM packages
-          SIGN: 1
-          SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
-          APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
-          APPIMAGETOOL_FORCE_SIGN: 1
+    - name: Build Linux aarch64-unknown-linux-gnu
+      run: pnpm tauri build --target aarch64-unknown-linux-gnu
+      env:
+        # These sign DEB, AppImage and RPM packages
+        SIGN: 1
+        SIGN_KEY: ${{ env.LINUX_SIGN_KEY_ID }}
+        APPIMAGETOOL_SIGN_PASSPHRASE: ${{ env.LINUX_APPIMAGETOOL_SIGN_PASSPHRASE }}
+        APPIMAGETOOL_FORCE_SIGN: 1
 
-          #Tauri updater signing
-          TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        #Tauri updater signing
+        TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
+        TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-      # ===== NOUVELLE SECTION POUR LE SNAP =====
+    # ===== NOUVELLE SECTION POUR LE SNAP =====
 
-      - name: Install Snapcraft
-        run: |
-          sudo snap install snapcraft --classic
+    - name: Install Snapcraft
+      run: |
+        sudo snap install snapcraft --classic
 
-      - name: Create Snap from DEB
-        run: |
-          # Create snapcraft directory structure
-          mkdir -p snap-build/usr
+    - name: Create Snap from DEB
+      run: |
+        # Create snapcraft directory structure
+        mkdir -p snap-build/meta snap-build/snap
 
-          # Extract the DEB package
-          dpkg -x src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb snap-build/
+        # Extract the DEB package
+        dpkg -x src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb snap-build/
 
-          # Create snapcraft.yaml
-          cat > snap-build/snapcraft.yaml << 'EOF'
-          name: prophetkacou
-          title: Prophet Kacou
-          base: core22
-          build-base: core22
-          version: "1.0.1"
-          type: app
-          summary: This app contains all the message of Prophet Kacou Philippe
-          description: |
-            The Book of Prophet Kacou, having the same value as the Books of the Bible.
+        # Create snapcraft.yaml
+        cat > snap-build/snap/snapcraft.yaml << 'EOF'
+        name: prophetkacou
+        title: Prophet Kacou
+        base: core22
+        version: "1.0.1"
+        summary: This app contains all the message of Prophet Kacou Philippe
+        description: |
+          The Book of Prophet Kacou, having the same value as the Books of the Bible.
 
-            On April 24, 1993, Kacou Philippe, a young man working on a construction site, received a vision: the visitation of an angel of God who commissioned him with a Message destined for the Salvation of the whole earth, in fulfillment of the cry of Matthew 25:6—the midnight cry in the Bible—after the evening time with the prophet William Marrion Branham, according to Mark 13:35. The Message reveals many great mysteries of humanity, such as the origin of the Black race. This application contains the entire Message that Jesus Christ gave to His Servant Kacou Philippe for humanity, as well as the account of his conversion and the three great visions of his call and commission just as he received them. The Message has already been translated into more than 80 languages and is addressed to all the inhabitants of the earth. Share it with everyone you love.
+          On April 24, 1993, Kacou Philippe, a young man working on a construction site, received a vision: the visitation of an angel of God who commissioned him with a Message destined for the Salvation of the whole earth, in fulfillment of the cry of Matthew 25:6—the midnight cry in the Bible—after the evening time with the prophet William Marrion Branham, according to Mark 13:35. The Message reveals many great mysteries of humanity, such as the origin of the Black race. This application contains the entire Message that Jesus Christ gave to His Servant Kacou Philippe for humanity, as well as the account of his conversion and the three great visions of his call and commission just as he received them. The Message has already been translated into more than 80 languages and is addressed to all the inhabitants of the earth. Share it with everyone you love.
 
-          grade: stable
-          confinement: strict
+        grade: stable
+        confinement: strict
 
-          contact:
-            - aikpeachille55@gmail.com
-            - https://www.linkedin.com/in/achile-aikpe-018654196/
+        contact: aikpeachille55@gmail.com
+        website: https://philippekacou.org
+        issues: https://github.com/yourusername/yourrepo/issues
 
-          website:
-            - https://philippekacou.org
+        architectures:
+          - build-on: [arm64]
+            build-for: [arm64]
 
-          issues:
-            - aikpeachille55@gmail.com
-            - https://www.linkedin.com/in/achile-aikpe-018654196/
+        layout:
+          /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+            bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
 
-          architectures:
-            - build-on: [arm64]
-              build-for: [arm64]
+        apps:
+          prophetkacou:
+            command: usr/bin/prophetkacou
+            desktop: usr/share/applications/prophetkacou.desktop
+            plugs:
+              - desktop
+              - desktop-legacy
+              - wayland
+              - x11
+              - opengl
+              - network
+              - network-bind
+              - home
+              - gsettings
+              - audio-playback
+            environment:
+              GTK_USE_PORTAL: "1"
+              WEBKIT_DISABLE_COMPOSITING_MODE: "1"
 
-          layout:
-            /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
-              bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
+        parts:
+          prophetkacou:
+            plugin: dump
+            source: .
+            stage-packages:
+              - libwebkit2gtk-4.1-0
+              - libgtk-3-0
+              - libayatana-appindicator3-1
+              - libglib2.0-0
+              - libgdk-pixbuf-2.0-0
+              - libcairo2
+              - libpango-1.0-0
+              - libatk1.0-0
+              - libsoup-3.0-0
+              - libjavascriptcoregtk-4.1-0
+              - glib-networking
+              - gsettings-desktop-schemas
+        EOF
 
-          apps:
-            prophetkacou:
-              command: usr/bin/prophetkacou
-              desktop: usr/share/applications/prophetkacou.desktop
-              plugs:
-                - desktop
-                - desktop-legacy
-                - wayland
-                - x11
-                - opengl
-                - network
-                - network-bind
-                - home
-                - gsettings
-                - audio-playback
-              environment:
-                # Ensures GTK uses correct theme
-                GTK_USE_PORTAL: "1"
-                # WebKit environment variables
-                WEBKIT_DISABLE_COMPOSITING_MODE: "1"
+        # Build the snap in destructive mode (no container needed)
+        cd snap-build
+        snapcraft pack --destructive-mode --verbose
 
-          parts:
-            prophetkacou:
-              plugin: dump
-              source: .
-              stage-packages:
-                - libwebkit2gtk-4.1-0
-                - libgtk-3-0
-                - libayatana-appindicator3-1
-                - libglib2.0-0
-                - libgdk-pixbuf2.0-0
-                - libcairo2
-                - libpango-1.0-0
-                - libatk1.0-0
-                - libsoup-3.0-0
-                - libjavascriptcoregtk-4.1-0
-                - glib-networking
-                - gsettings-desktop-schemas
-          EOF
+    - name: Login to Snapcraft
+      run: |
+        echo "${{ secrets.SNAPCRAFT_TOKEN }}" | snapcraft login --with -
 
-          # Build the snap
-          cd snap-build
-          snapcraft pack
+    - name: Publish Snap to Store
+      run: |
+        cd snap-build
+        snapcraft upload --release=stable *.snap
 
-      - name: Login to Snapcraft
-        run: |
-          echo "${{ env.SNAPCRAFT_TOKEN }}" | snapcraft login --with -
+    - name: Upload Snap as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: prophetkacou-aarch64-snap
+        path: snap-build/*.snap
 
-      - name: Publish Snap to Store
-        run: |
-          cd snap-build
-          snapcraft upload --release=stable *.snap
+    # ===== FIN DE LA SECTION SNAP =====
 
-      - name: Upload Snap as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: prophetkacou-aarch64-snap
-          path: snap-build/*.snap
-
-      # ===== FIN DE LA SECTION SNAP =====
-
-      - name: Upload assets to CrabNebula
-        uses: crabnebula-dev/cloud-release@v0
-        with:
-          command: release upload ${{ env.CN_APPLICATION }} --framework tauri
-          api-key: ${{ env.CN_API_KEY }}
-
+    - name: Upload assets to CrabNebula
+      uses: crabnebula-dev/cloud-release@v0
+      with:
+        command: release upload ${{ env.CN_APPLICATION }} --framework tauri
+        api-key: ${{ env.CN_API_KEY }}
   #Step 5: publish release to CrabNebula
   # publish-release:
   #   name: publish release to CrabNebula
