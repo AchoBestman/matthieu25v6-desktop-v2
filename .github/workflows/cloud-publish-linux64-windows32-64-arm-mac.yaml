@@ -1098,6 +1098,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-${{ runner.arch }}-apt-
 
+    
     - name: Install pnpm
       uses: pnpm/action-setup@v3
       with:
@@ -1166,127 +1167,28 @@ jobs:
         TAURI_SIGNING_PRIVATE_KEY: ${{ env.TAURI_SIGNING_PRIVATE_KEY }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ env.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
-    # ===== NOUVELLE SECTION POUR LE SNAP =====
-
-    - name: Install Snapcraft
-      run: |
-        sudo snap install snapcraft --classic
-
-    - name: Create Snap from DEB
-      run: |
-        # Create snapcraft directory structure
-        mkdir -p snap-build/meta snap-build/snap
-
-        # Extract the DEB package
-        dpkg -x src-tauri/target/aarch64-unknown-linux-gnu/release/bundle/deb/*.deb snap-build/
-
-        # Create snapcraft.yaml
-        cat > snap-build/snap/snapcraft.yaml << 'EOF'
-        name: prophetkacou
-        title: Prophet Kacou
-        base: core22
-        version: "1.0.1"
-        summary: This app contains all the message of Prophet Kacou Philippe
-        description: |
-          The Book of Prophet Kacou, having the same value as the Books of the Bible.
-
-          On April 24, 1993, Kacou Philippe, a young man working on a construction site, received a vision: the visitation of an angel of God who commissioned him with a Message destined for the Salvation of the whole earth, in fulfillment of the cry of Matthew 25:6—the midnight cry in the Bible—after the evening time with the prophet William Marrion Branham, according to Mark 13:35. The Message reveals many great mysteries of humanity, such as the origin of the Black race. This application contains the entire Message that Jesus Christ gave to His Servant Kacou Philippe for humanity, as well as the account of his conversion and the three great visions of his call and commission just as he received them. The Message has already been translated into more than 80 languages and is addressed to all the inhabitants of the earth. Share it with everyone you love.
-
-        grade: stable
-        confinement: strict
-
-        contact: aikpeachille55@gmail.com
-        website: https://philippekacou.org
-        issues: https://github.com/yourusername/yourrepo/issues
-
-        architectures:
-          - build-on: [arm64]
-            build-for: [arm64]
-
-        layout:
-          /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
-            bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
-
-        apps:
-          prophetkacou:
-            command: usr/bin/prophetkacou
-            desktop: usr/share/applications/prophetkacou.desktop
-            plugs:
-              - desktop
-              - desktop-legacy
-              - wayland
-              - x11
-              - opengl
-              - network
-              - network-bind
-              - home
-              - gsettings
-              - audio-playback
-            environment:
-              GTK_USE_PORTAL: "1"
-              WEBKIT_DISABLE_COMPOSITING_MODE: "1"
-
-        parts:
-          prophetkacou:
-            plugin: dump
-            source: .
-            stage-packages:
-              - libwebkit2gtk-4.1-0
-              - libgtk-3-0
-              - libayatana-appindicator3-1
-              - libglib2.0-0
-              - libgdk-pixbuf-2.0-0
-              - libcairo2
-              - libpango-1.0-0
-              - libatk1.0-0
-              - libsoup-3.0-0
-              - libjavascriptcoregtk-4.1-0
-              - glib-networking
-              - gsettings-desktop-schemas
-        EOF
-
-        # Build the snap in destructive mode (no container needed)
-        cd snap-build
-        snapcraft pack --destructive-mode --verbose
-
-    - name: Login to Snapcraft
-      run: |
-        echo "${{ secrets.SNAPCRAFT_TOKEN }}" | snapcraft login --with -
-
-    - name: Publish Snap to Store
-      run: |
-        cd snap-build
-        snapcraft upload --release=stable *.snap
-
-    - name: Upload Snap as artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: prophetkacou-aarch64-snap
-        path: snap-build/*.snap
-
-    # ===== FIN DE LA SECTION SNAP =====
-
     - name: Upload assets to CrabNebula
       uses: crabnebula-dev/cloud-release@v0
       with:
         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
         api-key: ${{ env.CN_API_KEY }}
+
   #Step 5: publish release to CrabNebula
-  # publish-release:
-  #   name: publish release to CrabNebula
-  #   needs:
-  #     - build-macos-out-apple-store
-  #     - build-macos-on-apple-store
-  #     - build-windows-x64
-  #     - build-windows-x86
-  #     - build-windows-arm64
-  #     - build-linux-x64
-  #     - build-linux-aarch64
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - uses: actions/checkout@v4
-  #     - name: Publish release to CrabNebula
-  #       uses: crabnebula-dev/cloud-release@v0
-  #       with:
-  #         command: release publish ${{ env.CN_APPLICATION }} --framework tauri
-  #         api-key: ${{ env.CN_API_KEY }}
+  publish-release:
+    name: publish release to CrabNebula
+    needs:
+    - build-macos-out-apple-store
+    - build-macos-on-apple-store
+    - build-windows-x64
+    - build-windows-x86
+    - build-windows-arm64
+    - build-linux-x64
+    - build-linux-aarch64
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Publish release to CrabNebula
+      uses: crabnebula-dev/cloud-release@v0
+      with:
+        command: release publish ${{ env.CN_APPLICATION }} --framework tauri
+        api-key: ${{ env.CN_API_KEY }}
