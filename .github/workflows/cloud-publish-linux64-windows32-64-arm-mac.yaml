@@ -1116,6 +1116,7 @@ jobs:
 
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
+
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
@@ -1183,11 +1184,11 @@ jobs:
           cat > snap-build/snapcraft.yaml << 'EOF'
           name: prophetkacou
           title: Prophet Kacou
-          base: core22 # we recommend using 'core22' for new snaps. base: core24 builds the snap in an Ubuntu 24.04 environment.
-          build-base: core22 #The build environment to use when building the snap
+          base: core22
+          build-base: core22
           version: "1.0.1"
-          type: app # we recommend using 'app' if your snap has a UI
-          summary: This app contains all the message of Prophet Kacou Philippe # 79 char long summary
+          type: app
+          summary: This app contains all the message of Prophet Kacou Philippe
           description: |
             The Book of Prophet Kacou, having the same value as the Books of the Bible.
 
@@ -1208,41 +1209,56 @@ jobs:
             - https://www.linkedin.com/in/achile-aikpe-018654196/
 
           architectures:
-            - build-on:
-                - amd64
-              build-for:
-                - amd64
-            - build-on:
-                - arm64
-              build-for:
-                - arm64
+            - build-on: [arm64]
+              build-for: [arm64]
 
           layout:
-            /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0:
-              bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0
+            /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1:
+              bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.1
 
           apps:
             prophetkacou:
               command: usr/bin/prophetkacou
               desktop: usr/share/applications/prophetkacou.desktop
-              extensions: [ gnome ]
               plugs:
+                - desktop
+                - desktop-legacy
+                - wayland
+                - x11
+                - opengl
                 - network
+                - network-bind
                 - home
+                - gsettings
+                - audio-playback
+              environment:
+                # Ensures GTK uses correct theme
+                GTK_USE_PORTAL: "1"
+                # WebKit environment variables
+                WEBKIT_DISABLE_COMPOSITING_MODE: "1"
 
           parts:
             prophetkacou:
               plugin: dump
               source: .
               stage-packages:
-                - libwebkit2gtk-4.0-37
+                - libwebkit2gtk-4.1-0
                 - libgtk-3-0
                 - libayatana-appindicator3-1
+                - libglib2.0-0
+                - libgdk-pixbuf2.0-0
+                - libcairo2
+                - libpango-1.0-0
+                - libatk1.0-0
+                - libsoup-3.0-0
+                - libjavascriptcoregtk-4.1-0
+                - glib-networking
+                - gsettings-desktop-schemas
           EOF
 
           # Build the snap
           cd snap-build
-          snapcraft --destructive-mode
+          snapcraft pack
 
       - name: Login to Snapcraft
         run: |
@@ -1250,7 +1266,6 @@ jobs:
 
       - name: Publish Snap to Store
         run: |
-          echo "build snapcraft"
           cd snap-build
           snapcraft upload --release=stable *.snap
 
