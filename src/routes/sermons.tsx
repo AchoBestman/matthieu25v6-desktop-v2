@@ -373,7 +373,7 @@ function RouteComponent() {
                   )}
                   <div>
                     <span className="font-bold dark:text-red-500">
-                      {verset.number}.
+                      {verset.number}
                     </span>
                     <span
                       dangerouslySetInnerHTML={{
