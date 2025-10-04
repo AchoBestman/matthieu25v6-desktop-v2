@@ -1172,7 +1172,7 @@ jobs:
         command: release upload ${{ env.CN_APPLICATION }} --framework tauri
         api-key: ${{ env.CN_API_KEY }}
 
-  Step 5: publish release to CrabNebula
+  #Step 5: publish release to CrabNebula
   publish-release:
     name: publish release to CrabNebula
     needs:
