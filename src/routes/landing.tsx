@@ -205,7 +205,7 @@ export default function RouteComponent() {
                 <button
                   onClick={() =>
                     openLink(
-                      "https://web.crabnebula.cloud/prophet-kacou/prophet-kacou/releases"
+                      "https://www.philippekacou.org/en-en/download"
                     )
                   }
                   className="px-4 py-2 bg-white hover:bg-pkp-ocean text-pkp-indigo hover:text-white font-semibold rounded shadow-lg transition-colors text-sm cursor-pointer border border-white"
