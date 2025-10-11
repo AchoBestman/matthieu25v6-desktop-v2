@@ -7,4 +7,4 @@ feat: Enhance UI components with new styles and search functionality
 - Enhanced dialog components with consistent styling and improved user experience.
 - Updated list and card components for photos and videos to align with new design.
 - Refined sermon and biography routes for better layout and styling consistency.
-- Adjusted index.css for new color variables and audio player styles.
+- Adjusted new color variables and audio player styles.
