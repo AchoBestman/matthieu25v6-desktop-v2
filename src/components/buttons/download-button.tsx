@@ -6,7 +6,7 @@ import { tr } from "@/translation";
 import DownloadProgressModal from "../dialog/download-progress-modal";
 import { useLangue } from "@/context/langue-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
-import { clearHistory, DownloadHistoryItem, loadHistory, updateHistory } from "@/lib/download-history";
+import { clearHistory, DownloadHistoryItem, updateHistory } from "@/lib/download-history";
 import { downloadDir } from "@tauri-apps/api/path";
 
 export async function downloadAudioWithProgress(
@@ -86,6 +86,7 @@ export const DownloadButton = ({
       setFinishedDownload(true);
     }
 
+    //console.log(progress, 'song progress')
     return () => {};
   }, [progress]);
 
