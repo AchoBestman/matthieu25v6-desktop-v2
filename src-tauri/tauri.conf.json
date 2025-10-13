@@ -50,7 +50,8 @@
       "resources/fr/matth25v6_fr.db",
       "resources/en/matth25v6_en.db",
       "resources/es/matth25v6_es.db",
-      "resources/pt/matth25v6_pt.db"
+      "resources/pt/matth25v6_pt.db",
+      "resources/common/common.db"
     ],
     "externalBin": [],
     "category": "Music",

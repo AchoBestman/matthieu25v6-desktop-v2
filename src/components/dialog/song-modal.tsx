@@ -32,7 +32,7 @@ const SongModal = ({
 }) => {
   const { fontSize } = useSermon();
   const { lng } = useLangue();
-  //console.log("Rendering SongModal with song:", song);
+
   async function handleDownload() {
     onOpenChange(false);
     const blob = await pdf(

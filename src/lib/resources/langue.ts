@@ -3,6 +3,8 @@ import { allModels, oneModel } from "@/lib/resources/base";
 import { Langue } from "@/schemas/langue";
 import { DataType } from "@/schemas/sermon";
 
+export const isCommon = true;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -35,6 +37,7 @@ export const findAll = async (
 
   const response = await allModels<Langue>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -55,6 +58,7 @@ export const findBy = async (
   const response = await oneModel<Langue>(
     resource,
     lang,
+    isCommon,
     params,
     relationships
   );

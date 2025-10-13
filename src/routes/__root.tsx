@@ -23,12 +23,14 @@ import { SearchDrawer } from "@/components/commons/search-drawer";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import DonwloadHistoryDropdown from "@/components/commons/download-history";
 import AppUpdaterDropdown from "@/components/commons/app-updater";
+import useLangueUpdates from "@/hooks/use-langue-updates";
 
 export const Route = createRootRoute({
   component: RootComponent,
 });
 
 function RootComponent() {
+   useLangueUpdates()
   const { lng } = useLangue();
   const [topMenus, setTopMenus] = React.useState(menus);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);

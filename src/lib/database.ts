@@ -1,6 +1,6 @@
 import Database from "@tauri-apps/plugin-sql";
 import { exists, mkdir, remove, writeFile } from "@tauri-apps/plugin-fs";
-import { AppDatabaseDir, downloadDrogressType } from "./utils";
+import { AppDatabaseDir, downloadDrogressType, getDbInfo } from "./utils";
 import { API_URL } from "./env";
 import { appDataDir, join } from "@tauri-apps/api/path";
 
@@ -8,15 +8,9 @@ import { appDataDir, join } from "@tauri-apps/api/path";
  * Delete file for local
  */
 
-export async function deleteDb(initial: string) {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
-    throw new Error(
-      `Invalid format: ${initial} must be in the format 'AA-AA{BC}'`
-    );
-  }
-  const [country, langue] = initial.toLowerCase().split("-");
-  const dbPath = `${country}/matth25v6_${langue}.db`;
-  await remove(dbPath, {
+export async function deleteDb(initial: string, isCommon: boolean) {
+  const dbInfo = await getDbInfo(initial, isCommon);
+  await remove(dbInfo.dbpath, {
     baseDir: AppDatabaseDir,
     recursive: true,
   });
@@ -28,6 +22,7 @@ export async function deleteDb(initial: string) {
 export async function downloadWithProgress(
   url: string,
   initial: string,
+  isCommon: boolean,
   onProgress?: ({
     percent,
     downloadSize,
@@ -35,16 +30,9 @@ export async function downloadWithProgress(
   }: downloadDrogressType) => void,
   signal?: () => boolean
 ) {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
-    throw new Error(
-      `Invalid format: ${initial} must be in the format 'AA-AA{BC}'`
-    );
-  }
+  const dbInfo = await getDbInfo(initial, isCommon);
 
-  const [country, langue] = initial.toLowerCase().split("-");
-  const dbPath = `${country}/matth25v6_${langue}.db`;
-
-  await mkdir(country, {
+  await mkdir(dbInfo.subdir, {
     baseDir: AppDatabaseDir,
     recursive: true,
   });
@@ -101,7 +89,7 @@ export async function downloadWithProgress(
     position += chunk.length;
   }
 
-  await writeFile(dbPath, blob, {
+  await writeFile(dbInfo.dbpath, blob, {
     baseDir: AppDatabaseDir,
   });
 }
@@ -110,6 +98,7 @@ export async function downloadWithProgress(
 //it load database from this directory
 const database = async (
   initial: string,
+  isCommon: boolean,
   onProgress?: ({
     percent,
     downloadSize,
@@ -117,35 +106,30 @@ const database = async (
   }: downloadDrogressType) => void,
   signal?: () => boolean
 ) => {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
-    throw new Error(
-      `Invalid format: ${initial} must be in the format 'AA-AA{BC}'`
-    );
-  }
-  const [country, langue] = initial.toLowerCase().split("-");
-  //work on mac and windows but not work on linux
-  const dbPath = `${country}/matth25v6_${langue}.db`;
-  let fullDbPath = dbPath;
 
-  //this work on linux
-  const baseDir = await appDataDir();                       // ~/.local/share/<appname>/
-  fullDbPath = await join(baseDir, country, `matth25v6_${langue}.db`);
+  const dbInfo = await getDbInfo(initial, isCommon);
+
+  const baseDir = await appDataDir();// ~/.local/share/<appname>/
+  const fullDbPath = await join(baseDir, dbInfo.subdir, dbInfo.dbname);
   // Ensure the folder exists
 
-  await mkdir(country, {
+  await mkdir(dbInfo.subdir, {
     baseDir: AppDatabaseDir,
     recursive: true,
   });
 
-  const dbExists = await dbExist(initial);
+  const dbExists = await dbExist(initial, isCommon);
 
   if (!dbExists) {
     // If the file doesn't exist, download it
 
+    const url = isCommon ? `${API_URL}/auth/download-common-db` : `${API_URL}/auth/download/${initial}`;
+
     try {
       await downloadWithProgress(
-        `${API_URL}/auth/download/${initial}`,
+        url,
         initial,
+        isCommon,
         onProgress,
         signal
       );
@@ -158,16 +142,10 @@ const database = async (
   });
 };
 
-export const dbExist = async (initial: string) => {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(initial)) {
-    throw new Error(
-      `Invalid format: ${initial} must be in the format 'AA-AA{BC}'`
-    );
-  }
-  const [country, langue] = initial.toLowerCase().split("-");
-  const dbPath = `${country}/matth25v6_${langue}.db`;
+export const dbExist = async (initial: string, isCommon: boolean) => {
+  const dbInfo = await getDbInfo(initial, isCommon);
 
-  const status = await exists(dbPath, {
+  const status = await exists(dbInfo.dbpath, {
     baseDir: AppDatabaseDir,
   });
 

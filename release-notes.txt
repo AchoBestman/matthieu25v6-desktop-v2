@@ -1,10 +1,7 @@
-feat: Enhance UI components with new styles and search functionality
+feat(langue-updates): implement language update fetching and local storage management
 
-- Added search functionality to LangueDropdown with automatic focus on input.
-- Updated styles in various components to use new color scheme (pkp-sand, pkp-ocean).
-- Improved accessibility by preventing dropdown closure when interacting with search input.
-- Refactored SelectWithSearch to reset search term on close and focus input when opened.
-- Enhanced dialog components with consistent styling and improved user experience.
-- Updated list and card components for photos and videos to align with new design.
-- Refined sermon and biography routes for better layout and styling consistency.
-- Adjusted new color variables and audio player styles.
+- Added `useLangueUpdates` hook to fetch available language updates from the server.
+- Implemented `getAvailableLangs` function to read language directories and identify available languages.
+- Introduced local storage management for tracking last updates and available updates with relevant keys.
+- Created utility functions for setting and getting update data from local storage.
+- Enhanced error handling for network requests and file reading operations.

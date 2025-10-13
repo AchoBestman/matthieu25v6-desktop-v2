@@ -2,9 +2,11 @@ import database from "@/lib/database";
 import { resources, ResourcesType } from "@/lib/resources";
 import { downloadDrogressType, toSingle } from "@/lib/utils";
 import { DataType } from "@/schemas/sermon";
+import { AppDataUpdate } from "../db-updates";
 
 export const allModels = async <T>(
   lang: string,
+  isCommon: boolean,
   baseQuery: string,
   countQuery: string,
   searchParams: any[],
@@ -13,7 +15,7 @@ export const allModels = async <T>(
   order?: { column: string; direction: "ASC" | "DESC" },
   groupBy?: string
 ): Promise<DataType<T>> => {
-  const db = await database(lang);
+  const db = await database(lang, isCommon);
 
   const countResult = await db.select<{ total: number }[]>(
     countQuery,
@@ -76,11 +78,12 @@ try {
 export const oneModel = async <T>(
   resource: ResourcesType,
   lang: string,
+  isCommon: boolean,
   params: { column: string; value: string | number | boolean },
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[],
   onProgress?: (percent: downloadDrogressType) => void
 ): Promise<T | T[]> => {
-  const db = await database(lang, (percent) => {
+  const db = await database(lang, isCommon, (percent) => {
     if (onProgress) {
       onProgress(percent);
     }
@@ -168,13 +171,20 @@ export const oneModel = async <T>(
 export const totalModel = async (
   resource: ResourcesType,
   lang: string,
+  isCommon: boolean,
   onProgress?: (percent: downloadDrogressType) => void
 ): Promise<number> => {
-  const db = await database(lang, (percent) => {
+  const db = await database(lang, isCommon, (percent) => {
     if (onProgress) {
       onProgress(percent);
     }
   });
   const result = await db.select(`SELECT COUNT(*) as total FROM ${resource} `);
   return (result as any[])[0].total;
+};
+
+export const findLangueLastUpdate = async (lang: string, update_langue: string) => {
+  const db = await database(lang, true);
+  const result = await db.select(`SELECT updated_at, langue FROM langue_last_updateds WHERE langue = ? LIMIT 1`, [update_langue]) as AppDataUpdate[];
+  return result[0] as AppDataUpdate;
 };
