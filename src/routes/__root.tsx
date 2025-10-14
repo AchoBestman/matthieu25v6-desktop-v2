@@ -24,13 +24,15 @@ import "react-confirm-alert/src/react-confirm-alert.css";
 import DonwloadHistoryDropdown from "@/components/commons/download-history";
 import AppUpdaterDropdown from "@/components/commons/app-updater";
 import useLangueUpdates from "@/hooks/use-langue-updates";
+import ErrorFallback from "@/components/commons/error-fallback";
 
 export const Route = createRootRoute({
   component: RootComponent,
+  errorComponent: ErrorFallback,
 });
 
 function RootComponent() {
-   useLangueUpdates()
+  useLangueUpdates();
   const { lng } = useLangue();
   const [topMenus, setTopMenus] = React.useState(menus);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);

@@ -38,10 +38,10 @@ const SermonHeader = ({
     const fileName = `${sermon.chapter}-${lng}`;
 
     //create filePath
-    const filePath = await createPaths(lng, 'Sermons', fileName, 'pdf');
+    const filePath = await createPaths(lng, "Sermons", fileName, "pdf");
 
     await writeFile(filePath, uint8Array, { baseDir: DownloadBaseDir });
-    await openFile(filePath)
+    await openFile(filePath);
   }
 
   const { lng } = useLangue();
