@@ -1,7 +1,12 @@
-feat(langue-updates): implement language update fetching and local storage management
+feat: Implement notification system with dropdown UI and server integration
 
-- Added `useLangueUpdates` hook to fetch available language updates from the server.
-- Implemented `getAvailableLangs` function to read language directories and identify available languages.
-- Introduced local storage management for tracking last updates and available updates with relevant keys.
-- Created utility functions for setting and getting update data from local storage.
-- Enhanced error handling for network requests and file reading operations.
+- Added NotificationDropdown component for displaying user notifications.
+- Integrated notification fetching from the server and local storage management.
+- Implemented functionality to mark notifications as read or deleted.
+- Added search and filter capabilities for notifications.
+- Updated AppUpdaterDropdown to use new update status variable.
+- Refactored useLangueUpdates to utilize availableServerLanguesUpdates and availableServerNotifications.
+- Enhanced database download functions with improved error handling.
+- Created Tabs component for better organization of notification views.
+- Updated sermon routes to load images from both local and common sources.
+- Added webTranslation state to LangueContext for better language handling.
