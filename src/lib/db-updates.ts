@@ -1,3 +1,7 @@
+import { downloadWithProgress } from "./database";
+import { API_URL } from "./env";
+import { findLangueLastUpdate } from "./resources/base";
+
 //database last update key
 export const DB_LAST_UPDATE_KEY = "languesLastUpdates";
 
@@ -108,3 +112,53 @@ export const updateLangueLastUpdate = async (data: AppDataUpdate) => {
   );
   setTotalAppDataUpdatesAvailable(newTotal);
 };
+
+
+
+export const availableServerLanguesUpdates = async (lng: string, langs: string[]) => {
+
+      const params = new URLSearchParams();
+
+      [...langs, "common"].forEach((lang) => params.append("langs[]", lang));
+      const url = `${API_URL}/${lng}/langue-releases/all-new-updates?${params.toString()}`;
+
+      try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+
+        const data = await response.json();
+        setAppDataUpdatesAvailable(data);
+        setLastAppDataUpdates(data)
+
+        const common = data.find(
+          (item: AppDataUpdate) => item.langue === "common"
+        );
+
+        if (common?.updated_at) {
+          const lastupdatedAt = await findLangueLastUpdate(lng, common.langue);
+          if (
+            !lastupdatedAt ||
+            (lastupdatedAt &&
+              new Date(common.updated_at) > new Date(lastupdatedAt.updated_at))
+          ) {
+                try {
+                  console.log(common, "download updated common database finish")
+                  await downloadWithProgress(
+                    `${API_URL}/auth/download-common-db`,
+                    lng,
+                    true,
+                  );
+                } catch (err) {
+                  console.error("Error downloading database:", err);
+                }
+          }
+        }
+        
+      } catch (err: any) {
+        console.error("Error fetching updates:", err);
+      } finally {
+      }
+    };

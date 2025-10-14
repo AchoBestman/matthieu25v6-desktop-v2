@@ -25,6 +25,7 @@ import DonwloadHistoryDropdown from "@/components/commons/download-history";
 import AppUpdaterDropdown from "@/components/commons/app-updater";
 import useLangueUpdates from "@/hooks/use-langue-updates";
 import ErrorFallback from "@/components/commons/error-fallback";
+import NotificationDropdown from "@/components/commons/notification-dropdown";
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -73,6 +74,7 @@ function RootComponent() {
             </BreadcrumbList>
           </Breadcrumb>
           <div className="flex items-center">
+            <NotificationDropdown/>
             <AppUpdaterDropdown />
             <DonwloadHistoryDropdown />
             <SearchCodeIcon

@@ -4,7 +4,7 @@ import SermonHeader from "@/components/sermons/sermon-header";
 import { useLangue } from "@/context/langue-context";
 import { useSermon } from "@/context/sermon-context";
 import { resources } from "@/lib/resources";
-import { findBy, findImage } from "@/lib/resources/sermon";
+import { findBy, findImage, findCommonImage } from "@/lib/resources/sermon";
 import {
   createPaths,
   downloadDrogressType,
@@ -165,7 +165,7 @@ function RouteComponent() {
   const [sermonImage, setSermonImage] = useState<{
     name: string;
     blobUrl: string | null;
-  }>();
+  }>({ name: "", blobUrl: null });
 
   const {
     fontSize,
@@ -269,6 +269,22 @@ function RouteComponent() {
     setOpenProgress(!openProgress);
   };
 
+  async function loadSermonImage() {
+    if (!sermon?.cover) return;
+
+    try {
+      const value = await findImage(lng, sermon.cover);
+      setSermonImage(value);
+    } catch (err1) {
+      try {
+        const value = await findCommonImage(lng, sermon.cover);
+        setSermonImage(value);
+      } catch (err2) {
+        console.log(err2, "image error");
+      }
+    }
+  }
+
   useEffect(() => {
     if (sermon) {
       getLocalFilePath(lng, "Sermons", `${sermon.chapter} : ${sermon.title}`)
@@ -280,17 +296,7 @@ function RouteComponent() {
         });
     }
 
-    if (sermon?.cover) {
-      findImage(lng, sermon.cover)
-        .then((value) => {
-          setSermonImage(value);
-        })
-        .catch((err) => {
-          console.log(err, "image error");
-        });
-    } else {
-      setSermonImage({ name: "", blobUrl: null });
-    }
+    loadSermonImage()
   }, [sermon]);
 
   useEffect(() => {

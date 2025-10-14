@@ -11,13 +11,12 @@ import { tr } from "@/translation";
 import { useUpdater } from "@/hooks/use-updater";
 
 const AppUpdaterDropdown = () => {
-  const { update, progress, status, error, checkForUpdate, installUpdate } =
+  const { update, progress, updateStatus, error, checkForUpdate, installUpdate } =
     useUpdater();
 
   useEffect(() => {
     // Automatically check on startup ddd
     checkForUpdate();
-    console.log(status);
   }, [checkForUpdate]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -60,7 +59,7 @@ const AppUpdaterDropdown = () => {
                     <span className="mr-2 text-3xl">
                       Prophet Kacou v{update.version}
                     </span>
-                    {status === "downloading" && (
+                    {updateStatus === "downloading" && (
                       <progress
                         style={{ borderRadius: "6px" }}
                         value={progress + 20}
@@ -79,7 +78,7 @@ const AppUpdaterDropdown = () => {
                       toggleDropdown(e);
                     }}
                   >
-                    {status === "idle" && update && (
+                    {updateStatus === "idle" && update && (
                       <RefreshCw className="w-7 text-red-500"></RefreshCw>
                     )}
                   </button>

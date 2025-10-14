@@ -1,6 +1,6 @@
 import { ResourcesType } from "@/lib/resources";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { AppDatabaseDir, downloadDrogressType, getDbInfo, toObject } from "../utils";
+import { downloadDrogressType, getDbInfo, toObject } from "../utils";
 import {
   createDataTypeSchema,
   DataType,
@@ -11,7 +11,6 @@ import {
 } from "@/schemas/sermon";
 import database, { dbExist } from "../database";
 import { invoke } from "@tauri-apps/api/core";
-import { mkdir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
 
 export const isCommon = false;
@@ -166,24 +165,13 @@ export const findBy = async (
 };
 
 export const findImage = async (lang: string, name: string) => {
+  
   const dbInfo = await getDbInfo(lang, isCommon);
-
-  // Ensure the folder exists
-
-  await mkdir(dbInfo.subdir, {
-    baseDir: AppDatabaseDir,
-    recursive: true,
-  });
 
   const dbExists = await dbExist(lang, isCommon);
   if (!dbExists) return { name, blobUrl: null };
 
-  // 🔥 Résoudre le chemin absolu vers le fichier db
-  //const dbPath = await resolveResource(relativePath);
-  // ⚠️ si ton fichier est bien copié dans "resources" au build
-  // sinon -> utilise appDataDir + relativePath
-  const dbPath = (await appDataDir()) + "/" + dbInfo.dbname;
-
+  const dbPath = (await appDataDir()) + "/" + dbInfo.dbpath;
   // appel du Rust command fetch_blob
   const blob: number[] = await invoke("fetch_blob", {
     dbPath,
@@ -203,23 +191,13 @@ export const findImage = async (lang: string, name: string) => {
 
 
 export const findCommonImage = async (lang: string, name: string) => {
+
   const dbInfo = await getDbInfo(lang, true);
-
-  // Ensure the folder exists
-
-  await mkdir(dbInfo.subdir, {
-    baseDir: AppDatabaseDir,
-    recursive: true,
-  });
 
   const dbExists = await dbExist(lang, true);
   if (!dbExists) return { name, blobUrl: null };
 
-  // 🔥 Résoudre le chemin absolu vers le fichier db
-  //const dbPath = await resolveResource(relativePath);
-  // ⚠️ si ton fichier est bien copié dans "resources" au build
-  // sinon -> utilise appDataDir + relativePath
-  const dbPath = (await appDataDir()) + "/" + dbInfo.dbname;
+  const dbPath = (await appDataDir()) + "/" + dbInfo.dbpath;
 
   // appel du Rust command fetch_blob
   const blob: number[] = await invoke("fetch_blob", {

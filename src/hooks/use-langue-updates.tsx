@@ -1,8 +1,8 @@
 import { useLangue } from "@/context/langue-context";
-import { downloadWithProgress } from "@/lib/database";
-import { AppDataUpdate, setAppDataUpdatesAvailable, setLastAppDataUpdates } from "@/lib/db-updates";
-import { API_URL } from "@/lib/env";
-import { findLangueLastUpdate } from "@/lib/resources/base";
+import {
+  availableServerLanguesUpdates
+} from "@/lib/db-updates";
+import { availableServerNotifications } from "@/lib/notifications";
 import { AppDatabaseDir } from "@/lib/utils";
 import { readDir } from "@tauri-apps/plugin-fs";
 import { useEffect } from "react";
@@ -54,49 +54,10 @@ function useLangueUpdates() {
 
   useEffect(() => {
     const fetchUpdates = async () => {
-      const langs = await getAvailableLangs(); // Example languages, replace with actual logic to get relevant languages
-      const params = new URLSearchParams();
-
-      [...langs, "common"].forEach((lang) => params.append("langs[]", lang));
-      const url = `${API_URL}/${lng}/langue-releases/all-new-updates?${params.toString()}`;
-
       try {
-        console.log(url, "download updated common database url")
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          throw new Error(`HTTP error ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log(data, "download updated common database ")
-        setAppDataUpdatesAvailable(data);
-        setLastAppDataUpdates(data)
-
-        const common = data.find(
-          (item: AppDataUpdate) => item.langue === "common"
-        ) as AppDataUpdate;
-
-        if (common && common.updated_at) {
-          const lastupdatedAt = await findLangueLastUpdate(lng, common.langue);
-          if (
-            !lastupdatedAt ||
-            (lastupdatedAt &&
-              new Date(common.updated_at) > new Date(lastupdatedAt.updated_at))
-          ) {
-                try {
-                  console.log(common, "download updated common database finish")
-                  await downloadWithProgress(
-                    `${API_URL}/auth/download-common-db`,
-                    lng,
-                    true,
-                  );
-                } catch (err) {
-                  console.error("Error downloading database:", err);
-                }
-          }
-        }
-        
+        const langs = await getAvailableLangs();
+        availableServerNotifications(lng, langs).catch(err=> console.log(err));
+        availableServerLanguesUpdates(lng, langs).catch(err=> console.log(err));
       } catch (err: any) {
         console.error("Error fetching updates:", err);
       } finally {

@@ -64,7 +64,7 @@ export function useUpdater() {
   return {
     update,
     progress,
-    status,
+    updateStatus: status,
     error,
     checkForUpdate,
     installUpdate,
