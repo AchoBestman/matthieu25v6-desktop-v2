@@ -72,26 +72,24 @@ export const setLastAppDataUpdates = (data: AppDataUpdate[]): void => {
 
 export const dbHasNewUpdate = (lang: string): AppDataUpdate | undefined => {
   const totalAvailable: string[] = getTotalAppDataUpdatesAvailable();
-  let dbHasUpdate = false;
+  const lastUpdatedAt = getLastAppDataUpdate(lang);
+  const currentUpdate = getAppDataUpdateAvailable(lang);
 
-  const lastupdatedAt = getLastAppDataUpdate(lang);
-  const currentLangueUpdate = getAppDataUpdateAvailable(lang);
+  if (!currentUpdate) return undefined;
+  
 
-  if (currentLangueUpdate && lastupdatedAt) {
-    if (
-      new Date(currentLangueUpdate.updated_at) >
-      new Date(lastupdatedAt.updated_at)
-    ) {
-      dbHasUpdate = true;
-      if (!totalAvailable.includes(lang)) totalAvailable.push(lang);
-    }
-  } else if (currentLangueUpdate && !lastupdatedAt) {
-    dbHasUpdate = true;
-    if (!totalAvailable.includes(lang)) totalAvailable.push(lang);
+  const lastTime = lastUpdatedAt ? new Date(lastUpdatedAt.updated_at).getTime() : 0;
+  const currentTime = new Date(currentUpdate.updated_at).getTime();
+
+  const hasUpdate = currentTime > lastTime;
+
+
+  if (hasUpdate && !totalAvailable.includes(lang)) {
+    totalAvailable.push(lang);
+    setTotalAppDataUpdatesAvailable(totalAvailable);
   }
-  setTotalAppDataUpdatesAvailable(totalAvailable);
 
-  return dbHasUpdate ? currentLangueUpdate : undefined;
+  return hasUpdate ? currentUpdate : undefined;
 };
 
 export const updateLangueLastUpdate = async (data: AppDataUpdate) => {

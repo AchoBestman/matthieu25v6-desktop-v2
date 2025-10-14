@@ -61,6 +61,7 @@ function useLangueUpdates() {
       const url = `${API_URL}/${lng}/langue-releases/all-new-updates?${params.toString()}`;
 
       try {
+        console.log(url, "download updated common database url")
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -68,6 +69,7 @@ function useLangueUpdates() {
         }
 
         const data = await response.json();
+        console.log(data, "download updated common database ")
         setAppDataUpdatesAvailable(data);
         setLastAppDataUpdates(data)
 
@@ -83,7 +85,7 @@ function useLangueUpdates() {
               new Date(common.updated_at) > new Date(lastupdatedAt.updated_at))
           ) {
                 try {
-                  console.log(common, "download updated common database")
+                  console.log(common, "download updated common database finish")
                   await downloadWithProgress(
                     `${API_URL}/auth/download-common-db`,
                     lng,
