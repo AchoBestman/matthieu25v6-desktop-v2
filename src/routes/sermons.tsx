@@ -270,7 +270,10 @@ function RouteComponent() {
   };
 
   async function loadSermonImage() {
-    if (!sermon?.cover) return;
+    if (!sermon?.cover){
+      setSermonImage({ name: "", blobUrl: null })
+      return
+    };
 
     try {
       const value = await findImage(lng, sermon.cover);
