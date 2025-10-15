@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Jesteś offline. Połącz się z internetem, aby pobrać.",
     "stop_playing": "Czy na pewno chcesz zatrzymać dźwięk i zamknąć odtwarzacz?"
+  },
+  "notification": {
+    "notification": "powiadomienie",
+    "notifications": "powiadomienia",
+    "mark_all_as_read": "Oznacz wszystkie jako przeczytane",
+    "unread": "nieprzeczytane",
+    "all": "wszystko",
+    "deleted": "usunięte",
+    "no_notification": "Brak powiadomień",
+    "read_all": "Przeczytaj wszystko",
+    "delete_all": "Usuń wszystko",
+    "see": "Zobacz",
+    "make_as_read": "Oznacz jako przeczytane"
   }
 }

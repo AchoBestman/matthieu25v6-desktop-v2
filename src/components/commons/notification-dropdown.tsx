@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useMemo, ChangeEvent } from "react";
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  ChangeEvent,
+} from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Bell, Eye, Trash,MailOpen } from "lucide-react";
+import { Bell, Eye, Trash, MailOpen } from "lucide-react";
 import { useDebounce } from "use-debounce";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 import { tr } from "@/translation";
@@ -22,7 +28,9 @@ import { useLangue } from "@/context/langue-context";
 import type { Notification } from "@/lib/notifications";
 
 const NotificationDropdown = () => {
-  const [notifications, setLocalNotifications] = useState<Notification[]>([]);
+  const [localNotifications, setLocalNotifications] = useState<Notification[]>(
+    []
+  );
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 300);
@@ -42,7 +50,7 @@ const NotificationDropdown = () => {
 
   // Filtrer les notifications avec memoization
   const filteredNotifications = useMemo(() => {
-    return notifications.filter((n) => {
+    return localNotifications.filter((n) => {
       const searchMatch = n.content
         ?.toLowerCase()
         .includes(searchDebounce.toLowerCase());
@@ -56,12 +64,12 @@ const NotificationDropdown = () => {
           return !n.deleted_at && searchMatch;
       }
     });
-  }, [notifications, activeTab, searchDebounce]);
+  }, [localNotifications, activeTab, searchDebounce]);
 
   // Compter les notifications non lues
   const unreadCount = useMemo(() => {
-    return notifications.filter((n) => !n.read_at && !n.deleted_at).length;
-  }, [notifications]);
+    return localNotifications.filter((n) => !n.read_at && !n.deleted_at).length;
+  }, [localNotifications]);
 
   // Actions globales avec gestion d'erreur
   const handleReadAll = useCallback(() => {
@@ -69,7 +77,7 @@ const NotificationDropdown = () => {
     handleConfirmAlert(tr("button.confirm_action"), false, async () => {
       try {
         setIsLoading(true);
-        await markNotificationsAsRead();
+        markNotificationsAsRead();
         loadNotifications();
       } catch (error) {
         console.error("Erreur lors du marquage des notifications:", error);
@@ -85,7 +93,7 @@ const NotificationDropdown = () => {
     handleConfirmAlert(tr("button.confirm_action"), false, async () => {
       try {
         setIsLoading(true);
-        await markNotificationsAsDeleted();
+        markNotificationsAsDeleted();
         loadNotifications();
       } catch (error) {
         console.error("Erreur lors de la suppression:", error);
@@ -97,22 +105,28 @@ const NotificationDropdown = () => {
   }, [loadNotifications]);
 
   // Actions unitaires
-  const handleMarkAsRead = useCallback((id: number) => {
-    markNotificationAsRead(id);
-    loadNotifications();
-  }, [loadNotifications]);
+  const handleMarkAsRead = useCallback(
+    (id: number) => {
+      markNotificationAsRead(id);
+      loadNotifications();
+    },
+    [loadNotifications]
+  );
 
-  const handleDelete = useCallback((id: number) => {
-    markNotificationAsDeleted(id);
-    loadNotifications();
-  }, [loadNotifications]);
+  const handleDelete = useCallback(
+    (id: number) => {
+      markNotificationAsDeleted(id);
+      loadNotifications();
+    },
+    [loadNotifications]
+  );
 
   const handleViewNotification = useCallback(
     (notif: Notification) => {
       setIsOpen(false);
       handleMarkAsRead(notif.id);
-      handleConfirmAlert(notif.content, notif.url ? false : true, ()=>{
-        console.log(notif.url)
+      handleConfirmAlert(notif.content, !notif.url, () => {
+        console.log(notif.url);
       });
     },
     [handleMarkAsRead]
@@ -122,10 +136,13 @@ const NotificationDropdown = () => {
     setSearch(e.target.value);
   }, []);
 
-  const toggleDropdown = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    setIsOpen((prev) => !prev);
-  }, []);
+  const toggleDropdown = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      setIsOpen((prev) => !prev);
+    },
+    []
+  );
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
@@ -133,7 +150,9 @@ const NotificationDropdown = () => {
         <button
           onClick={toggleDropdown}
           className="flex items-center text-gray-700 dark:text-gray-400"
-          aria-label={`Notifications (${unreadCount} non lues)`}
+          aria-label={`${tr("notification.notifications")} (${unreadCount} ${tr(
+            "notification.unread"
+          )})`}
         >
           <Bell className="object-cover p-0.5 cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
           {unreadCount > 0 && (
@@ -150,16 +169,20 @@ const NotificationDropdown = () => {
       >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex justify-around mb-3">
-            <TabsTrigger value="all">{"All"}</TabsTrigger>
-            <TabsTrigger value="unread">
-              {"Unread"}
+            <TabsTrigger value={tr("notification.all")}>
+              <span className=" capitalize">{tr("notification.all")}</span>
+            </TabsTrigger>
+            <TabsTrigger value={tr("notification.unread")}>
+              <span className="capitalize">{tr("notification.unread")}</span>
               {unreadCount > 0 && (
                 <span className="ml-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
                   {unreadCount}
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value="deleted">{"Delete"}</TabsTrigger>
+            <TabsTrigger value={tr("notification.deleted")}>
+              <span className="capitalize">{tr("notification.deleted")}</span>
+            </TabsTrigger>
           </TabsList>
 
           <Input
@@ -184,8 +207,8 @@ const NotificationDropdown = () => {
                   />
                 ))
               ) : (
-                <li className="text-center text-gray-500 text-sm py-4">
-                  {"Aucune notification"}
+                <li className="text-center text-gray-500 text-sm py-4 capitalize">
+                  {tr("notification.no_notification")}
                 </li>
               )}
             </ul>
@@ -198,14 +221,14 @@ const NotificationDropdown = () => {
             disabled={isLoading || unreadCount === 0}
             className="cursor-pointer ext-blue-500 dark:text-blue-300 text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
-            {"Read all"}
+            <span className="capitalize">{tr("notification.read_all")}</span>
           </button>
           <button
             onClick={handleClearAll}
             disabled={isLoading}
             className="cursor-pointer text-red-500 dark:text-red-300 text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
-            {"Delete all"}
+            <span className="capitalize">{tr("notification.delete_all")}</span>
           </button>
         </div>
       </DropdownMenuContent>
@@ -235,7 +258,7 @@ const NotificationItem = React.memo(
 
     return (
       <li className="flex justify-between items-start gap-3 border-b pb-2 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors">
-                  <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex flex-col flex-1 min-w-0">
           <span
             className={`text-sm font-medium truncate ${
               isUnread
@@ -250,7 +273,7 @@ const NotificationItem = React.memo(
           </span>
           <div className="flex justify-between items-center mt-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              {new Date(notif.created_at).toLocaleDateString("fr-FR", {
+              {new Date(notif.updated_at).toLocaleDateString("fr-FR", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
@@ -263,7 +286,7 @@ const NotificationItem = React.memo(
                 onClick={() => onView(notif)}
                 disabled={isLoading}
                 className="text-blue-500 hover:text-blue-700 text-xs flex items-center gap-1 disabled:opacity-50 transition-colors cursor-pointer"
-                title="Voir"
+                title={tr("notification.see")}
               >
                 <Eye className="w-3 h-3" />
               </button>
@@ -272,7 +295,7 @@ const NotificationItem = React.memo(
                   onClick={() => onMarkAsRead(notif.id)}
                   disabled={isLoading}
                   className="text-green-600 hover:text-green-700 text-xs flex items-center gap-1 disabled:opacity-50 transition-colors cursor-pointer"
-                  title="Marquer comme lu"
+                  title={tr("notification.make_as_read")}
                 >
                   <MailOpen className="w-3 h-3" />
                 </button>
@@ -282,7 +305,7 @@ const NotificationItem = React.memo(
                   onClick={() => onDelete(notif.id)}
                   disabled={isLoading}
                   className="text-red-500 hover:text-red-700 text-xs flex items-center gap-1 disabled:opacity-50 transition-colors cursor-pointer"
-                  title="Supprimer"
+                  title={tr("notification.deleted")}
                 >
                   <Trash className="w-3 h-3" />
                 </button>

@@ -34,7 +34,7 @@
     "audio": "Scarica MP3",
     "close": "Chiudi",
     "see_more": "Vedi più",
-        "cancel": "Annulla",
+    "cancel": "Annulla",
     "confirm": "Conferma",
     "continue": "Continua",
     "download": "Scarica",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Sei offline. Connettiti a Internet per scaricare.",
     "stop_playing": "Vuoi davvero interrompere l'audio e chiudere il lettore?"
+  },
+  "notification": {
+    "notification": "notifica",
+    "notifications": "notifiche",
+    "mark_all_as_read": "Segna tutto come letto",
+    "unread": "non letto",
+    "all": "tutti",
+    "deleted": "eliminato",
+    "no_notification": "Nessuna notifica",
+    "read_all": "Leggi tutto",
+    "delete_all": "Elimina tutto",
+    "see": "Vedi",
+    "make_as_read": "Segna come letto"
   }
 }

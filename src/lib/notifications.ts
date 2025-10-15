@@ -5,7 +5,7 @@ export const NOTIFICATIONS = "NOTIFICATIONS";
 
 export type Notification = {
   id: number;
-  initial: string;
+  langue_initial: string;
   web_translation: string;
   content: string;
   url?: string;
@@ -20,6 +20,7 @@ export type SearchNotificationFilter = {
   content?: string;
   read_at?: boolean;
   deleted_at?: boolean;
+  type?: "client" | "server";
 };
 
 const mergeNotifications = (
@@ -28,20 +29,18 @@ const mergeNotifications = (
 ): Notification[] => {
   const map = new Map<string, Notification>();
 
-  // Commencer par les locales (priorité à l’état local : lu/supprimé)
+  // Commencer par les locales
   localNotifs.forEach((notif) => map.set(notif.id.toString(), notif));
 
-  // Ajouter celles du serveur (sans écraser les locales)
+  // Ajouter celles du serveur (en écrasant les locales si même id)
   serverNotifs.forEach((notif) => {
-    if (!map.has(notif.id.toString())) {
-      map.set(notif.id.toString(), notif);
-    }
+    map.set(notif.id.toString(), notif);
   });
 
   // Retourner un tableau trié par date descendante (les plus récentes d’abord)
   return Array.from(map.values()).sort((a, b) => {
-    const dateA = a.read_at || a.deleted_at || "";
-    const dateB = b.read_at || b.deleted_at || "";
+    const dateA = a.read_at || a.deleted_at || a.updated_at || "";
+    const dateB = b.read_at || b.deleted_at || b.updated_at || "";
     return new Date(dateB).getTime() - new Date(dateA).getTime();
   });
 };
@@ -94,7 +93,6 @@ export const getNotifications = (
 };
 
 export const availableServerNotifications = async (
-  lng: string,
   langs: string[]
 ): Promise<void> => {
   try {
@@ -118,10 +116,14 @@ export const availableServerNotifications = async (
 
     [...langs, "common"].forEach((lang) => params.append("langs[]", lang));
     readAndDeleteNotifsIds.forEach((id) =>
-      params.append("ids[]", id.toString())
+      params.append("ids_not_in[]", id.toString())
     );
 
-    const url = `${API_URL}/${lng}/notifications?${params.toString()}`;
+    params.append("type", "server");
+    params.append("is_active", "true");
+    params.append("per_page", "1000");
+
+    const url = `${API_URL}/auth/messages?${params.toString()}`;
 
     // 🔹 4. Appeler l’API pour récupérer les nouvelles notifications
     const response = await fetch(url);
@@ -129,16 +131,15 @@ export const availableServerNotifications = async (
       throw new Error(`HTTP error ${response.status}`);
     }
 
-    const serverData: Notification[] = await response.json();
+    const serverData: { data: Notification[] } = await response.json();
 
     // 🔹 5. Fusionner les notifications locales et serveur sans doublons
-    const allNotifis = mergeNotifications(localNotifs, serverData);
+    const allNotifis = mergeNotifications(localNotifs, serverData.data);
 
     // 🔹 6. Sauvegarder la liste finale dans le localStorage
     setNotifications(allNotifis);
   } catch (error) {
     console.error("Erreur lors du chargement des notifications :", error);
-    setNotifications(mockNotifications)
   }
 };
 
@@ -193,92 +194,3 @@ export const markNotificationsAsDeleted = (): void => {
 
   setNotifications(updated);
 };
-
-
-
-/// donner de mock
-
-// --- Génération automatique des 24 notifications de test ---
-
-const langs = [
-
-  { initial: "fr-fr", web_translation: "fr" },
-  { initial: "en-en", web_translation: "en" },
-  { initial: "es-es", web_translation: "es" },
-  { initial: "pt-pt", web_translation: "pt" },
-];
-
-// Helper pour date aléatoire
-function randomDate(daysAgo = 30) {
-  const d = new Date();
-  d.setDate(d.getDate() - Math.floor(Math.random() * daysAgo));
-  return d.toISOString();
-}
-
-// Helper pour contenu tronqué
-function generateContent(lang: string, index: number): string {
-  const samples: Record<string, string[]> = {
-    en: [
-      "Lorem ipsum dolor sit amet consectetur adipisicing elit. Impedit, expedita officiis quos, aut et totam nihil maiores excepturi tempore recusandae neque praesentium unde similique itaque alias voluptatibus, molestiae voluptatem harum?",
-      "Your session has expired, please log in again.",
-      "New update available for your account.",
-      "You have a new message from admin.",
-      "Security alert detected in your account.",
-      "Your subscription has been renewed successfully.",
-    ],
-    es: [
-      "¡Bienvenido a tu panel!",
-      "Tu sesión ha expirado, inicia sesión nuevamente.",
-      "Nueva actualización disponible para tu cuenta.",
-      "Tienes un nuevo mensaje del administrador.",
-      "Alerta de seguridad detectada en tu cuenta.",
-      "Tu suscripción ha sido renovada con éxito.",
-    ],
-    pt: [
-      "Bem-vindo ao seu painel!",
-      "Sua sessão expirou, faça login novamente.",
-      "Nova atualização disponível para sua conta.",
-      "Você tem uma nova mensagem do administrador.",
-      "Alerta de segurança detectado na sua conta.",
-      "Sua assinatura foi renovada com sucesso.",
-    ],
-    fr: [
-      "Bienvenue sur votre tableau de bord !",
-      "Votre session a expiré, veuillez vous reconnecter.",
-      "Nouvelle mise à jour disponible pour votre compte.",
-      "Vous avez un nouveau message de l’administrateur.",
-      "Alerte de sécurité détectée sur votre compte.",
-      "Votre abonnement a été renouvelé avec succès.",
-    ],
-  };
-
-  const sample = samples[lang][index % samples[lang].length];
-  return sample + " ".repeat(index % 3);
-}
-
-// Combinaisons possibles d’états :
-// 1. non lue, active
-// 2. lue, active
-// 3. supprimée, non lue
-// 4. lue et supprimée
-
-export const mockNotifications: Notification[] = Array.from({ length: 24 }, (_, i) => {
-  const lang = langs[i % langs.length];
-  const statusType = i % 4;
-
-  const baseDate = randomDate(20);
-  const read_at = statusType === 1 || statusType === 3 ? randomDate(10) : undefined;
-  const deleted_at = statusType === 2 || statusType === 3 ? randomDate(5) : undefined;
-
-  return {
-    id: i + 1,
-    initial: lang.initial,
-    web_translation: lang.web_translation,
-    content: generateContent(lang.web_translation, i),
-    url: i % 3 === 0 ? `https://example.com/notification/${i + 1}` : undefined,
-    read_at,
-    deleted_at,
-    created_at: baseDate,
-    updated_at: randomDate(3),
-  };
-});

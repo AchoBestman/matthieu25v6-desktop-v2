@@ -1,6 +1,6 @@
 {
   "home": {
-   "title": "Prophet Kacou",
+    "title": "Prophet Kacou",
     "home": "Home",
     "confidentiality_clause": "Privacy Policy",
     "choose_langue": "Click on your language (Flag)",
@@ -34,7 +34,7 @@
     "audio": "Download mp3",
     "close": "Close",
     "see_more": "See more",
-     "cancel": "Cancel",
+    "cancel": "Cancel",
     "confirm": "Confirm",
     "continue": "Continue",
     "download": "Download",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "You are offline. Please connect to the internet to download.",
     "stop_playing": "Do you really want to stop the audio and close the player?"
+  },
+  "notification": {
+    "notification": "notification",
+    "notifications": "notifications",
+    "mark_all_as_read": "Mark all as read",
+    "unread": "unread",
+    "all": "all",
+    "deleted": "deleted",
+    "no_notification": "No notification",
+    "read_all": "Read all",
+    "delete_all": "Delete all",
+    "see": "See",
+    "make_as_read": "Mark as read"
   }
 }

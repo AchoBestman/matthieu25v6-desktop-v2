@@ -1,7 +1,5 @@
 import { useLangue } from "@/context/langue-context";
-import {
-  availableServerLanguesUpdates
-} from "@/lib/db-updates";
+import { availableServerLanguesUpdates } from "@/lib/db-updates";
 import { availableServerNotifications } from "@/lib/notifications";
 import { AppDatabaseDir } from "@/lib/utils";
 import { readDir } from "@tauri-apps/plugin-fs";
@@ -56,8 +54,10 @@ function useLangueUpdates() {
     const fetchUpdates = async () => {
       try {
         const langs = await getAvailableLangs();
-        availableServerNotifications(lng, langs).catch(err=> console.log(err));
-        availableServerLanguesUpdates(lng, langs).catch(err=> console.log(err));
+        availableServerNotifications(langs).catch((err) => console.log(err));
+        availableServerLanguesUpdates(lng, langs).catch((err) =>
+          console.log(err)
+        );
       } catch (err: any) {
         console.error("Error fetching updates:", err);
       } finally {
