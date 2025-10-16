@@ -71,6 +71,11 @@ const NotificationDropdown = () => {
     return localNotifications.filter((n) => !n.read_at && !n.deleted_at).length;
   }, [localNotifications]);
 
+  // Compter les notifications non supprimées
+  const undeleteCount = useMemo(() => {
+    return localNotifications.filter((n) => !n.deleted_at).length;
+  }, [localNotifications]);
+
   // Actions globales avec gestion d'erreur
   const handleReadAll = useCallback(() => {
     setIsOpen(false);
@@ -107,16 +112,22 @@ const NotificationDropdown = () => {
   // Actions unitaires
   const handleMarkAsRead = useCallback(
     (id: number) => {
-      markNotificationAsRead(id);
-      loadNotifications();
+      setIsOpen(false);
+      handleConfirmAlert(tr("button.confirm_action"), false, () => {
+        markNotificationAsRead(id);
+        loadNotifications();
+      });
     },
     [loadNotifications]
   );
 
   const handleDelete = useCallback(
     (id: number) => {
-      markNotificationAsDeleted(id);
-      loadNotifications();
+      setIsOpen(false);
+      handleConfirmAlert(tr("button.confirm_action"), false, () => {
+        markNotificationAsDeleted(id);
+        loadNotifications();
+      });
     },
     [loadNotifications]
   );
@@ -124,7 +135,8 @@ const NotificationDropdown = () => {
   const handleViewNotification = useCallback(
     (notif: Notification) => {
       setIsOpen(false);
-      handleMarkAsRead(notif.id);
+      markNotificationAsRead(notif.id);
+      loadNotifications();
       handleConfirmAlert(notif.content, !notif.url, () => {
         console.log(notif.url);
       });
@@ -169,10 +181,10 @@ const NotificationDropdown = () => {
       >
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="w-full flex justify-around mb-3">
-            <TabsTrigger value={tr("notification.all")}>
+            <TabsTrigger value="all">
               <span className=" capitalize">{tr("notification.all")}</span>
             </TabsTrigger>
-            <TabsTrigger value={tr("notification.unread")}>
+            <TabsTrigger value="unread">
               <span className="capitalize">{tr("notification.unread")}</span>
               {unreadCount > 0 && (
                 <span className="ml-2 text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">
@@ -180,7 +192,7 @@ const NotificationDropdown = () => {
                 </span>
               )}
             </TabsTrigger>
-            <TabsTrigger value={tr("notification.deleted")}>
+            <TabsTrigger value="deleted">
               <span className="capitalize">{tr("notification.deleted")}</span>
             </TabsTrigger>
           </TabsList>
@@ -225,7 +237,7 @@ const NotificationDropdown = () => {
           </button>
           <button
             onClick={handleClearAll}
-            disabled={isLoading}
+            disabled={isLoading || undeleteCount === 0}
             className="cursor-pointer text-red-500 dark:text-red-300 text-sm hover:underline disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
           >
             <span className="capitalize">{tr("notification.delete_all")}</span>
@@ -260,17 +272,20 @@ const NotificationItem = React.memo(
       <li className="flex justify-between items-start gap-3 border-b pb-2 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors">
         <div className="flex flex-col flex-1 min-w-0">
           <span
+            onClick={() => onView(notif)}
             className={`text-sm font-medium truncate ${
               isUnread
                 ? "text-gray-900 dark:text-gray-100 font-semibold"
                 : "text-gray-700 dark:text-gray-400"
             }`}
             title={notif.content}
-          >
-            {notif.content && notif.content.length > 50
-              ? notif.content.slice(0, 50) + "..."
-              : notif.content}
-          </span>
+            dangerouslySetInnerHTML={{
+              __html:
+                notif.content && notif.content.length > 50
+                  ? notif.content.slice(0, 50) + "..."
+                  : notif.content,
+            }}
+          />
           <div className="flex justify-between items-center mt-2">
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {new Date(notif.updated_at).toLocaleDateString("fr-FR", {

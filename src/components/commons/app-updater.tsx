@@ -29,7 +29,7 @@ const AppUpdaterDropdown = () => {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild className="outline-none">
-        {update?.version && (
+        {!update?.version && (
           <button
             onClick={toggleDropdown}
             className="flex items-center text-gray-700 dark:text-gray-400"
@@ -37,7 +37,7 @@ const AppUpdaterDropdown = () => {
             <span className="h-8 w-8 ml-1.5 cursor-pointer">
               <RefreshCw className="object-cover p-0.5 cursor-pointer text-gray-500 transition-colors bg-white border border-gray-200 rounded-full hover:text-dark-900 h-8 w-8 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white" />
             </span>
-            {update && (
+            {!update && (
               <span className="-ml-4 -mt-6 h-5 w-5 text-white bg-red-500 rounded-full">
                 {1}
               </span>

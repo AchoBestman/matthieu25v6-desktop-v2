@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { tr } from "@/translation";
 import { confirmAlert } from "react-confirm-alert";
 
@@ -46,25 +47,34 @@ export const alertConfirmOptions = (
     message: "",
     customUI: ({ onClose }: { onClose: () => void }) => (
       <div className="react-confirm-alert-body">
-        {title && <h1>{title}</h1>}
-        <div
-          dangerouslySetInnerHTML={{ __html: formattedMessage }}
-          style={{ textAlign: "left", lineHeight: "1.6" }}
-        />
-        <div className="react-confirm-alert-button-group">
+        {title && <h1 className="text-xl font-semibold">{title}</h1>}
+
+        <ScrollArea className="p-3">
+          <div
+            className="text-lg whitespace-pre-line"
+            dangerouslySetInnerHTML={{ __html: formattedMessage }}
+          />
+        </ScrollArea>
+
+        <div className="react-confirm-alert-button-group flex justify-end gap-3">
           {isAlert ? (
-            <button onClick={onClose}>{tr("button.close")}</button>
+            <button onClick={onClose} className="btn-primary">
+              {tr("button.close")}
+            </button>
           ) : (
             <>
               <button
                 onClick={() => {
-                  handleConfirm && handleConfirm();
+                  handleConfirm?.();
                   onClose();
                 }}
+                className="btn-primary"
               >
                 {tr("button.confirm")}
               </button>
-              <button onClick={onClose}>{tr("button.cancel")}</button>
+              <button onClick={onClose} className="btn-secondary">
+                {tr("button.cancel")}
+              </button>
             </>
           )}
         </div>
