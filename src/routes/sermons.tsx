@@ -208,25 +208,76 @@ function RouteComponent() {
     }
   };
 
+  // Fonction pour surligner le texte
+  const highlightText = (
+    text: string,
+    searchTerm: string,
+    shouldHighlight: boolean
+  ) => {
+    if (!searchTerm || searchTerm.trim().length < 3 || !shouldHighlight) {
+      return text.replace(/\n/g, "<br>");
+    }
+
+    const regex = new RegExp(
+      `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`,
+      "gi"
+    );
+    return text
+      .replace(
+        regex,
+        '<mark class="bg-yellow-300 dark:bg-yellow-600">$1</mark>'
+      )
+      .replace(/\n/g, "<br>");
+  };
+
   const handleLocalSearch = (event: ChangeEvent<HTMLInputElement>) => {
     const term = event.target.value;
+    setSearch(term);
+
     if (term.trim().length > 2) {
-      const index = sermon?.verses?.find((item) =>
+      // Trouver le premier verset qui contient le terme
+      const firstMatchingVerse = sermon?.verses?.find((item) =>
         item.content.toLowerCase().includes(term.toLowerCase())
       );
-      if (index?.number) {
-        setVerseNumber(index?.number.toString());
-      }
-      if (!index?.number) {
-        //clear coloration if text is not found
+
+      if (firstMatchingVerse) {
+        const verseIndex = sermon?.verses!.indexOf(firstMatchingVerse) || 0;
+        setVerseNumber(firstMatchingVerse.number.toString());
+
+        // Scroller vers le premier élément
+        setTimeout(() => {
+          refs.current[verseIndex]?.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }, 100);
+      } else {
         setVerseNumber("");
       }
-      setSearch(term);
     } else {
-      //clear coloration if text is not found
       setVerseNumber("");
     }
   };
+
+  // const handleLocalSearch = (event: ChangeEvent<HTMLInputElement>) => {
+  //   const term = event.target.value;
+  //   if (term.trim().length > 2) {
+  //     const index = sermon?.verses?.find((item) =>
+  //       item.content.toLowerCase().includes(term.toLowerCase())
+  //     );
+  //     if (index?.number) {
+  //       setVerseNumber(index?.number.toString());
+  //     }
+  //     if (!index?.number) {
+  //       //clear coloration if text is not found
+  //       setVerseNumber("");
+  //     }
+  //     setSearch(term);
+  //   } else {
+  //     //clear coloration if text is not found
+  //     setVerseNumber("");
+  //   }
+  // };
 
   const handleSearch = useCallback(() => {
     if (!verseNumber) return;
@@ -270,10 +321,10 @@ function RouteComponent() {
   };
 
   async function loadSermonImage() {
-    if (!sermon?.cover){
-      setSermonImage({ name: "", blobUrl: null })
-      return
-    };
+    if (!sermon?.cover) {
+      setSermonImage({ name: "", blobUrl: null });
+      return;
+    }
 
     try {
       const value = await findImage(lng, sermon.cover);
@@ -299,7 +350,7 @@ function RouteComponent() {
         });
     }
 
-    loadSermonImage()
+    loadSermonImage();
   }, [sermon]);
 
   useEffect(() => {
@@ -334,6 +385,18 @@ function RouteComponent() {
             : tr("home.waiting")
         }
       >
+        <style>{`
+          mark {
+            background-color: #fef08a;
+            color: inherit;
+            padding: 0.1em 0.2em;
+            border-radius: 0.25em;
+          }
+          .dark mark {
+            background-color: #ca8a04;
+            color: white;
+          }
+        `}</style>
         <div className="bg-pkp-sand dark:bg-gray-800">
           <div
             className={`sticky top-16 w-full -mt-4 h-25 px-2 py-2 bg-pkp-sand dark:bg-gray-800 z-1`}
@@ -359,69 +422,79 @@ function RouteComponent() {
                 <img alt="" className="w-full" src={sermonImage?.blobUrl} />
               )}
             </div>
-            {sermon?.verses?.map((verset: Verses, key: number) => (
-              <div key={verset.number} style={{ fontSize }}>
-                <div
-                  ref={(el) => {
-                    refs.current[key] = el;
-                  }}
-                  className={`py-1 ${
-                    verseNumber?.toString() === verset.number.toString() &&
-                    ((!search && verset.number > 1) || search)
-                      ? "bg-blue-600 dark:bg-yellow-300"
-                      : "bg-transparent"
-                  } ${
-                    verseNumber?.toString() === verset.number.toString() &&
-                    ((!search && verset.number > 1) || search)
-                      ? "text-white dark:text-black"
-                      : ""
-                  }`}
-                >
-                  {verset.title && (
-                    <h1 className="py-1 text-left font-bold">{verset.title}</h1>
-                  )}
+            {sermon?.verses?.map((verset: Verses, key: number) => {
+              const isCurrentVerse =
+                verseNumber?.toString() === verset.number.toString();
+              const hasBackground = isCurrentVerse && verset.number > 1;
+
+              return (
+                <div key={verset.number} style={{ fontSize }}>
+                  <div
+                    ref={(el) => {
+                      refs.current[key] = el;
+                    }}
+                    className={`py-1 ${
+                      hasBackground
+                        ? "bg-blue-600 dark:bg-yellow-300"
+                        : "bg-transparent"
+                    } ${hasBackground ? "text-white dark:text-black" : ""}`}
+                  >
+                    {verset.title && (
+                      <h1 className="py-1 text-left font-bold">
+                        {verset.title}
+                      </h1>
+                    )}
+                    <div>
+                      <span className="font-bold dark:text-red-500">
+                        {verset.number}
+                      </span>
+                      <span
+                        dangerouslySetInnerHTML={{
+                          // Ne pas surligner si le verset a l'arrière-plan coloré
+                          __html: ` ${highlightText(
+                            verset.content,
+                            search || "",
+                            !hasBackground
+                          )}`,
+                        }}
+                      ></span>
+                    </div>
+                  </div>
+                  <DownloadVerseLink
+                    verset={verset}
+                    sermon={sermon}
+                    lng={lng}
+                  />
+
                   <div>
-                    <span className="font-bold dark:text-red-500">
-                      {verset.number}
-                    </span>
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: ` ${verset.content.replace(/\n/g, "<br>")}`,
-                      }}
-                    ></span>
+                    {verset.concordances?.concordance.map((value: any) => (
+                      <span
+                        className="cursor-pointer
+                print-concordance
+                px-2 py-1
+                bg-blue-100 dark:bg-blue-900
+                text-blue-800 dark:text-blue-200
+                rounded
+                hover:bg-blue-200 dark:hover:bg-blue-700
+                active:bg-blue-300 dark:active:bg-blue-600
+                transition-colors
+                duration-200
+                mr-1 mb-1 text-sm"
+                        onClick={() =>
+                          navigateToSermon(
+                            value.sermon_number,
+                            value.verse_number
+                          )
+                        }
+                        key={`${value.sermon_number}-${value.verse_number}`}
+                      >
+                        {value.label}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <DownloadVerseLink verset={verset} sermon={sermon} lng={lng} />
-
-                <div>
-                  {/** not use button because in the pdf button give bad content */}
-                  {verset.concordances?.concordance.map((value: any) => (
-                    <span
-                      className="cursor-pointer
-                          print-concordance
-                          px-2 py-1
-                          bg-blue-100 dark:bg-blue-900
-                          text-blue-800 dark:text-blue-200
-                          rounded
-                          hover:bg-blue-200 dark:hover:bg-blue-700
-                          active:bg-blue-300 dark:active:bg-blue-600
-                          transition-colors
-                          duration-200
-                          mr-1 mb-1 text-sm"
-                      onClick={() =>
-                        navigateToSermon(
-                          value.sermon_number,
-                          value.verse_number
-                        )
-                      }
-                      key={`${value.sermon_number}-${value.verse_number}`}
-                    >
-                      {value.label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
             <div className="mt-4">{sermon?.similar_sermon}</div>
             <div className="flex justify-center items-center w-full my-4">
               {sermonImage?.blobUrl && sermon?.number === 9 && (

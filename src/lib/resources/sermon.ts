@@ -21,29 +21,25 @@ export const findAll = async (
   params?: { [key: string]: string | number | boolean },
   order?: { column: string; direction: "ASC" | "DESC" }
 ): Promise<DataType<Sermon>> => {
-
   const baseQuery = `SELECT s.*, v.number as verse_number FROM ${resource} s LEFT JOIN verses v ON v.sermon_id = s.id AND v.number = 1`;
-  //const baseQuery = `SELECT * FROM ${resource}`; is the old one
-  let countQuery = `SELECT COUNT(*) as total FROM ${resource}`;
+  let countQuery = `SELECT COUNT(DISTINCT s.id) as total FROM ${resource} s LEFT JOIN verses v ON v.sermon_id = s.id AND v.number = 1`;
+
   const conditions = [];
   const searchParams: any[] = [];
 
+  // 🔍 Recherche par chapter **et** title
   if (params?.search) {
-    conditions.push(
-      `(chapter LIKE ?)`
-    );
-    searchParams.push(
-      `%${params.search}%`
-    );
+    conditions.push(`(s.chapter LIKE ? OR s.title LIKE ?)`);
+    searchParams.push(`%${params.search}%`, `%${params.search}%`);
   }
 
   if (params?.number) {
     conditions.push(`v.number = ?`);
     searchParams.push(params.number);
   }
-  conditions.push(`is_active = ?`);
+  conditions.push(`s.is_active = ?`);
   searchParams.push(1);
-  
+
   if (conditions.length > 0) {
     const whereClause = ` WHERE ` + conditions.join(" AND ");
     countQuery += whereClause;
@@ -165,7 +161,6 @@ export const findBy = async (
 };
 
 export const findImage = async (lang: string, name: string) => {
-  
   const dbInfo = await getDbInfo(lang, isCommon);
 
   const dbExists = await dbExist(lang, isCommon);
@@ -189,9 +184,7 @@ export const findImage = async (lang: string, name: string) => {
   };
 };
 
-
 export const findCommonImage = async (lang: string, name: string) => {
-
   const dbInfo = await getDbInfo(lang, true);
 
   const dbExists = await dbExist(lang, true);
