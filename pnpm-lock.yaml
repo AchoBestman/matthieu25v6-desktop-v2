@@ -98,6 +98,9 @@ importers:
       framer-motion:
         specifier: ^12.19.1
         version: 12.19.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      html-truncate:
+        specifier: ^1.2.2
+        version: 1.2.2
       htmlparser2:
         specifier: ^10.0.0
         version: 10.0.0
@@ -150,6 +153,9 @@ importers:
       '@tauri-apps/cli':
         specifier: ^2
         version: 2.5.0
+      '@types/html-truncate':
+        specifier: ^1.2.4
+        version: 1.2.4
       '@types/node':
         specifier: ^24.0.3
         version: 24.0.3
@@ -1444,6 +1450,9 @@ packages:
   '@types/estree@1.0.8':
     resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
+  '@types/html-truncate@1.2.4':
+    resolution: {integrity: sha512-tZysECytmk7mi1yNuOXnu4dgitNf4Mstfu2oTYJ3iFoC4xSMMXnUPS/uj2QOx96SEnRFOZsNQozojxlHQY3avA==}
+
   '@types/i18next@13.0.0':
     resolution: {integrity: sha512-gp/SIShAuf4WOqi8ey0nuI7qfWaVpMNCcs/xLygrh/QTQIXmlDC1E0TtVejweNW+7SGDY7g0lyxyKZIJuCKIJw==}
     deprecated: This is a stub types definition. i18next provides its own type definitions, so you do not need this installed.
@@ -1811,6 +1820,9 @@ packages:
 
   hsl-to-rgb-for-reals@1.1.1:
     resolution: {integrity: sha512-LgOWAkrN0rFaQpfdWBQlv/VhkOxb5AsBjk6NQVx4yEzWS923T07X0M1Y0VNko2H52HeSpZrZNNMJ0aFqsdVzQg==}
+
+  html-truncate@1.2.2:
+    resolution: {integrity: sha512-oiXb65RDxSYY8eXJKJiKHHpI7LyQbMG8LbSuvvWLLxAKNywJ7aaq0M1ynj2QJs0odQNggEEg/dTFVtH3lG0ClQ==}
 
   htmlparser2@10.0.0:
     resolution: {integrity: sha512-TwAZM+zE5Tq3lrEHvOlvwgj1XLWQCtaaibSN11Q+gGBAS7Y1uZSWwXXRe4iF6OXnaq1riyQAPFOBtYc77Mxq0g==}
@@ -3758,6 +3770,8 @@ snapshots:
 
   '@types/estree@1.0.8': {}
 
+  '@types/html-truncate@1.2.4': {}
+
   '@types/i18next@13.0.0(typescript@5.6.3)':
     dependencies:
       i18next: 25.2.1(typescript@5.6.3)
@@ -4119,6 +4133,8 @@ snapshots:
       hsl-to-rgb-for-reals: 1.1.1
 
   hsl-to-rgb-for-reals@1.1.1: {}
+
+  html-truncate@1.2.2: {}
 
   htmlparser2@10.0.0:
     dependencies:

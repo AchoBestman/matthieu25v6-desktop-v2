@@ -26,6 +26,7 @@ import {
 import { useLangue } from "@/context/langue-context";
 
 import type { Notification } from "@/lib/notifications";
+import truncate from "html-truncate";
 
 const NotificationDropdown = () => {
   const [localNotifications, setLocalNotifications] = useState<Notification[]>(
@@ -267,7 +268,7 @@ const NotificationItem = React.memo(
   }: NotificationItemProps) => {
     const isUnread = !notif.read_at && !notif.deleted_at;
     const isDeleted = !!notif.deleted_at;
-
+    const truncatedHTML = truncate(notif.content, 50, { ellipsis: "..." });
     return (
       <li className="flex justify-between items-start gap-3 border-b pb-2 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors">
         <div className="flex flex-col flex-1 min-w-0">
@@ -280,10 +281,7 @@ const NotificationItem = React.memo(
             }`}
             title={notif.content}
             dangerouslySetInnerHTML={{
-              __html:
-                notif.content && notif.content.length > 50
-                  ? notif.content.slice(0, 50) + "..."
-                  : notif.content,
+              __html: truncatedHTML,
             }}
           />
           <div className="flex justify-between items-center mt-2">

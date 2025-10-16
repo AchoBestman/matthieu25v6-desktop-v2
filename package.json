@@ -1,7 +1,7 @@
 {
   "name": "prophet-kacou-desktop-v2",
   "private": true,
-  "version": "1.0.8",
+  "version": "1.0.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -44,6 +44,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.19.1",
+    "html-truncate": "^1.2.2",
     "htmlparser2": "^10.0.0",
     "i18next": "^25.2.1",
     "lucide-react": "^0.522.0",
@@ -63,6 +64,7 @@
   "devDependencies": {
     "@tanstack/router-plugin": "^1.121.29",
     "@tauri-apps/cli": "^2",
+    "@types/html-truncate": "^1.2.4",
     "@types/node": "^24.0.3",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.1",
