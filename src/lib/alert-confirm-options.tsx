@@ -7,7 +7,7 @@ import { confirmAlert } from "react-confirm-alert";
  * @param text - Plain text to convert
  * @returns HTML formatted string
  */
-const textToHtml = (text: string): string => {
+export const textToHtml = (text: string): string => {
   return (
     text
       // Remplace les doubles sauts de ligne par des paragraphes
