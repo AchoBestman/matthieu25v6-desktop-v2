@@ -3,6 +3,8 @@ import { allModels, oneModel } from "@/lib/resources/base";
 import { Album } from "@/schemas/album";
 import { DataType } from "@/schemas/sermon";
 
+export const isCommon = true;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -31,6 +33,7 @@ export const findAll = async (
 
   const response = await allModels<Album>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -48,7 +51,7 @@ export const findBy = async (
   params: { column: string; value: string | number | boolean },
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[]
 ) => {
-  const response = await oneModel<Album>(resource, lang, params, relationships);
+  const response = await oneModel<Album>(resource, lang, isCommon, params, relationships);
   return response as Album;
 };
 

@@ -34,7 +34,7 @@
     "audio": "تحميل MP3",
     "close": "إغلاق",
     "see_more": "المزيد",
-        "cancel": "إلغاء",
+    "cancel": "إلغاء",
     "confirm": "تأكيد",
     "continue": "متابعة",
     "download": "تنزيل",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "أنت غير متصل بالإنترنت. يرجى الاتصال بالإنترنت لتنزيل الملف.",
     "stop_playing": "هل تريد حقًا إيقاف الصوت وإغلاق المشغل؟"
+  },
+  "notification": {
+    "notification": "إشعار",
+    "notifications": "الإشعارات",
+    "mark_all_as_read": "تحديد الكل كمقروء",
+    "unread": "غير مقروء",
+    "all": "الكل",
+    "deleted": "محذوف",
+    "no_notification": "لا توجد إشعارات",
+    "read_all": "اقرأ الكل",
+    "delete_all": "حذف الكل",
+    "see": "عرض",
+    "make_as_read": "تحديد كمقروء"
   }
 }

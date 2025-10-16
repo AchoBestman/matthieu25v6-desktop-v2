@@ -5,6 +5,8 @@ import database from "@/lib/database";
 import { DataType } from "@/schemas/sermon";
 import { BrotherList, Ministre, Singer, SingleHead } from "@/schemas/brother";
 
+export const isCommon = true;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -88,6 +90,7 @@ export const findAll = async (
 
   const response = await allModels<BrotherList>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -108,11 +111,12 @@ export const findBy = async (
   const response = await oneModel<BrotherList>(
     resource,
     lang,
+    isCommon,
     params,
     relationships
   );
   const [model] = response as BrotherList[];
-  const db = await database(lang);
+  const db = await database(lang, isCommon);
   // 2. Get heads with country and assembly->city
   const heads = await db.select<Array<SingleHead>>(
     `

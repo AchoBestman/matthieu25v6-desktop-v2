@@ -34,7 +34,7 @@
     "audio": "Descargar mp3",
     "close": "Cerrar",
     "see_more": "Ver más",
-        "cancel": "Cancelar",
+    "cancel": "Cancelar",
     "confirm": "Confirmar",
     "continue": "Continuar",
     "download": "Descargar",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Estás desconectado. Por favor, conéctate a Internet para descargar.",
     "stop_playing": "¿Realmente quieres detener el audio y cerrar el reproductor?"
+  },
+  "notification": {
+    "notification": "notificación",
+    "notifications": "notificaciones",
+    "mark_all_as_read": "Marcar todo como leído",
+    "unread": "no leído",
+    "all": "todo",
+    "deleted": "eliminado",
+    "no_notification": "Sin notificaciones",
+    "read_all": "Leer todo",
+    "delete_all": "Eliminar todo",
+    "see": "Ver",
+    "make_as_read": "Marcar como leído"
   }
 }

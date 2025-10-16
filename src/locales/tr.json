@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Çevrimdışısınız. İndirmek için internete bağlanın.",
     "stop_playing": "Sesi durdurup oynatıcıyı kapatmak istediğinizden emin misiniz?"
+  },
+  "notification": {
+    "notification": "bildirim",
+    "notifications": "bildirimler",
+    "mark_all_as_read": "Tümünü okundu olarak işaretle",
+    "unread": "okunmamış",
+    "all": "tümü",
+    "deleted": "silindi",
+    "no_notification": "Bildirim yok",
+    "read_all": "Tümünü oku",
+    "delete_all": "Tümünü sil",
+    "see": "Görüntüle",
+    "make_as_read": "Okundu olarak işaretle"
   }
 }

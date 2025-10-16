@@ -87,6 +87,16 @@ export const languages: Array<LangueDataType> = [
   },
 ];
 
+export const openLink = async (url: string) => {
+  try {
+    await OpenTauri(url);
+  } catch (error) {
+    console.error("Erreur lors de l'ouverture du lien:", error);
+    // Fallback : ouvrir dans le navigateur classique
+    window.open(url, "_blank");
+  }
+};
+
 export default function RouteComponent() {
   const { setDefaultLangue } = useLangue();
   const { setVerseNumber, setNumber } = useSermon();
@@ -96,16 +106,6 @@ export default function RouteComponent() {
     setDefaultLangue(langue);
     setNumber("1");
     setVerseNumber("");
-  };
-
-  const openLink = async (url: string) => {
-    try {
-      await OpenTauri(url);
-    } catch (error) {
-      console.error("Erreur lors de l'ouverture du lien:", error);
-      // Fallback : ouvrir dans le navigateur classique
-      window.open(url, "_blank");
-    }
   };
 
   return (
@@ -204,9 +204,7 @@ export default function RouteComponent() {
               <div className="flex items-center justify-between gap-3">
                 <button
                   onClick={() =>
-                    openLink(
-                      "https://www.philippekacou.org/en-en/download"
-                    )
+                    openLink("https://www.philippekacou.org/en-en/download")
                   }
                   className="px-4 py-2 bg-white hover:bg-pkp-ocean text-pkp-indigo hover:text-white font-semibold rounded shadow-lg transition-colors text-sm cursor-pointer border border-white"
                 >

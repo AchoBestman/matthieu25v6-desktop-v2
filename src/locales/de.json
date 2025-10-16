@@ -34,7 +34,7 @@
     "audio": "MP3 herunterladen",
     "close": "Schließen",
     "see_more": "Mehr sehen",
-        "cancel": "Abbrechen",
+    "cancel": "Abbrechen",
     "confirm": "Bestätigen",
     "continue": "Fortsetzen",
     "download": "Herunterladen",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Sie sind offline. Bitte stellen Sie eine Internetverbindung her, um den Download zu starten.",
     "stop_playing": "Möchten Sie die Wiedergabe wirklich beenden und den Player schließen?"
+  },
+  "notification": {
+    "notification": "Benachrichtigung",
+    "notifications": "Benachrichtigungen",
+    "mark_all_as_read": "Alle als gelesen markieren",
+    "unread": "ungelesen",
+    "all": "alle",
+    "deleted": "gelöscht",
+    "no_notification": "Keine Benachrichtigungen",
+    "read_all": "Alles lesen",
+    "delete_all": "Alles löschen",
+    "see": "Ansehen",
+    "make_as_read": "Als gelesen markieren"
   }
 }

@@ -34,7 +34,7 @@
     "audio": "Download mp3",
     "close": "Sluiten",
     "see_more": "Meer weergeven",
-        "cancel": "Annuleren",
+    "cancel": "Annuleren",
     "confirm": "Bevestigen",
     "continue": "Doorgaan",
     "download": "Downloaden",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Je bent offline. Verbind met internet om te downloaden.",
     "stop_playing": "Weet je zeker dat je de audio wilt stoppen en de speler wilt sluiten?"
+  },
+  "notification": {
+    "notification": "melding",
+    "notifications": "meldingen",
+    "mark_all_as_read": "Alles als gelezen markeren",
+    "unread": "ongelezen",
+    "all": "alles",
+    "deleted": "verwijderd",
+    "no_notification": "Geen meldingen",
+    "read_all": "Alles lezen",
+    "delete_all": "Alles verwijderen",
+    "see": "Bekijken",
+    "make_as_read": "Markeren als gelezen"
   }
 }

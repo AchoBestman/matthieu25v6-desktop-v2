@@ -56,7 +56,9 @@ export function useUpdater() {
       });
       await relaunch();
     } catch (err: any) {
-      setError(err.message ?? "Update failed");
+      //setError(err.message ?? "Update failed");
+      console.log(err, "updater logs")
+      setError(typeof err === "string" ? err : JSON.stringify(err, null, 2));
       setStatus("error");
     }
   }, [update]);
@@ -64,7 +66,7 @@ export function useUpdater() {
   return {
     update,
     progress,
-    status,
+    updateStatus: status,
     error,
     checkForUpdate,
     installUpdate,

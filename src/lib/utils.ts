@@ -41,6 +41,15 @@ export type DownloadProgress = {
   id: string;
   file_path: string;
 };
+
+export interface DbInfo {
+    subdir: string,
+    lang: string,
+    dbname: string,
+    dbpath: string,
+    isCommon: boolean,
+}
+
 //all downloaded files will be put in the download folder
 export const DownloadBaseDir = BaseDirectory.Download;
 
@@ -49,6 +58,24 @@ export const AppDatabaseDir = BaseDirectory.AppData;
 
 // files base path
 export const BasePath = "Philippekacou";
+
+// databases
+export const APP_DB_NAME = "matth25v6";
+export const COMMON_DB_NAME = "common";
+
+/**
+ * Récupère les infos de base de données via Tauri (Rust)
+ * @param initial - code sous forme "AA-AA" ou "AA-AAA" (ex: FR-fr, cd-swe)
+ * @param isCommon - si true, renvoie la DB commune
+ */
+export async function getDbInfo(initial: string, isCommon: boolean = false): Promise<DbInfo> {
+  return await invoke<DbInfo>("resolve_db_info", {
+    initial,
+    isCommon,
+    appDbName: APP_DB_NAME,
+    commonDbName: COMMON_DB_NAME,
+  });
+}
 
 export const createPaths = async (
   initial: string,
@@ -324,3 +351,5 @@ export const cancelDownload = async (modelId: number): Promise<boolean> => {
   console.log(response,'clear data')
   return response as boolean
 };
+
+

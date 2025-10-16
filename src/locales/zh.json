@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "您当前处于离线状态。请连接互联网以下载。",
     "stop_playing": "您确定要停止音频并关闭播放器吗？"
+  },
+  "notification": {
+    "notification": "通知",
+    "notifications": "通知",
+    "mark_all_as_read": "标记全部为已读",
+    "unread": "未读",
+    "all": "全部",
+    "deleted": "已删除",
+    "no_notification": "没有通知",
+    "read_all": "阅读全部",
+    "delete_all": "删除全部",
+    "see": "查看",
+    "make_as_read": "标记为已读"
   }
 }

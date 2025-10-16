@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Vous êtes hors ligne. Veuillez vous connecter à Internet pour télécharger.",
     "stop_playing": "Voulez-vous vraiment arrêter l'audio et fermer le lecteur?"
+  },
+  "notification": {
+    "notification": "notification",
+    "notifications": "notifications",
+    "mark_all_as_read": "Marquer tout comme lu",
+    "unread": "non lu",
+    "all": "tout",
+    "deleted": "supprimée",
+    "no_notification": "Aucune notification",
+    "read_all": "Tout lire",
+    "delete_all": "Tout supprimer",
+    "see": "Voir",
+    "make_as_read": "Marquer comme lu"
   }
 }
