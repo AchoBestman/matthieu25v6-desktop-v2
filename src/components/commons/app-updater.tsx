@@ -89,7 +89,7 @@ const AppUpdaterDropdown = () => {
                     )}
                   </button>
                 </div>
-                {error && <p className="text-red-500">⚠️ ss{error}</p>}
+                {error && <p className="text-red-500">⚠️ {error}</p>}
               </DropdownMenuItem>
             </li>
           )}

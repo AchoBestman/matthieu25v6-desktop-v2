@@ -56,7 +56,8 @@ export function useUpdater() {
       });
       await relaunch();
     } catch (err: any) {
-      setError(err.message ?? "Update failed");
+      //setError(err.message ?? "Update failed");
+      setError(typeof err === "string" ? err : JSON.stringify(err, null, 2));
       setStatus("error");
     }
   }, [update]);
