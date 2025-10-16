@@ -4,6 +4,8 @@ import database from "../database";
 import { DataType } from "@/schemas/sermon";
 import { SingList } from "@/schemas/song";
 
+export const isCommon = true;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -37,6 +39,7 @@ export const findAll = async (
 
   const response = await allModels<SingList>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -57,6 +60,7 @@ export const findBy = async (
   const response = await oneModel<SingList>(
     resource,
     lang,
+    isCommon,
     params,
     relationships
   );
@@ -71,7 +75,7 @@ export const findPreviousSong = async (
   id: number,
   album_id?: number
 ) => {
-  const db = await database(lang);
+  const db = await database(lang, isCommon);
   let result;
   if (album_id) {
     result = await db.select(
@@ -103,7 +107,7 @@ export const findNextSong = async (
   id: number,
   album_id?: number
 ) => {
-  const db = await database(lang);
+  const db = await database(lang, isCommon);
 
   let result;
   if (album_id) {

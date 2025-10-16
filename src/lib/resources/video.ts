@@ -3,6 +3,8 @@ import { allModels, oneModel } from "@/lib/resources/base";
 import { DataType } from "@/schemas/sermon";
 import { Video } from "@/schemas/video";
 
+export const isCommon = false;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -40,6 +42,7 @@ export const findAll = async (
 
   const response = await allModels<Video>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -57,7 +60,7 @@ export const findBy = async (
   params: { column: string; value: string | number | boolean },
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[]
 ) => {
-  const response = await oneModel<Video>(resource, lang, params, relationships);
+  const response = await oneModel<Video>(resource, lang, isCommon, params, relationships);
 
   const [model] = response as Video[];
 

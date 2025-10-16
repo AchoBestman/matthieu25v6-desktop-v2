@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Você está offline. Conecte-se à internet para fazer o download.",
     "stop_playing": "Você realmente deseja parar o áudio e fechar o reprodutor?"
+  },
+  "notification": {
+    "notification": "notificação",
+    "notifications": "notificações",
+    "mark_all_as_read": "Marcar tudo como lido",
+    "unread": "não lido",
+    "all": "todos",
+    "deleted": "excluído",
+    "no_notification": "Sem notificações",
+    "read_all": "Ler tudo",
+    "delete_all": "Excluir tudo",
+    "see": "Ver",
+    "make_as_read": "Marcar como lido"
   }
 }

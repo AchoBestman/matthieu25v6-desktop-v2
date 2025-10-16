@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Ești offline. Te rugăm să te conectezi la internet pentru a descărca.",
     "stop_playing": "Chiar vrei să oprești audio și să închizi playerul?"
+  },
+  "notification": {
+    "notification": "notificare",
+    "notifications": "notificări",
+    "mark_all_as_read": "Marchează totul ca citit",
+    "unread": "necitit",
+    "all": "toate",
+    "deleted": "șters",
+    "no_notification": "Nicio notificare",
+    "read_all": "Citește tot",
+    "delete_all": "Șterge tot",
+    "see": "Vezi",
+    "make_as_read": "Marchează ca citit"
   }
 }

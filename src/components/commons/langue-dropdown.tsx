@@ -19,6 +19,7 @@ import { Langue } from "@/schemas/langue";
 import { useLangue } from "@/context/langue-context";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { useSermon } from "@/context/sermon-context";
+import { AppDataUpdate, dbHasNewUpdate, getTotalAppDataUpdatesAvailable, updateLangueLastUpdate } from "@/lib/db-updates";
 
 export type LangueDataType = {
   id: number;
@@ -28,7 +29,10 @@ export type LangueDataType = {
   countryFip: string;
   translation: string;
   exist: boolean;
+  currentUpdate?: AppDataUpdate;
 };
+
+export const isCommon = false;
 
 const LangueDropdown = () => {
   const { setDefaultLangue, lng } = useLangue();
@@ -46,7 +50,6 @@ const LangueDropdown = () => {
   const [open, setOpen] = useState<boolean>(false);
   const abortRef = useRef(false);
   const searchInputRef = useRef<HTMLInputElement>(null); // Ref pour l'input
-
   const onOpenChange = () => {
     setOpen(!open);
   };
@@ -59,7 +62,7 @@ const LangueDropdown = () => {
     abortRef.current = !abortRef.current;
   };
 
-  const downloadDb = async (initial: string) => {
+  const downloadDb = async (initial: string, currentUpdate?: AppDataUpdate) => {
     try {
       abortRef.current = false;
       onOpenChangeProgress();
@@ -71,8 +74,13 @@ const LangueDropdown = () => {
       await downloadWithProgress(
         `${API_URL}/auth/download/${initial}`,
         initial,
-        (percent) => {
+        isCommon,
+        async (percent) => {
           setProgress(percent);
+          if (percent.percent === 100 && currentUpdate) {
+            updateLangueLastUpdate(currentUpdate).then(() => {
+            });
+          }
         },
         () => abortRef.current
       );
@@ -83,7 +91,7 @@ const LangueDropdown = () => {
 
   const removeDb = async (initial: string) => {
     try {
-      await deleteDb(initial);
+      await deleteDb(initial, isCommon);
       await availabeLangues();
     } catch (err) {
       console.error("Error deleting database:", err);
@@ -102,11 +110,13 @@ const LangueDropdown = () => {
       },
       { column: "order", direction: "ASC" }
     );
+
     const data = response.data;
+    const priorityLangues = ["en-en", "fr-fr", "es-es", "pt-pt"];
 
     const customLangues = await Promise.all(
       data.map(async (item: Langue) => {
-        const status = await dbExist(item.initial);
+        const status = await dbExist(item.initial, isCommon);
         const itemToArray = item.initial.split("-");
         const countryFip = itemToArray[0];
 
@@ -115,13 +125,33 @@ const LangueDropdown = () => {
           icon: `/images/drapeau/${countryFip}.jpg`,
           lang: item.initial,
           name: item.libelle,
-          countryFip: countryFip,
+          countryFip,
           translation: item.web_translation,
           exist: status,
+          currentUpdate: dbHasNewUpdate(item.initial),
         };
       })
     );
 
+    // Tri personnalisé : existence, priorité, updatedAt, order
+    // Tri personnalisé : existence + priorité
+    customLangues.sort((a, b) => {
+      // 1️⃣ Langues existantes avant non-existantes
+      if (a.exist && !b.exist) return -1;
+      if (!a.exist && b.exist) return 1;
+
+      // 2️⃣ Langues prioritaires en tête parmi les existantes
+      const aPriority = priorityLangues.indexOf(a.lang);
+      const bPriority = priorityLangues.indexOf(b.lang);
+      if (aPriority !== -1 && bPriority === -1) return -1;
+      if (aPriority === -1 && bPriority !== -1) return 1;
+      if (aPriority !== -1 && bPriority !== -1) return aPriority - bPriority;
+
+      // 3️⃣ Sinon on garde l'ordre actuel
+      return 0;
+    });
+
+    // Mise à jour des états
     setLangues(customLangues);
     setSearchLangues(customLangues);
   };
@@ -209,6 +239,11 @@ const LangueDropdown = () => {
               )}
             </span>
             <span className="text-white cursor-pointer">
+              {getTotalAppDataUpdatesAvailable().length > 0 && getTotalAppDataUpdatesAvailable().includes(lng) && (
+                <span className="bg-red-500 px-1 py-0.5 rounded-full">
+                  {getTotalAppDataUpdatesAvailable().length}
+                </span>
+              )}
               <svg
                 className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
                   isOpen ? "rotate-180" : ""
@@ -284,12 +319,16 @@ const LangueDropdown = () => {
                       <button className="flex cursor-pointer mr-4">
                         {item.exist ? (
                           <>
-                            <button
-                              className="cursor-pointer"
-                              onClick={() => downloadDb(item.lang)}
-                            >
-                              <RefreshCcw className="w-5 text-pkp-ocean dark:text-white mx-2"></RefreshCcw>
-                            </button>
+                            {item.currentUpdate && (
+                              <button
+                                className="cursor-pointer"
+                                onClick={() =>
+                                  downloadDb(item.lang, item.currentUpdate)
+                                }
+                              >
+                                <RefreshCcw className="w-5 text-pkp-ocean dark:text-white mx-2"></RefreshCcw>
+                              </button>
+                            )}
                             <button
                               className="cursor-pointer"
                               onClick={() => removeDb(item.lang)}

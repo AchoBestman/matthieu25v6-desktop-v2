@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Anda sedang offline. Harap sambungkan ke internet untuk mengunduh.",
     "stop_playing": "Apakah Anda yakin ingin menghentikan audio dan menutup pemutar?"
+  },
+  "notification": {
+    "notification": "notifikasi",
+    "notifications": "notifikasi",
+    "mark_all_as_read": "Tandai semua telah dibaca",
+    "unread": "belum dibaca",
+    "all": "semua",
+    "deleted": "dihapus",
+    "no_notification": "Tidak ada notifikasi",
+    "read_all": "Baca semua",
+    "delete_all": "Hapus semua",
+    "see": "Lihat",
+    "make_as_read": "Tandai sebagai dibaca"
   }
 }

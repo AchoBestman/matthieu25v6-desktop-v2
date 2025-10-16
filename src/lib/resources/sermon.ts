@@ -1,6 +1,6 @@
 import { ResourcesType } from "@/lib/resources";
 import { allModels, oneModel } from "@/lib/resources/base";
-import { AppDatabaseDir, downloadDrogressType, toObject } from "../utils";
+import { downloadDrogressType, getDbInfo, toObject } from "../utils";
 import {
   createDataTypeSchema,
   DataType,
@@ -11,8 +11,9 @@ import {
 } from "@/schemas/sermon";
 import database, { dbExist } from "../database";
 import { invoke } from "@tauri-apps/api/core";
-import { mkdir } from "@tauri-apps/plugin-fs";
 import { appDataDir } from "@tauri-apps/api/path";
+
+export const isCommon = false;
 
 export const findAll = async (
   resource: ResourcesType,
@@ -20,29 +21,25 @@ export const findAll = async (
   params?: { [key: string]: string | number | boolean },
   order?: { column: string; direction: "ASC" | "DESC" }
 ): Promise<DataType<Sermon>> => {
-
   const baseQuery = `SELECT s.*, v.number as verse_number FROM ${resource} s LEFT JOIN verses v ON v.sermon_id = s.id AND v.number = 1`;
-  //const baseQuery = `SELECT * FROM ${resource}`; is the old one
-  let countQuery = `SELECT COUNT(*) as total FROM ${resource}`;
+  let countQuery = `SELECT COUNT(DISTINCT s.id) as total FROM ${resource} s LEFT JOIN verses v ON v.sermon_id = s.id AND v.number = 1`;
+
   const conditions = [];
   const searchParams: any[] = [];
 
+  // 🔍 Recherche par chapter **et** title
   if (params?.search) {
-    conditions.push(
-      `(chapter LIKE ?)`
-    );
-    searchParams.push(
-      `%${params.search}%`
-    );
+    conditions.push(`(s.chapter LIKE ? OR s.title LIKE ?)`);
+    searchParams.push(`%${params.search}%`, `%${params.search}%`);
   }
 
   if (params?.number) {
     conditions.push(`v.number = ?`);
     searchParams.push(params.number);
   }
-  conditions.push(`is_active = ?`);
+  conditions.push(`s.is_active = ?`);
   searchParams.push(1);
-  
+
   if (conditions.length > 0) {
     const whereClause = ` WHERE ` + conditions.join(" AND ");
     countQuery += whereClause;
@@ -50,6 +47,7 @@ export const findAll = async (
 
   const response = await allModels<Sermon>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -73,7 +71,7 @@ export const findAllVerses = async (
   params?: { [key: string]: string | number | boolean },
   order?: { column: string; direction: "ASC" | "DESC" }
 ): Promise<Array<Verses & { sermon_number: number }>> => {
-  const db = await database(lang);
+  const db = await database(lang, isCommon);
 
   let baseQuery = `
     SELECT 
@@ -118,6 +116,7 @@ export const findBy = async (
   const response = await oneModel<Sermon>(
     resource,
     lang,
+    isCommon,
     params,
     relationships,
     onProgress
@@ -162,29 +161,36 @@ export const findBy = async (
 };
 
 export const findImage = async (lang: string, name: string) => {
-  if (!/^[A-Za-z]{2}-[A-Za-z]{2,4}$/.test(lang)) {
-    throw new Error(
-      `Invalid format: ${lang} must be in the format 'AA-AA{BC}'`
-    );
-  }
-  const [country, langue] = lang.toLowerCase().split("-");
-  const relativePath = `${country}/matth25v6_${langue}.db`;
+  const dbInfo = await getDbInfo(lang, isCommon);
 
-  // Ensure the folder exists
-
-  await mkdir(country, {
-    baseDir: AppDatabaseDir,
-    recursive: true,
-  });
-
-  const dbExists = await dbExist(lang);
+  const dbExists = await dbExist(lang, isCommon);
   if (!dbExists) return { name, blobUrl: null };
 
-  // 🔥 Résoudre le chemin absolu vers le fichier db
-  //const dbPath = await resolveResource(relativePath);
-  // ⚠️ si ton fichier est bien copié dans "resources" au build
-  // sinon -> utilise appDataDir + relativePath
-  const dbPath = (await appDataDir()) + "/" + relativePath;
+  const dbPath = (await appDataDir()) + "/" + dbInfo.dbpath;
+  // appel du Rust command fetch_blob
+  const blob: number[] = await invoke("fetch_blob", {
+    dbPath,
+    name,
+  });
+
+  // `blob` est un tableau de bytes → tu le convertis en Uint8Array
+  const buffer = new Uint8Array(blob);
+  // tu peux créer une URL pour l’afficher comme image
+  const blobUrl = URL.createObjectURL(new Blob([buffer]));
+
+  return {
+    name,
+    blobUrl,
+  };
+};
+
+export const findCommonImage = async (lang: string, name: string) => {
+  const dbInfo = await getDbInfo(lang, true);
+
+  const dbExists = await dbExist(lang, true);
+  if (!dbExists) return { name, blobUrl: null };
+
+  const dbPath = (await appDataDir()) + "/" + dbInfo.dbpath;
 
   // appel du Rust command fetch_blob
   const blob: number[] = await invoke("fetch_blob", {

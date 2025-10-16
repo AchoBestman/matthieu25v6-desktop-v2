@@ -5,6 +5,27 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Style pour react-confirm-alert */
+/* Centrage du modal */
+.react-confirm-alert-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Taille adaptative */
+.react-confirm-alert-body {
+  width: auto !important;
+  height: auto !important;
+  max-width: 90vw !important;
+  max-height: 90vh !important;
+  overflow: auto;
+  box-sizing: border-box;
+  background-color: var(--pkp-sand) !important;
+  color: var(--foreground) !important;
+  text-align: justify !important;
+}
+
 /* Audio player - couleur quand le lecteur ne joue pas */
 .audio-player-wrapper .rhap_main-controls-button,
 .audio-player-wrapper .rhap_additional-controls .rhap_volume-button button {

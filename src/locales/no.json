@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "Du er frakoblet. Koble til internett for å laste ned.",
     "stop_playing": "Vil du virkelig stoppe lyden og lukke spilleren?"
+  },
+  "notification": {
+    "notification": "varsling",
+    "notifications": "varsler",
+    "mark_all_as_read": "Merk alt som lest",
+    "unread": "ulest",
+    "all": "alle",
+    "deleted": "slettet",
+    "no_notification": "Ingen varsler",
+    "read_all": "Les alt",
+    "delete_all": "Slett alt",
+    "see": "Se",
+    "make_as_read": "Merk som lest"
   }
 }

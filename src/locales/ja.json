@@ -34,7 +34,7 @@
     "audio": "MP3ダウンロード",
     "close": "閉じる",
     "see_more": "もっと見る",
-        "cancel": "キャンセル",
+    "cancel": "キャンセル",
     "confirm": "確認",
     "continue": "続ける",
     "download": "ダウンロード",
@@ -109,5 +109,18 @@
   "alert": {
     "cannot_download": "オフラインです。ダウンロードするにはインターネットに接続してください。",
     "stop_playing": "本当にオーディオを停止してプレーヤーを閉じますか？"
+  },
+  "notification": {
+    "notification": "通知",
+    "notifications": "通知",
+    "mark_all_as_read": "すべて既読にする",
+    "unread": "未読",
+    "all": "すべて",
+    "deleted": "削除済み",
+    "no_notification": "通知はありません",
+    "read_all": "すべて読む",
+    "delete_all": "すべて削除",
+    "see": "見る",
+    "make_as_read": "既読にする"
   }
 }

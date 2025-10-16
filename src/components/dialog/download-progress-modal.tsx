@@ -27,6 +27,8 @@ const DownloadProgressModal = ({
   cancel?: boolean;
   type?: string;
 }) => {
+
+
   return (
     <div>
       <AlertDialog open={open} onOpenChange={onOpenChange}>

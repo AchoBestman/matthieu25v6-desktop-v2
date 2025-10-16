@@ -4,6 +4,8 @@ import { Assembly, AssemblySerchParams } from "@/schemas/assembly";
 import { SingleHead } from "@/schemas/brother";
 import { DataType } from "@/schemas/sermon";
 
+export const isCommon = true;
+
 export const findAll = async (
   resource: ResourcesType,
   lang: string,
@@ -44,6 +46,7 @@ export const findAll = async (
 
   const response = await allModels<Assembly>(
     lang,
+    isCommon,
     baseQuery,
     countQuery,
     searchParams,
@@ -64,6 +67,7 @@ export const findBy = async (
   const response = await oneModel<SingleHead>(
     resource,
     lang,
+    isCommon,
     params,
     relationships
   );

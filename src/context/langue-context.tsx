@@ -13,6 +13,7 @@ import {
 
 type LangueContextType = {
   lng: string;
+  webTranslation: string;
   langName: string;
   setLng: (lng: string) => void;
   setLangName: (langName: string) => void;
@@ -35,6 +36,7 @@ export function LangueProvider({
   children: ReactNode;
 }>) {
   const [lng, setLng] = useState("en-en");
+  const [webTranslation, setWebTranslation] = useState("en");
   const [langName, setLangName] = useState("English");
   const defauttLangue = localStorage.getItem("defauttLangue");
 
@@ -42,6 +44,7 @@ export function LangueProvider({
     if (defauttLangue) {
       const langue = JSON.parse(defauttLangue);
       setTr(langue.tr);
+      setWebTranslation(langue.tr)
       setLangName(langue.name);
       setLng(langue.lang);
     }
@@ -51,6 +54,7 @@ export function LangueProvider({
     setLng(langue.lang);
     setLangName(langue.name);
     setTr(langue.translation);
+    setWebTranslation(langue.translation)
     localStorage.setItem(
       "defauttLangue",
       JSON.stringify({
@@ -65,11 +69,12 @@ export function LangueProvider({
     () => ({
       lng,
       langName,
+      webTranslation,
       setLng,
       setLangName,
       setDefaultLangue,
     }),
-    [lng, langName]
+    [lng, langName, webTranslation]
   );
 
   return (

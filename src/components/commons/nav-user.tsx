@@ -18,7 +18,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { open as OpenTauri } from "@tauri-apps/plugin-shell";
+import { openLink } from "@/routes/landing";
 
 export function NavUser({
   user,
@@ -31,15 +31,6 @@ export function NavUser({
 }>) {
   const { isMobile } = useSidebar();
 
-  const openLink = async (url: string) => {
-    try {
-      await OpenTauri(url);
-    } catch (error) {
-      console.error("Erreur lors de l'ouverture du lien:", error);
-      // Fallback : ouvrir dans le navigateur classique
-      window.open(url, "_blank");
-    }
-  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
