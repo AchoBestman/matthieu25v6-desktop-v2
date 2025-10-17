@@ -79,7 +79,7 @@ export const oneModel = async <T>(
   resource: ResourcesType,
   lang: string,
   isCommon: boolean,
-  params: { column: string; value: string | number | boolean },
+  params: { column: string; value: string | number | boolean } | { column: string; value: string | number | boolean }[],
   relationships?: { table: string; type: "BelongsTo" | "HasOne" | "HasMany" }[],
   onProgress?: (percent: downloadDrogressType) => void
 ): Promise<T | T[]> => {
@@ -89,11 +89,26 @@ export const oneModel = async <T>(
     }
   });
 
-  // 1. Get the model by ID
+  // 🧩 Construire dynamiquement les conditions WHERE
+  let whereClause = "";
+  let values: (string | number | boolean)[] = [];
+
+  if (Array.isArray(params)) {
+    // Exemple: [ { column: "id", value: 2 }, { column: "status", value: "active" } ]
+    const conditions = params.map((p) => `${p.column} = ?`);
+    whereClause = conditions.join(" AND ");
+    values = params.map((p) => p.value);
+  } else {
+    whereClause = `${params.column} = ?`;
+    values = [params.value];
+  }
+
+  // 🔍 Exécution de la requête
   const result = await db.select(
-    `SELECT * FROM ${resource} WHERE ${params.column} = ?`,
-    [params.value]
+    `SELECT * FROM ${resource} WHERE ${whereClause} ORDER BY id DESC`,
+    values
   );
+
 
   if (resource === resources.sings) {
     return result as T[];
@@ -103,7 +118,7 @@ export const oneModel = async <T>(
 
   if (!model) {
     throw new Error(
-      `Model not found for ${resource} with ${params.column} = ${params.value}`
+      `Model not found for ${resource} with ${whereClause.replace(/\?/g, () => JSON.stringify(values.shift()))}`
     );
   }
 
