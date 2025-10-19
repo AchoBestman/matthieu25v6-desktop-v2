@@ -1,11 +1,12 @@
 "use client";
-import { useAudioPlayer } from "@/context/audio-player-context";
+import {useAudioPlayer } from "@/context/audio-player-context";
 import { useLangue } from "@/context/langue-context";
 import { tr } from "@/translation";
-import { XCircle } from "lucide-react";
+import { Repeat, Repeat1, Repeat2, XCircle } from "lucide-react";
 import AudioPlayer from "react-h5-audio-player";
 import "react-h5-audio-player/lib/styles.css";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
+import type {PlayModeType} from "@/context/audio-player-context"
 
 const SongPlayer = ({
   lightColor,
@@ -20,6 +21,7 @@ const SongPlayer = ({
     system: darkColor ?? "#a0a83b",
   };
   const { lng } = useLangue();
+
   const {
     audioUrl,
     autoPlay,
@@ -32,7 +34,12 @@ const SongPlayer = ({
     play,
     albumId,
     playedAudioUrl,
+    repeatMode,
+    setRepeatMode
   } = useAudioPlayer();
+
+  
+
   if (!audioUrl) return null;
 
   const handleRemovePlayer = () => {
@@ -48,6 +55,100 @@ const SongPlayer = ({
     setAudio("", "", 0);
   };
 
+  const toggleRepeatMode = () => {
+    const nextMode: PlayModeType =
+      repeatMode === "none" ? "one" : repeatMode === "one" ? "all" : "none";
+    setRepeatMode(nextMode);
+  };
+
+  const onEnded = () => {
+    if (repeatMode === "one") {
+      audioRef.current?.play(); // rejoue la même chanson
+      return;
+    }
+    if (albumId) {
+      playNext?.(lng, "Hymns");
+    } else {
+      playNext?.(lng, audioTitle.includes(" : ") ? "Sermons" : "Others");
+    }
+  };
+
+  const onListen = () => {
+    if (audioRef.current) {
+      if (albumId) {
+        setPlay?.(true, "Hymns");
+      } else {
+        setPlay?.(true, audioTitle.includes(" : ") ? "Sermons" : "Others");
+      }
+    }
+  };
+
+  const onPause = () => {
+    if (audioRef.current) {
+      if (albumId) {
+        setPlay?.(false, "Hymns");
+      } else {
+        setPlay?.(false, audioTitle.includes(" : ") ? "Sermons" : "Others");
+      }
+    }
+  };
+
+  const onClickPrevious = () => {
+    if (albumId) {
+      playPrevious?.(lng, "Hymns");
+    } else {
+      playPrevious?.(lng, audioTitle.includes(" : ") ? "Sermons" : "Others");
+    }
+  };
+
+  const onClickNext = () => {
+    if (albumId) {
+      playNext?.(lng, "Hymns");
+    } else {
+      playNext?.(lng, audioTitle.includes(" : ") ? "Sermons" : "Others");
+    }
+  };
+
+  const customAdditionalControls = [
+    <div
+      key="title"
+      style={{
+        fontWeight: "bold",
+        fontStyle: "italic",
+        color: "dark",
+        fontSize: "13px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      {/* ce span vide est indispensable pour bien aligner le texte du lecteur */}
+      <span></span>
+      <div className="flex items-center gap-3">
+      <span>
+        {audioTitle.substring(0, 50)}
+        {audioTitle.length > 50 ? "..." : ""}
+      </span>
+        <XCircle
+          onClick={handleRemovePlayer}
+          className="h-6 w-6 text-pkp-ocean cursor-pointer"
+        />
+        <button onClick={toggleRepeatMode} className="cursor-pointer">
+          {repeatMode === "none" && (
+            <Repeat className="h-6 w-6 text-pkp-ocean" />
+          )}
+          {repeatMode === "one" && (
+            <Repeat1 className="h-6 w-6 text-pkp-ocean" />
+          )}
+          {repeatMode === "all" && (
+            <Repeat2 className="h-6 w-6 text-pkp-ocean" />
+          )}
+        </button>
+      </div>
+    </div>,
+  ];
+
   return (
     <div
       className={`audio-player-wrapper ${play ? "playing" : ""} ${
@@ -58,7 +159,7 @@ const SongPlayer = ({
         bottom: 0,
         right: 0,
         zIndex: "10",
-        width: "72.3%",
+        width:"82.3%",
         border: "2px solid #a0a83b",
       }}
     >
@@ -76,85 +177,13 @@ const SongPlayer = ({
           showDownloadProgress={true}
           showFilledVolume={true}
           layout="horizontal-reverse"
-          onListen={() => {
-            if (audioRef.current) {
-              if (albumId) {
-                setPlay?.(true, "Hymns");
-              } else {
-                setPlay?.(
-                  true,
-                  audioTitle.includes(" : ") ? "Sermons" : "Others"
-                );
-              }
-            }
-          }}
-          onPause={() => {
-            if (audioRef.current) {
-              if (albumId) {
-                setPlay?.(false, "Hymns");
-              } else {
-                setPlay?.(
-                  false,
-                  audioTitle.includes(" : ") ? "Sermons" : "Others"
-                );
-              }
-            }
-          }}
-          onEnded={() => {
-            if (albumId) {
-              playNext?.(lng, "Hymns");
-            } else {
-              playNext?.(
-                lng,
-                audioTitle.includes(" : ") ? "Sermons" : "Others"
-              );
-            }
-          }}
+          onListen={onListen}
+          onPause={onPause}
+          onEnded={onEnded}
           onPlay={(e) => console.log(e, "onPlay")}
-          onClickPrevious={() => {
-            if (albumId) {
-              playPrevious?.(lng, "Hymns");
-            } else {
-              playPrevious?.(
-                lng,
-                audioTitle.includes(" : ") ? "Sermons" : "Others"
-              );
-            }
-          }}
-          onClickNext={() => {
-            if (albumId) {
-              playNext?.(lng, "Hymns");
-            } else {
-              playNext?.(
-                lng,
-                audioTitle.includes(" : ") ? "Sermons" : "Others"
-              );
-            }
-          }}
-          customAdditionalControls={[
-            <div
-              key="title"
-              style={{
-                fontWeight: "bold",
-                fontStyle: "italic",
-                color: "dark",
-                fontSize: "13px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <span>
-                {audioTitle.substring(0, 50)}
-                {audioTitle.length > 50 ? "..." : ""}
-              </span>
-              <XCircle
-                onClick={handleRemovePlayer}
-                className="h-9 w-9 text-pkp-ocean cursor-pointer"
-              ></XCircle>
-            </div>,
-          ]}
+          onClickPrevious={onClickPrevious}
+          onClickNext={onClickNext}
+          customAdditionalControls={customAdditionalControls}
           style={{
             backgroundColor: color.dark,
           }}

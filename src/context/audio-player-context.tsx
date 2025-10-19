@@ -15,6 +15,7 @@ import { useLangue } from "./langue-context";
 import { handleConfirmAlert } from "@/lib/alert-confirm-options";
 import { getHistory } from "@/lib/download-history";
 
+export type PlayModeType = "none" | "one" | "all";
 type AudioContextType = {
   audioUrl: string | null;
   audioTitle: string;
@@ -24,7 +25,8 @@ type AudioContextType = {
   play?: boolean;
   playedAudioUrl?: string;
   isDownloaded?: boolean;
-  fileOriginalName?: string,
+  fileOriginalName?: string;
+  repeatMode: PlayModeType;
   setAudio: (
     url: string,
     audioTitle: string,
@@ -37,6 +39,7 @@ type AudioContextType = {
   setPlay?: (play: boolean, subFolder: AudioFolder) => void;
   playPrevious?: (lng: string, subFolder: AudioFolder) => void;
   togglePlayPause: () => void;
+  setRepeatMode: (mode: PlayModeType) => void;
   audioRef: React.RefObject<HTMLAudioElement | null>;
 };
 
@@ -59,12 +62,17 @@ export function AudioPlayerProvider({
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
   const [audioTitle, setAudioTitle] = useState<string>("");
   const [audioId, setAudioId] = useState<number | undefined>();
+  const [firstAudioId, setFirstAudioId] = useState<number | undefined>();
   const [albumId, setAlbumId] = useState<number | undefined>();
   const [playedAudioUrl, setPlayedAudioUrl] = useState<string>("");
   const [isDownloaded, setIsDownloaded] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [play, setPlay] = useState<boolean>(false);
-  const [fileOriginalName, setFileOriginalName] = useState<string|undefined>('')
+  const [fileOriginalName, setFileOriginalName] = useState<string | undefined>(
+    ""
+  );
+  const [audioRepeatMode, setAudioRepeatMode] = useState<PlayModeType>("none");
+
   useEffect(() => {
     if (audioId && audioTitle && audioUrl) {
       if (albumId) {
@@ -94,32 +102,34 @@ export function AudioPlayerProvider({
     setAudioTitle(title);
     setAlbumId(albumId);
     setAudioId(audioId);
-    setFileOriginalName(fileOriginalName)
+    setFileOriginalName(fileOriginalName);
   };
 
   const playNext = async (lng: string, subFolder: AudioFolder) => {
-    
+  
     if (audioId) {
+      if (!firstAudioId) {
+        setFirstAudioId(audioId);
+      }
 
-      if(fileOriginalName){
-        const song = getHistory(audioId,'+')
-        if(song){
+      if (fileOriginalName) {
+        const song = getHistory(audioId, "+", audioRepeatMode==='all' ? firstAudioId: undefined);
+        if (song) {
           setAudioUrl(song.url);
           setAutoPlay(true);
           setAudioTitle(song.fileOriginalName);
           setAlbumId(song.albumId);
           setAudioId(song.modelId);
-          return 
+          return;
         }
-        
       }
-      const response = await findNextSong(lng, audioId, albumId);
+      const response = await findNextSong(lng, audioId, albumId,  audioRepeatMode==='all' ? firstAudioId: undefined);
       const [song] = response as { [key: string]: string | number }[];
       const title = song.album_id
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
       const canPlay = await getCanPlay(title, subFolder).catch(() => {
-        handleConfirmAlert(tr("alert.cannot_download"))
+        handleConfirmAlert(tr("alert.cannot_download"));
       });
 
       if (song && canPlay) {
@@ -134,18 +144,16 @@ export function AudioPlayerProvider({
 
   const playPrevious = async (lng: string, subFolder: AudioFolder) => {
     if (audioId) {
-
-      if(fileOriginalName){
-        const song = getHistory(audioId,'-')
-        if(song){
+      if (fileOriginalName) {
+        const song = getHistory(audioId, "-");
+        if (song) {
           setAudioUrl(song.url);
           setAutoPlay(true);
           setAudioTitle(song.fileOriginalName);
           setAlbumId(song.albumId);
           setAudioId(song.modelId);
-          return 
+          return;
         }
-        
       }
 
       const response = await findPreviousSong(lng, audioId, albumId);
@@ -154,7 +162,7 @@ export function AudioPlayerProvider({
         ? song.title.toString()
         : `${song.chapter.toString()} : ${song.title.toString()}`;
       const canPlay = await getCanPlay(title, subFolder).catch(() => {
-        handleConfirmAlert(tr("alert.cannot_download"))
+        handleConfirmAlert(tr("alert.cannot_download"));
       });
 
       if (song && canPlay) {
@@ -207,7 +215,7 @@ export function AudioPlayerProvider({
       setIsDownloaded(true);
     } catch (error) {
       if (!navigator.onLine) {
-        handleConfirmAlert(tr("alert.cannot_download"))
+        handleConfirmAlert(tr("alert.cannot_download"));
         audioRef.current?.pause();
         setAudio("", "", 0);
         return;
@@ -230,11 +238,13 @@ export function AudioPlayerProvider({
       playedAudioUrl,
       isDownloaded,
       fileOriginalName,
+      repeatMode: audioRepeatMode,
       setAudio,
       playNext,
       playPrevious,
       togglePlayPause,
       setPlay,
+      setRepeatMode: setAudioRepeatMode,
     }),
     [
       audioUrl,
@@ -245,7 +255,8 @@ export function AudioPlayerProvider({
       play,
       playedAudioUrl,
       isDownloaded,
-      fileOriginalName
+      fileOriginalName,
+      audioRepeatMode,
     ]
   );
 
