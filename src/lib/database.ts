@@ -38,9 +38,14 @@ export async function downloadWithProgress(
       recursive: true,
     });
 
-    const bustCacheUrl = `${url}?t=${Date.now()}`;
+    const response = await fetch(`${url}?t=${Date.now()}`, { cache: "no-store" });
+    if (!response.ok || !response.body) {
+      throw new Error("Failed to fetch signed url.");
+    }
 
-    const res = await fetch(bustCacheUrl, { cache: "no-store" });
+    const body = await response.json() as {download_url: string};
+
+    const res = await fetch(body.download_url, { cache: "no-store" });
 
     if (!res.ok || !res.body) {
       throw new Error("Failed to fetch file.");
@@ -127,8 +132,8 @@ const database = async (
     // If the file doesn't exist, download it
 
     const url = isCommon
-      ? `${API_URL}/auth/download-common-db`
-      : `${API_URL}/auth/download/${initial}`;
+      ? `${API_URL}/common/download-url`
+      : `${API_URL}/${initial}/download-url`;
 
     try {
       await downloadWithProgress(url, initial, isCommon, onProgress, signal);

@@ -45,18 +45,29 @@ export const clearHistories = () => {
   localStorage.removeItem(STORAGE_KEY);
 };
 
-export const getHistory = (id: number, type: '-'|'+') => {
+export const getHistory = (id: number, type: '-'|'+', firstAudioId?: number) => {
   const history = loadHistory();
 
   if (history.length === 0) return undefined;
 
-  const index = history.findIndex(h => h.modelId === id);
+  let index = history.findIndex(h => h.modelId === id);
 
   if (index >= 0) {
-    // trouvé → retourner le suivant ou precedent si dispo
-    return history[type === '+' ? Math.min(index + 1, history.length - 1) : Math.max(index - 1, 0)];
-  } 
+    // trouvé → retourner le suivant ou le précédent selon le type
+    let response = history[
+      type === '+'
+        ? Math.min(index + 1, history.length - 1)
+        : Math.max(index - 1, 0)
+    ];
 
-  // pas trouvé → retourner le meme élément
-  return history[index];
+    if(!response && firstAudioId){
+      index = history.findIndex(h => h.modelId === firstAudioId);
+      response = history[index]
+    }
+
+    return response
+  }
+
+  // toujours pas trouvé → aucun élément
+  return undefined;
 };

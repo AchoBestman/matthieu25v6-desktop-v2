@@ -71,8 +71,9 @@ const LangueDropdown = () => {
         downloadSize: 0,
         totalSize: 0,
       });
+      
       await downloadWithProgress(
-        `${API_URL}/auth/download/${initial}`,
+        `${API_URL}/${initial}/download-url`,
         initial,
         isCommon,
         async (percent) => {

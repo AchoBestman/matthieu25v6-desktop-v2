@@ -75,9 +75,9 @@ export const findPreviousSong = async (
   id: number,
   album_id?: number
 ) => {
-  const db = await database(lang, isCommon);
   let result;
   if (album_id) {
+    const db = await database(lang, isCommon);
     result = await db.select(
       `SELECT * FROM sings
      WHERE album_id = ? AND "order" < (
@@ -88,6 +88,7 @@ export const findPreviousSong = async (
       [album_id, id, album_id]
     );
   } else {
+    const db = await database(lang, false);
     result = await db.select(
       `SELECT * FROM sermons
        WHERE "number" < (
@@ -105,32 +106,63 @@ export const findPreviousSong = async (
 export const findNextSong = async (
   lang: string,
   id: number,
-  album_id?: number
+  album_id?: number,
+  firstAudioId?: number
 ) => {
-  const db = await database(lang, isCommon);
+  try {
 
-  let result;
-  if (album_id) {
-    result = await db.select(
-      `SELECT * FROM sings
+    let result;
+    if (album_id) {
+      const db = await database(lang, isCommon);
+      result = await db.select(
+        `SELECT * FROM sings
        WHERE album_id = ? AND "order" > (
          SELECT "order" FROM sings WHERE id = ? AND album_id = ?
        )
        ORDER BY "order" ASC
        LIMIT 1;`,
-      [album_id, id, album_id]
-    );
-  } else {
-    result = await db.select(
-      `SELECT * FROM sermons
+        [album_id, id, album_id]
+      );
+
+      const [song] = result as { [key: string]: string | number }[];
+
+      // 👉 Si rien n’est trouvé, retourner le premier son (boucle)
+      if (!song?.album_id) {
+        if (firstAudioId) {
+          result = await db.select(
+            `SELECT * FROM sings WHERE id = ? AND album_id = ? LIMIT 1;`,
+            [firstAudioId, album_id]
+          );
+        }
+      }
+    } else {
+      const db = await database(lang, false);
+      console.log("sermon result start", id);
+      result = await db.select(
+        `SELECT * FROM sermons
          WHERE "number" > (
          SELECT "number" FROM sermons WHERE id = ?
        )
        ORDER BY "number" ASC
        LIMIT 1;`,
-      [id]
-    );
-  }
+        [id]
+      );
+      const [song] = result as { [key: string]: string | number }[];
 
-  return result;
+      // 👉 Si rien n’est trouvé, retourner le premier sermon
+      if (!song?.chapter) {
+        if (firstAudioId) {
+          result = await db.select(
+            `SELECT * FROM sermons WHERE id = ? LIMIT 1;`,
+            [firstAudioId]
+          );
+        }
+      }
+    }
+
+    return result;
+  } catch (error) {
+    console.error("🔥 ERREUR dans findNextSong :", error);
+    throw error; // pour la remonter si nécessaire
+  }
 };
