@@ -147,7 +147,7 @@ export const availableServerLanguesUpdates = async (lng: string, langs: string[]
                 try {
                   console.log(common, "download updated common database finish")
                   await downloadWithProgress(
-                    `${API_URL}/auth/download-common-db`,
+                    `${API_URL}/common/download-url`,
                     lng,
                     true,
                   );
