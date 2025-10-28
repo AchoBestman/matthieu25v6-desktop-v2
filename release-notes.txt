@@ -1,1 +1,1 @@
-feat: Add repeat mode functionality to SongPlayer and enhance audio history management
+feat(audio): custom audio player by adding button for audio or album repetition.
