@@ -83,7 +83,7 @@ export const SermonPrinter = ({
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.title}>
-        {sermon.chapter} :{" "}
+        {sermon.chapter} (Kc.{sermon?.number}) :{" "}
         {`${sermon.title ?? ""} ${sermon.sub_title ?? ""}`.trim()}
       </Text>
 

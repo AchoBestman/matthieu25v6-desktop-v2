@@ -1,1 +1,4 @@
-feat(audio): custom audio player by adding button for audio or album repetition.
+Add Hungarian and Vietnamese flag images
+
+- Added hu.jpg for the Hungarian flag.
+- Added vn.jpg for the Vietnamese flag.

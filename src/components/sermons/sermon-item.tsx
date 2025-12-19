@@ -56,7 +56,7 @@ const SermonItem = ({
       >
         <div className="flex w-full items-center gap-2">
           <span className="font-medium text-blue-600 dark:text-blue-400">
-            {sermon.chapter}
+            {sermon.chapter} (Kc.{sermon?.number})
           </span>
           <span className="ml-auto text-xs text-blue-600 dark:text-blue-400">
             {sermon.publication_date}

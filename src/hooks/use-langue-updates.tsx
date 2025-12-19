@@ -47,8 +47,8 @@ export async function getAvailableLangs(): Promise<string[]> {
   }
 }
 
-function useLangueUpdates() {
-  const { lng } = useLangue();
+function useLangueUpdates() { 
+  const { lng } = useLangue(); 
 
   useEffect(() => {
     const fetchUpdates = async () => {

@@ -33,7 +33,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
-  useLangueUpdates();
+  useLangueUpdates(); 
   const { lng } = useLangue();
   const [topMenus, setTopMenus] = React.useState(menus);
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);

@@ -49,7 +49,7 @@ const SermonHeader = ({
     <>
       <div className="text-dark dark:text-white text-xl pb-2 italic bold">
         <div className="whitespace-nowrap">
-          {`${sermon?.chapter} : ${sermon.title}`}
+          {`${sermon?.chapter} (Kc.${sermon?.number}) : ${sermon.title}`}
         </div>
       </div>
       <div className="flex items-center justify-end">
