@@ -11,6 +11,7 @@ This template should help get you started developing with Tauri, React and Types
 ## Translate language
 français(fr), anglaise(en), arabe(ar), allemand(de), espagnole(es), iran(fa), hindi(hi), Indonesia(id), italien(it), japan(ja), Netherlands(nl), Norsk(no), Polski(pl), portugais(pt), Româna(ro), russe(ru), Talmud(ta), Mandarin(zh), Türkçe(tr)
 
+arabe, norvegian, Turk, Talmud
 ## Artifat Building
                                                                 
 While building your update artifacts, you need to have the private key you generated in your environment variables. .env files do not work!

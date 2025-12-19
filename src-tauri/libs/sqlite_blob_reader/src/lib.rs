@@ -6,7 +6,7 @@ pub fn add(left: u64, right: u64) -> u64 {
 }
 
 pub fn get_file_blob(db_path: &str, name: &str) -> Result<Vec<u8>, String> {
-    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+    let conn: Connection = Connection::open(db_path).map_err(|e| e.to_string())?;
     let mut stmt = conn
         .prepare("SELECT file FROM image_sermons WHERE name = ?1")
         .map_err(|e| e.to_string())?;

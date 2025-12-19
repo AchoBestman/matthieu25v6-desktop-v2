@@ -1,7 +1,7 @@
 {
   "name": "prophet-kacou-desktop-v2",
   "private": true,
-  "version": "1.1.1",
+  "version": "1.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
